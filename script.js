@@ -2,14 +2,11 @@
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         e.preventDefault();
-        
         const targetId = this.getAttribute('href');
-        if (targetId === '#') return;
-        
         const targetElement = document.querySelector(targetId);
         if (targetElement) {
             window.scrollTo({
-                top: targetElement.offsetTop - 80,
+                top: targetElement.offsetTop - 70,
                 behavior: 'smooth'
             });
         }
@@ -17,8 +14,10 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 });
 
 // Set minimum check-in date to today
-const today = new Date().toISOString().split('T')[0];
-document.getElementById('checkin').setAttribute('min', today);
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('checkin').setAttribute('min', today);
+});
 
 // Set minimum check-out date based on check-in date
 document.getElementById('checkin').addEventListener('change', function() {
@@ -27,42 +26,31 @@ document.getElementById('checkin').addEventListener('change', function() {
     minCheckout.setDate(minCheckout.getDate() + 1);
     const minCheckoutStr = minCheckout.toISOString().split('T')[0];
     document.getElementById('checkout').setAttribute('min', minCheckoutStr);
-    
-    // Auto-set checkout date to next day if not already set
-    if (!document.getElementById('checkout').value || new Date(document.getElementById('checkout').value) <= checkinDate) {
-        document.getElementById('checkout').value = minCheckoutStr;
-    }
 });
 
 // Handle room booking buttons
-document.querySelectorAll('.book-room').forEach(button => {
+document.querySelectorAll('.room-card .btn-primary').forEach(button => {
     button.addEventListener('click', function() {
         const roomType = this.getAttribute('data-room');
-        document.getElementById('room-type').value = roomType;
+        const roomSelect = document.getElementById('room-type');
+        roomSelect.value = roomType;
         
         // Scroll to booking section
-        document.querySelector('#booking').scrollIntoView({ behavior: 'smooth' });
+        document.getElementById('booking').scrollIntoView({ behavior: 'smooth' });
         
         // Highlight the booking section
-        document.getElementById('booking').style.backgroundColor = '#fff8e6';
-        setTimeout(() => {
-            document.getElementById('booking').style.backgroundColor = '';
-        }, 2000);
+        document.getElementById('booking').style.animation = 'highlight 2s';
     });
 });
 
 // Helper function to get room type name
 function getRoomTypeName(roomType) {
-    switch(roomType) {
-        case 'executive':
-            return 'Executive Room';
-        case 'regular':
-            return 'Regular Bedroom';
-        case 'full-house':
-            return 'Full House';
-        default:
-            return 'Room';
-    }
+    const roomTypes = {
+        'executive': 'Executive Room',
+        'regular': 'Regular Bedroom',
+        'full-house': 'Full House'
+    };
+    return roomTypes[roomType] || 'Room';
 }
 
 // Video player is now embedded directly in the HTML
@@ -70,78 +58,130 @@ function getRoomTypeName(roomType) {
 
 // Initialize the page
 document.addEventListener('DOMContentLoaded', function() {
-    // Set today's date as default for check-in
-    document.getElementById('checkin').value = today;
+    // Initialize modals for images and videos
+    initGalleryModals();
     
-    // Set tomorrow's date as default for check-out
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    document.getElementById('checkout').value = tomorrow.toISOString().split('T')[0];
-    
-    // Scroll to top functionality
-    const scrollToTopButton = document.getElementById('scrollToTop');
-    
-    window.addEventListener('scroll', function() {
-        if (window.pageYOffset > 300) {
-            scrollToTopButton.classList.add('visible');
-        } else {
-            scrollToTopButton.classList.remove('visible');
-        }
-    });
-    
-    scrollToTopButton.addEventListener('click', function() {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
+    // Initialize video autoplay functionality
+    initVideoAutoplay();
+});
+
+// Scroll to top functionality
+const scrollToTopButton = document.getElementById('scrollToTop');
+window.addEventListener('scroll', () => {
+    if (window.pageYOffset > 300) {
+        scrollToTopButton.style.display = 'block';
+    } else {
+        scrollToTopButton.style.display = 'none';
+    }
+});
+
+scrollToTopButton.addEventListener('click', () => {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
     });
 });
 
-// Video functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const video = document.getElementById('gallery-video');
-    const expandBtn = document.querySelector('.expand-video-btn');
-    const videoModal = document.createElement('div');
-    const modalContent = document.createElement('div');
-    const closeModalBtn = document.createElement('button');
-    const modalVideo = document.createElement('video');
+// Gallery modal functionality
+function initGalleryModals() {
+    // Create image modal
+    const imageModal = document.createElement('div');
+    imageModal.className = 'image-modal';
+    const imageModalContent = document.createElement('div');
+    imageModalContent.className = 'image-modal-content';
+    const imageModalImg = document.createElement('img');
+    const closeImageModalBtn = document.createElement('button');
+    closeImageModalBtn.className = 'close-modal-btn';
+    closeImageModalBtn.innerHTML = '&times;';
     
-    // Create modal structure
+    imageModalContent.appendChild(imageModalImg);
+    imageModalContent.appendChild(closeImageModalBtn);
+    imageModal.appendChild(imageModalContent);
+    document.body.appendChild(imageModal);
+    
+    // Create video modal
+    const videoModal = document.createElement('div');
     videoModal.className = 'video-modal';
-    modalContent.className = 'video-modal-content';
-    closeModalBtn.className = 'close-modal-btn';
-    closeModalBtn.innerHTML = '&times;';
+    const videoModalContent = document.createElement('div');
+    videoModalContent.className = 'video-modal-content';
+    const modalVideo = document.createElement('video');
     modalVideo.controls = true;
     modalVideo.innerHTML = '<source src="videoOftheroomsAndEverything.mp4" type="video/mp4">Your browser does not support the video tag.';
+    const closeVideoModalBtn = document.createElement('button');
+    closeVideoModalBtn.className = 'close-modal-btn';
+    closeVideoModalBtn.innerHTML = '&times;';
     
-    modalContent.appendChild(modalVideo);
-    modalContent.appendChild(closeModalBtn);
-    videoModal.appendChild(modalContent);
+    videoModalContent.appendChild(modalVideo);
+    videoModalContent.appendChild(closeVideoModalBtn);
+    videoModal.appendChild(videoModalContent);
     document.body.appendChild(videoModal);
     
-    // Expand video to modal
-    expandBtn.addEventListener('click', function(e) {
+    // Handle expand button clicks for images
+    document.querySelectorAll('.gallery-item:not(.video-container) .expand-btn').forEach((btn, index) => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const imgSrc = this.closest('.gallery-item').querySelector('img').src;
+            imageModalImg.src = imgSrc;
+            imageModal.style.display = 'flex';
+        });
+    });
+    
+    // Handle expand button click for video
+    document.querySelector('.video-container .expand-btn').addEventListener('click', function(e) {
         e.stopPropagation();
         videoModal.style.display = 'flex';
+        // Pause the main video when expanding
+        const mainVideo = document.getElementById('gallery-video');
+        mainVideo.pause();
         // Play the modal video
         modalVideo.play();
     });
     
-    // Close modal
-    closeModalBtn.addEventListener('click', function() {
+    // Close image modal
+    closeImageModalBtn.addEventListener('click', function() {
+        imageModal.style.display = 'none';
+    });
+    
+    // Close video modal
+    closeVideoModalBtn.addEventListener('click', function() {
         videoModal.style.display = 'none';
         modalVideo.pause();
         modalVideo.currentTime = 0;
+        // Resume main video if it was playing
+        const mainVideo = document.getElementById('gallery-video');
+        const videoContainer = document.querySelector('.video-container');
+        const isVideoVisible = isElementInViewport(videoContainer);
+        if (isVideoVisible) {
+            mainVideo.play().catch(e => console.log('Autoplay prevented:', e));
+        }
     });
     
-    // Close modal when clicking outside
+    // Close modals when clicking outside
+    imageModal.addEventListener('click', function(e) {
+        if (e.target === imageModal) {
+            imageModal.style.display = 'none';
+        }
+    });
+    
     videoModal.addEventListener('click', function(e) {
         if (e.target === videoModal) {
             videoModal.style.display = 'none';
             modalVideo.pause();
             modalVideo.currentTime = 0;
+            // Resume main video if it was playing
+            const mainVideo = document.getElementById('gallery-video');
+            const videoContainer = document.querySelector('.video-container');
+            const isVideoVisible = isElementInViewport(videoContainer);
+            if (isVideoVisible) {
+                mainVideo.play().catch(e => console.log('Autoplay prevented:', e));
+            }
         }
     });
+}
+
+// Video autoplay functionality
+function initVideoAutoplay() {
+    const video = document.getElementById('gallery-video');
     
     // Auto play video when it comes into view
     const videoObserver = new IntersectionObserver((entries) => {
@@ -161,7 +201,18 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     videoObserver.observe(video);
-});
+}
+
+// Helper function to check if element is in viewport
+function isElementInViewport(el) {
+    const rect = el.getBoundingClientRect();
+    return (
+        rect.top >= 0 &&
+        rect.left >= 0 &&
+        rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+        rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+    );
+}
 
 // Form submission with loading spinner and backend processing
 function handleFormSubmit(formId, successMessage) {
