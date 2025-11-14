@@ -21,7 +21,7 @@ This documentation provides an overview of the Ankes Lodge website structure and
 - Facility images:
   - `HALL1.jpg` - Event hall
   - `HALL2.jpg` - Reception area
-  - `full4.jpg` - Dining hall
+  - `dining.jpg` - Dining hall
   - `fullwthcar.jpg` - Parking area
 - `videoOftheroomsAndEverything.mp4` - Virtual tour video
 
