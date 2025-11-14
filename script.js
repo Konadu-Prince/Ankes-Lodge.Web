@@ -259,8 +259,18 @@ function handleFormSubmit(formId, successMessage) {
             
             // Show success or error message
             if (data.status === 'success') {
-                alert(data.message);
-                form.reset();
+                if (formId === 'booking-form') {
+                    // Redirect to confirmation page with booking details
+                    const name = form.querySelector('#name').value;
+                    const checkin = form.querySelector('#checkin').value;
+                    const checkout = form.querySelector('#checkout').value;
+                    const roomType = form.querySelector('#room-type').value;
+                    
+                    window.location.href = `booking-confirmation.html?id=${data.bookingId}&name=${encodeURIComponent(name)}&checkin=${checkin}&checkout=${checkout}&room=${roomType}`;
+                } else {
+                    alert(data.message);
+                    form.reset();
+                }
             } else {
                 alert('Error: ' + data.message);
             }

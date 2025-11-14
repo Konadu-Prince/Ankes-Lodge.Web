@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Confirmation - Ankes Lodge</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="orangeLogo.png" type="image/png">
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <img src="orangeLogo.png" alt="Ankes Lodge Logo">
+                <h1>Ankes Lodge</h1>
+            </div>
+            <div class="menu-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html#home">Home</a></li>
+                    <li><a href="index.html#rooms">Rooms</a></li>
+                    <li><a href="index.html#facilities">Facilities</a></li>
+                    <li><a href="index.html#location">Location</a></li>
+                    <li><a href="index.html#contact">Contact</a></li>
+                    <li><a href="index.html#booking" class="btn-primary">Book Now</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Confirmation Section -->
+    <section class="confirmation">
+        <div class="container">
+            <div class="confirmation-content">
+                <div class="confirmation-icon">✓</div>
+                <h2>Booking Request Submitted!</h2>
+                <p>Thank you for choosing Ankes Lodge. Your booking request has been successfully submitted.</p>
+                
+                <div class="booking-details">
+                    <h3>Booking Details</h3>
+                    <div class="detail-item">
+                        <span class="label">Booking ID:</span>
+                        <span id="booking-id">-</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">Name:</span>
+                        <span id="customer-name">-</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">Check-in Date:</span>
+                        <span id="checkin-date">-</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">Check-out Date:</span>
+                        <span id="checkout-date">-</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="label">Room Type:</span>
+                        <span id="room-type">-</span>
+                    </div>
+                </div>
+                
+                <div class="confirmation-message">
+                    <p>A confirmation email has been sent to your email address with these details.</p>
+                    <p>Our team will contact you shortly to confirm your reservation and provide payment instructions.</p>
+                </div>
+                
+                <div class="confirmation-actions">
+                    <a href="index.html#booking" class="btn-primary">Make Another Booking</a>
+                    <a href="index.html" class="btn-secondary">Back to Home</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="orangeLogo.png" alt="Ankes Lodge Logo">
+                    <h3>Ankes Lodge</h3>
+                </div>
+                
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html#home">Home</a></li>
+                        <li><a href="index.html#rooms">Rooms</a></li>
+                        <li><a href="index.html#facilities">Facilities</a></li>
+                        <li><a href="index.html#booking">Booking</a></li>
+                        <li><a href="index.html#contact">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div class="social-media">
+                    <h4>Follow Us</h4>
+                    <p>Coming Soon</p>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2025 Ankes Lodge. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Get booking details from URL parameters
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const bookingId = urlParams.get('id');
+            const name = urlParams.get('name');
+            const checkin = urlParams.get('checkin');
+            const checkout = urlParams.get('checkout');
+            const roomType = urlParams.get('room');
+            
+            // Display booking details
+            if (bookingId) {
+                document.getElementById('booking-id').textContent = bookingId;
+            }
+            
+            if (name) {
+                document.getElementById('customer-name').textContent = name;
+            }
+            
+            if (checkin) {
+                document.getElementById('checkin-date').textContent = checkin;
+            }
+            
+            if (checkout) {
+                document.getElementById('checkout-date').textContent = checkout;
+            }
+            
+            if (roomType) {
+                const roomTypes = {
+                    'executive': 'Executive Room (₵299/night)',
+                    'regular': 'Regular Bedroom (₵199/night)',
+                    'full-house': 'Full House (Custom Pricing)'
+                };
+                document.getElementById('room-type').textContent = roomTypes[roomType] || roomType;
+            }
+        });
+    </script>
+</body>
+</html>
