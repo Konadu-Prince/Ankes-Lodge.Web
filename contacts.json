@@ -1,0 +1,18 @@
+[
+  {
+    "id": "ab51738a",
+    "timestamp": "2025-11-14 09:36:01",
+    "name": "Test Contact",
+    "email": "contact@example.com",
+    "subject": "Test Contact Message",
+    "message": "This is a test contact message to verify the system is working"
+  },
+  {
+    "id": "890e73c3",
+    "timestamp": "2025-11-14 09:48:09",
+    "name": "Test Contact",
+    "email": "contact@example.com",
+    "subject": "Test Subject",
+    "message": "This is a test contact message"
+  }
+]

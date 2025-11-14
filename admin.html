@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Ankes Lodge</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .bookings-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .bookings-table th,
+        .bookings-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .bookings-table th {
+            background-color: #FFA500;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .bookings-table tr:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .no-bookings {
+            text-align: center;
+            padding: 40px;
+            color: #777;
+        }
+        
+        .refresh-btn {
+            background-color: #FFA500;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .refresh-btn:hover {
+            background-color: #e69500;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            background-color: #f0f0f0;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            border-bottom: none;
+        }
+        
+        .tab.active {
+            background-color: #FFA500;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <img src="orangeLogo.png" alt="Ankes Lodge Logo">
+                <h1>Ankes Lodge - Admin Panel</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/">Back to Website</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="admin-container">
+        <div class="admin-header">
+            <h2>Booking Management</h2>
+            <div>
+                <button class="refresh-btn" id="refreshBtn">Refresh Data</button>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="bookings">Bookings</div>
+            <div class="tab" data-tab="contacts">Contact Messages</div>
+        </div>
+        
+        <div class="tab-content active" id="bookings-tab">
+            <table class="bookings-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Date</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Check-in</th>
+                        <th>Check-out</th>
+                        <th>Guests</th>
+                        <th>Room Type</th>
+                    </tr>
+                </thead>
+                <tbody id="bookingsBody">
+                    <tr>
+                        <td colspan="9" class="no-bookings">Loading bookings...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="tab-content" id="contacts-tab">
+            <table class="bookings-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Date</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Subject</th>
+                        <th>Message</th>
+                    </tr>
+                </thead>
+                <tbody id="contactsBody">
+                    <tr>
+                        <td colspan="6" class="no-bookings">Loading contacts...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Function to format date
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleDateString();
+        }
+        
+        // Function to fetch and display bookings
+        function loadBookings() {
+            try {
+                const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
+                const tbody = document.getElementById('bookingsBody');
+                
+                if (bookings.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="9" class="no-bookings">No bookings found</td></tr>';
+                    return;
+                }
+                
+                // Clear existing content
+                tbody.innerHTML = '';
+                
+                // Add bookings to table (reverse order to show newest first)
+                bookings.slice().reverse().forEach(booking => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${booking.id?.substring(0, 8) || 'N/A'}</td>
+                        <td>${formatDate(booking.timestamp)}</td>
+                        <td>${booking.name || 'N/A'}</td>
+                        <td>${booking.email || 'N/A'}</td>
+                        <td>${booking.phone || 'N/A'}</td>
+                        <td>${booking.checkin || 'N/A'}</td>
+                        <td>${booking.checkout || 'N/A'}</td>
+                        <td>${booking.adults || 0} adults, ${booking.children || 0} children</td>
+                        <td>${booking['room-type'] || booking.roomType || 'N/A'}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error loading bookings:', error);
+                document.getElementById('bookingsBody').innerHTML = '<tr><td colspan="9" class="no-bookings">Error loading bookings</td></tr>';
+            }
+        }
+        
+        // Function to fetch and display contacts
+        function loadContacts() {
+            try {
+                const contacts = JSON.parse(localStorage.getItem('contacts') || '[]');
+                const tbody = document.getElementById('contactsBody');
+                
+                if (contacts.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="no-bookings">No contacts found</td></tr>';
+                    return;
+                }
+                
+                // Clear existing content
+                tbody.innerHTML = '';
+                
+                // Add contacts to table (reverse order to show newest first)
+                contacts.slice().reverse().forEach(contact => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${contact.id?.substring(0, 8) || 'N/A'}</td>
+                        <td>${formatDate(contact.timestamp)}</td>
+                        <td>${contact['contact-name'] || contact.name || 'N/A'}</td>
+                        <td>${contact['contact-email'] || contact.email || 'N/A'}</td>
+                        <td>${contact.subject || 'N/A'}</td>
+                        <td>${contact['contact-message'] || contact.message || 'N/A'}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error loading contacts:', error);
+                document.getElementById('contactsBody').innerHTML = '<tr><td colspan="6" class="no-bookings">Error loading contacts</td></tr>';
+            }
+        }
+        
+        // Load data when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadBookings();
+            loadContacts();
+        });
+        
+        // Refresh button event
+        document.getElementById('refreshBtn').addEventListener('click', function() {
+            loadBookings();
+            loadContacts();
+        });
+        
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active class from all tabs and content
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                this.classList.add('active');
+                
+                // Show corresponding content
+                const tabName = this.getAttribute('data-tab');
+                document.getElementById(tabName + '-tab').classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
