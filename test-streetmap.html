@@ -69,11 +69,18 @@
             if (mapContainer) {
                 // Replace with actual Streetmap implementation
                 mapContainer.innerHTML = `
-                    <div style="width:100%; height:100%; background-color:#f0f0f0; display:flex; align-items:center; justify-content:center; flex-direction:column;">
-                        <h3 style="color:#333; margin-bottom:10px;">Ankes Lodge Location</h3>
-                        <p style="color:#666; text-align:center; padding:0 20px;">Interactive Street Map would appear here</p>
-                        <p style="color:#666; text-align:center; padding:0 20px;">Sunyani Abesim<br>After Olistar School<br>Nkran Kese Road<br>Opposite Omega Water Production Centre</p>
-                        <p style="color:#666; text-align:center; padding:0 20px;">Digital Address: BS-0484-4619</p>
+                    <div style="width:100%; height:100%; background-color:#f0f0f0; display:flex; align-items:center; justify-content:center; flex-direction:column; position:relative;">
+                        <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:40px; height:40px; background-color:#FFA500; border-radius:50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.3); z-index:10;"></div>
+                        <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:20px; height:20px; background-color:#333; border-radius:50%; z-index:11;"></div>
+                        <div style="background-color:rgba(255, 165, 0, 0.9); padding:10px 20px; border-radius:20px; margin-top:80px; z-index:12; box-shadow: 0 2px 10px rgba(0,0,0,0.2);">
+                            <h3 style="color:white; margin:0; font-size:16px; text-align:center;">Ankes Lodge Location</h3>
+                        </div>
+                        <div style="background-color:white; padding:20px; border-radius:10px; margin-top:20px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); text-align:center; max-width:80%;">
+                            <p style="color:#333; margin:5px 0;">Interactive Street Map would appear here</p>
+                            <p style="color:#333; margin:5px 0;">Sunyani Abesim</p>
+                            <p style="color:#666; margin:5px 0; font-size:14px;">After Olistar School<br>Nkran Kese Road<br>Opposite Omega Water Production Centre</p>
+                            <p style="color:#666; margin:5px 0; font-size:14px;">Digital Address: BS-0484-4619</p>
+                        </div>
                     </div>
                 `;
             }
