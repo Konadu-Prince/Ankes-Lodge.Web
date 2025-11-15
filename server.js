@@ -21,7 +21,7 @@ try {
     transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
-            user: 'ankeslodge@gmail.com',
+            user: 'konaduprince26@gmail.com',
             pass: 'uvyvtipfnavvkwwr' // Use App Password, not regular password
         }
     });
@@ -67,7 +67,7 @@ function sendConfirmationEmail(booking) {
     }
     
     const mailOptions = {
-        from: 'ankeslodge@gmail.com',
+        from: 'konaduprince26@gmail.com',
         to: booking.email,
         subject: `Booking Confirmation - Ankes Lodge (Booking ID: ${booking.id})`,
         html: `
@@ -115,7 +115,7 @@ function sendAdminNotification(booking) {
     if (!transporter) {
         console.log('Email transporter not configured, logging admin notification to console');
         console.log('=== ADMIN NOTIFICATION EMAIL ===');
-        console.log(`To: ankeslodge@gmail.com`);
+        console.log(`To: konaduprince26@gmail.com`);
         console.log(`Subject: New Booking Request - Ankes Lodge (Booking ID: ${booking.id})`);
         console.log(`Body:`);
         console.log(`A new booking request has been submitted. Details:`);
@@ -136,8 +136,8 @@ function sendAdminNotification(booking) {
     }
     
     const mailOptions = {
-        from: 'ankeslodge@gmail.com',
-        to: 'ankeslodge@gmail.com', // Admin email
+        from: 'konaduprince26@gmail.com',
+        to: 'konaduprince26@gmail.com', // Admin email
         subject: `New Booking Request - Ankes Lodge (Booking ID: ${booking.id})`,
         html: `
             <h2>New Booking Request - Ankes Lodge</h2>
@@ -167,7 +167,7 @@ function sendAdminNotification(booking) {
             console.log('Admin notification error:', error);
             // Log the email content as fallback
             console.log('=== ADMIN EMAIL FALLBACK LOG ===');
-            console.log(`To: ankeslodge@gmail.com`);
+            console.log(`To: konaduprince26@gmail.com`);
             console.log(`Subject: New Booking Request - Ankes Lodge (Booking ID: ${booking.id})`);
             console.log('Content:', mailOptions.html);
             console.log('================================');

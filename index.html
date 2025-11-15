@@ -348,7 +348,7 @@
                     </div>
                 </div>
                 <div class="map-placeholder">
-                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3969.847!2d-1.6300!3d6.7500!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sAnkes%20Lodge!5e0!3m2!1sen!2sgh!4v1620000000000!5m2!1sen!2sgh" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" title="Ankes Lodge Location"></iframe>
+                    <div id="streetmap-container" style="width:100%; height:100%; border-radius: 8px;"></div>
                 </div>
             </div>
         </div>
@@ -363,7 +363,7 @@
                     <h3>Get In Touch</h3>
                     <p><strong>General Manager:</strong> 0544904547, 0558647156</p>
                     <p><strong>Manager:</strong> 0248293512</p>
-                    <p><strong>Email:</strong> <a href="mailto:ankeslodge@gmail.com">ankeslodge@gmail.com</a></p>
+                    <p><strong>Email:</strong> <a href="mailto:konaduprince26@gmail.com">konaduprince26@gmail.com</a></p>
                     <p><strong>Address:</strong> Sunyani Abesim - After Olistar School - Nkran Kese Road, Opposite Omega Water Production Centre<br><strong>Digital Address:</strong> BS-0484-4619</p>
                 </div>
                 
@@ -431,6 +431,23 @@
         <span>↑</span>
     </button>
 
+    <script>
+        // Initialize Streetmap
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create a simple map container
+            const mapContainer = document.getElementById('streetmap-container');
+            if (mapContainer) {
+                // Replace with actual Streetmap implementation
+                mapContainer.innerHTML = `
+                    <div style="width:100%; height:100%; background-color:#f0f0f0; display:flex; align-items:center; justify-content:center; flex-direction:column;">
+                        <h3 style="color:#333; margin-bottom:10px;">Ankes Lodge Location</h3>
+                        <p style="color:#666; text-align:center; padding:0 20px;">Sunyani Abesim<br>After Olistar School<br>Nkran Kese Road<br>Opposite Omega Water Production Centre</p>
+                        <p style="color:#666; text-align:center; padding:0 20px;">Digital Address: BS-0484-4619</p>
+                    </div>
+                `;
+            }
+        });
+    </script>
     <script src="script.js"></script>
 </body>
 </html>
