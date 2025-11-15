@@ -41,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Try to save the contacts
     if (file_put_contents($contactsFile, json_encode($contacts, JSON_PRETTY_PRINT))) {
         // Send email notification
-        $to = "konaduprince@gmail.com";
+        $to = "ankeslodge@gmail.com";
         $emailSubject = "Contact Form: $subject";
         $body = "New Contact Form Submission:\n\n";
         $body .= "Name: $name\n";

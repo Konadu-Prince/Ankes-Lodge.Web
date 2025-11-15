@@ -51,7 +51,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Try to save the bookings
     if (file_put_contents($bookingsFile, json_encode($bookings, JSON_PRETTY_PRINT))) {
         // Send email notification
-        $to = "konaduprince@gmail.com";
+        $to = "ankeslodge@gmail.com";
         $subject = "New Booking Request from Ankes Lodge Website";
         $body = "New Booking Request:\n\n";
         $body .= "Name: $name\n";

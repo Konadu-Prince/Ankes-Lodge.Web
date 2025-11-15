@@ -43,7 +43,7 @@ class BookingHandler(BaseHTTPRequestHandler):
             # Gmail SMTP configuration
             smtp_server = "smtp.gmail.com"
             smtp_port = 587
-            sender_email = "konaduprince@gmail.com"
+            sender_email = "ankeslodge@gmail.com"
             # IMPORTANT: This should be a Google App Password, not your regular Gmail password
             sender_password = "uvyvtipfnavvkwwr"  # Google App Password
             
@@ -153,7 +153,7 @@ Special Requests: {booking['message']}
 Timestamp: {booking['timestamp']}
             """
             
-            email_sent = self.send_email_notification(email_subject, email_body, "konaduprince@gmail.com")
+            email_sent = self.send_email_notification(email_subject, email_body, "ankeslodge@gmail.com")
             
             if email_sent:
                 self.send_json_response({'status': 'success', 'message': 'Booking request submitted successfully! We will contact you shortly to confirm your reservation.'})
@@ -206,7 +206,7 @@ Message: {contact['message']}
 Timestamp: {contact['timestamp']}
             """
             
-            email_sent = self.send_email_notification(email_subject, email_body, "konaduprince@gmail.com")
+            email_sent = self.send_email_notification(email_subject, email_body, "ankeslodge@gmail.com")
             
             if email_sent:
                 self.send_json_response({'status': 'success', 'message': 'Thank you for your message! We will get back to you soon.'})
