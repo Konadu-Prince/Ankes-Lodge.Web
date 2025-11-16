@@ -7,7 +7,7 @@ const rateLimit = require('express-rate-limit');
 const { body, validationResult } = require('express-validator');
 
 const app = express();
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 8001;
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -35,10 +35,14 @@ if (transporter) {
     transporter.verify(function(error, success) {
         if (error) {
             console.log('Email configuration error:', error);
+            console.log('Email notifications will be logged to console as fallback');
+            transporter = null; // Disable email sending and use console logging
         } else {
             console.log('Email server is ready to send messages');
         }
     });
+} else {
+    console.log('Email transporter not configured. All email notifications will be logged to console.');
 }
 
 // Function to send confirmation email to customer
