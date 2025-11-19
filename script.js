@@ -76,6 +76,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize video autoplay functionality
     initVideoAutoplay();
+    
+    // Initialize flyer preview functionality
+    initFlyerPreview();
 });
 
 // Scroll to top functionality
@@ -119,7 +122,14 @@ function initGalleryModals() {
     videoModalContent.className = 'video-modal-content';
     const modalVideo = document.createElement('video');
     modalVideo.controls = true;
-    modalVideo.innerHTML = '<source src="videoOftheroomsAndEverything.mp4" type="video/mp4">Your browser does not support the video tag.';
+    modalVideo.muted = true; // Add muted attribute for better compatibility
+    modalVideo.playsInline = true; // Add playsInline attribute for mobile
+    // Create source element dynamically
+    const modalVideoSource = document.createElement('source');
+    modalVideoSource.type = 'video/mp4';
+    modalVideo.appendChild(modalVideoSource);
+    // Add fallback text
+    modalVideo.appendChild(document.createTextNode('Your browser does not support the video tag.'));
     const closeVideoModalBtn = document.createElement('button');
     closeVideoModalBtn.className = 'close-modal-btn';
     closeVideoModalBtn.innerHTML = '&times;';
@@ -139,15 +149,68 @@ function initGalleryModals() {
         });
     });
     
-    // Handle expand button click for video
-    document.querySelector('.video-container .expand-btn').addEventListener('click', function(e) {
-        e.stopPropagation();
-        videoModal.style.display = 'flex';
-        // Pause the main video when expanding
-        const mainVideo = document.getElementById('gallery-video');
-        mainVideo.pause();
-        // Play the modal video
-        modalVideo.play();
+    // Handle double-click on images to expand them
+    document.querySelectorAll('.gallery-item:not(.video-container)').forEach((item, index) => {
+        item.addEventListener('dblclick', function(e) {
+            // Prevent double-click from triggering if it's on the expand button itself
+            if (e.target.classList.contains('expand-btn')) return;
+            
+            const imgSrc = this.querySelector('img').src;
+            imageModalImg.src = imgSrc;
+            imageModal.style.display = 'flex';
+        });
+    });
+    
+    // Handle expand button clicks for videos
+    document.querySelectorAll('.video-container .expand-btn').forEach((btn, index) => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const videoSrc = this.closest('.video-container').querySelector('video source').src;
+            modalVideoSource.src = videoSrc;
+            modalVideo.load();
+            videoModal.style.display = 'flex';
+            // Pause all videos when expanding
+            document.querySelectorAll('video').forEach(video => {
+                if (video !== modalVideo) {
+                    video.pause();
+                }
+            });
+            // Play the modal video with muted attribute for autoplay compatibility
+            setTimeout(() => {
+                modalVideo.play().catch(e => {
+                    console.log('Autoplay prevented:', e);
+                    // If autoplay fails, show a visual cue to click
+                    modalVideo.setAttribute('title', 'Click to play');
+                });
+            }, 100);
+        });
+    });
+    
+    // Handle double-click on videos to expand them
+    document.querySelectorAll('.video-container').forEach((item, index) => {
+        item.addEventListener('dblclick', function(e) {
+            // Prevent double-click from triggering if it's on the expand button itself
+            if (e.target.classList.contains('expand-btn')) return;
+            
+            const videoSrc = this.querySelector('video source').src;
+            modalVideoSource.src = videoSrc;
+            modalVideo.load();
+            videoModal.style.display = 'flex';
+            // Pause all videos when expanding
+            document.querySelectorAll('video').forEach(video => {
+                if (video !== modalVideo) {
+                    video.pause();
+                }
+            });
+            // Play the modal video with muted attribute for autoplay compatibility
+            setTimeout(() => {
+                modalVideo.play().catch(e => {
+                    console.log('Autoplay prevented:', e);
+                    // If autoplay fails, show a visual cue to click
+                    modalVideo.setAttribute('title', 'Click to play');
+                });
+            }, 100);
+        });
     });
     
     // Close image modal
@@ -160,13 +223,14 @@ function initGalleryModals() {
         videoModal.style.display = 'none';
         modalVideo.pause();
         modalVideo.currentTime = 0;
-        // Resume main video if it was playing
-        const mainVideo = document.getElementById('gallery-video');
-        const videoContainer = document.querySelector('.video-container');
-        const isVideoVisible = isElementInViewport(videoContainer);
-        if (isVideoVisible) {
-            mainVideo.play().catch(e => console.log('Autoplay prevented:', e));
-        }
+        // Resume visible videos if they were playing
+        document.querySelectorAll('.video-container').forEach(container => {
+            const video = container.querySelector('video');
+            const isVideoVisible = isElementInViewport(container);
+            if (isVideoVisible) {
+                video.play().catch(e => console.log('Autoplay prevented:', e));
+            }
+        });
     });
     
     // Close modals when clicking outside
@@ -181,39 +245,78 @@ function initGalleryModals() {
             videoModal.style.display = 'none';
             modalVideo.pause();
             modalVideo.currentTime = 0;
-            // Resume main video if it was playing
-            const mainVideo = document.getElementById('gallery-video');
-            const videoContainer = document.querySelector('.video-container');
-            const isVideoVisible = isElementInViewport(videoContainer);
-            if (isVideoVisible) {
-                mainVideo.play().catch(e => console.log('Autoplay prevented:', e));
-            }
+            // Resume visible videos if they were playing
+            document.querySelectorAll('.video-container').forEach(container => {
+                const video = container.querySelector('video');
+                const isVideoVisible = isElementInViewport(container);
+                if (isVideoVisible) {
+                    video.play().catch(e => console.log('Autoplay prevented:', e));
+                }
+            });
         }
     });
 }
 
 // Video autoplay functionality
 function initVideoAutoplay() {
-    const video = document.getElementById('gallery-video');
+    // Get all videos that should have autoplay functionality
+    const videos = [
+        document.getElementById('gallery-video'),
+        document.getElementById('motivation-video-1'),
+        document.getElementById('motivation-video-2'),
+        document.getElementById('different-video')
+    ];
     
-    // Auto play video when it comes into view
+    // Add click event listeners to manually play videos if autoplay is blocked
+    videos.forEach(video => {
+        if (video) {
+            // Try to play when user clicks on the video
+            video.addEventListener('click', function() {
+                this.play().catch(e => console.log('Play prevented:', e));
+            });
+            
+            // Also try to play when user clicks the play button
+            // The button is a sibling element, not a child
+            const videoContainer = video.closest('.video-container');
+            if (videoContainer) {
+                const playButton = videoContainer.querySelector('.expand-btn');
+                if (playButton) {
+                    playButton.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        video.play().catch(e => console.log('Play prevented:', e));
+                    });
+                }
+            }
+        }
+    });
+    
+    // Auto play videos when they come into view
     const videoObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 // Play video when 50% of it is visible
                 if (entry.intersectionRatio >= 0.5) {
-                    video.play().catch(e => console.log('Autoplay prevented:', e));
+                    entry.target.play().catch(e => {
+                        console.log('Autoplay prevented:', e);
+                        // Add visual indicator that user needs to click to play
+                        entry.target.setAttribute('title', 'Click to play');
+                    });
                 }
             } else {
                 // Pause video when it's not visible
-                video.pause();
+                entry.target.pause();
             }
         });
     }, {
         threshold: 0.5 // Trigger when 50% of the video is visible
     });
     
-    videoObserver.observe(video);
+    // Observe each video
+    videos.forEach(video => {
+        if (video) {
+            videoObserver.observe(video);
+        }
+    });
 }
 
 // Helper function to check if element is in viewport
@@ -284,6 +387,45 @@ function handleFormSubmit(formId, successMessage) {
             console.error('Error:', error);
         });
     });
+}
+
+// Flyer preview functionality
+function initFlyerPreview() {
+    const previewBtn = document.getElementById('preview-flyer');
+    if (previewBtn) {
+        previewBtn.addEventListener('click', function() {
+            // Create modal for flyer preview
+            const flyerModal = document.createElement('div');
+            flyerModal.className = 'image-modal';
+            const flyerModalContent = document.createElement('div');
+            flyerModalContent.className = 'image-modal-content';
+            const flyerImg = document.createElement('img');
+            flyerImg.src = 'DownloadableFlyer.jpeg';
+            const closeFlyerModalBtn = document.createElement('button');
+            closeFlyerModalBtn.className = 'close-modal-btn';
+            closeFlyerModalBtn.innerHTML = '&times;';
+            
+            flyerModalContent.appendChild(flyerImg);
+            flyerModalContent.appendChild(closeFlyerModalBtn);
+            flyerModal.appendChild(flyerModalContent);
+            document.body.appendChild(flyerModal);
+            
+            flyerModal.style.display = 'flex';
+            
+            // Close modal functionality
+            closeFlyerModalBtn.addEventListener('click', function() {
+                flyerModal.style.display = 'none';
+                flyerModal.remove();
+            });
+            
+            flyerModal.addEventListener('click', function(e) {
+                if (e.target === flyerModal) {
+                    flyerModal.style.display = 'none';
+                    flyerModal.remove();
+                }
+            });
+        });
+    }
 }
 
 // Apply to both forms
