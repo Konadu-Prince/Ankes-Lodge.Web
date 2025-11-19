@@ -43,16 +43,26 @@ document.getElementById('checkin').addEventListener('change', function() {
 
 // Handle room booking buttons
 document.querySelectorAll('.room-card .btn-primary').forEach(button => {
-    button.addEventListener('click', function() {
-        const roomType = this.getAttribute('data-room');
-        const roomSelect = document.getElementById('room-type');
-        roomSelect.value = roomType;
+    button.addEventListener('click', function(e) {
+        // Prevent default behavior since we're recommending Airbnb
+        e.preventDefault();
         
-        // Scroll to booking section
-        document.getElementById('booking').scrollIntoView({ behavior: 'smooth' });
+        // Get the Airbnb link from the parent's first anchor element
+        const airbnbLink = this.parentElement.querySelector('a[href*="airbnb"]').href;
         
-        // Highlight the booking section
-        document.getElementById('booking').style.animation = 'highlight 2s';
+        // Open Airbnb link in new tab
+        window.open(airbnbLink, '_blank');
+    });
+});
+
+// Handle room booking buttons for direct booking (disabled)
+document.querySelectorAll('.room-card .btn-secondary').forEach(button => {
+    button.addEventListener('click', function(e) {
+        // Prevent default behavior since direct booking is coming soon
+        e.preventDefault();
+        
+        // Show alert that direct booking is coming soon
+        alert('Our direct booking system is currently being enhanced and will be available soon. Please use the Airbnb option for immediate booking.');
     });
 });
 
@@ -401,11 +411,23 @@ function initFlyerPreview() {
             flyerModalContent.className = 'image-modal-content';
             const flyerImg = document.createElement('img');
             flyerImg.src = 'DownloadableFlyer.jpeg';
+            
+            // Create download button for the preview modal
+            const downloadBtn = document.createElement('a');
+            downloadBtn.href = 'DownloadableFlyer.jpeg';
+            downloadBtn.download = 'Ankes-Lodge-Flyer.jpeg';
+            downloadBtn.className = 'btn-secondary';
+            downloadBtn.textContent = 'Download Flyer';
+            downloadBtn.style.marginTop = '15px';
+            downloadBtn.style.marginBottom = '15px';
+            downloadBtn.style.alignSelf = 'center';
+            
             const closeFlyerModalBtn = document.createElement('button');
             closeFlyerModalBtn.className = 'close-modal-btn';
             closeFlyerModalBtn.innerHTML = '&times;';
             
             flyerModalContent.appendChild(flyerImg);
+            flyerModalContent.appendChild(downloadBtn); // Add download button to modal
             flyerModalContent.appendChild(closeFlyerModalBtn);
             flyerModal.appendChild(flyerModalContent);
             document.body.appendChild(flyerModal);

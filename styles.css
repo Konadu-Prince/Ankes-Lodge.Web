@@ -434,9 +434,26 @@ section h2::after {
 .gallery-item {
     position: relative;
     border-radius: 8px;
-    overflow: hidden;
     box-shadow: var(--shadow);
     height: 250px;
+}
+
+/* Special styling for gallery item containing flyer download */
+.gallery-item:has(.flyer-download-container) {
+    background-color: var(--accent-color);
+    border: 2px solid var(--primary-color);
+}
+
+/* Apply overflow hidden only to images and videos directly */
+.gallery-item > img,
+.gallery-item > video,
+.video-container {
+    overflow: hidden;
+}
+
+/* Override overflow for gallery items containing flyer download container */
+.gallery-item:has(.flyer-download-container) {
+    overflow: visible;
 }
 
 .gallery-item img {
@@ -531,6 +548,23 @@ section h2::after {
     padding: 20px;
     background-color: var(--accent-color);
     border-radius: 8px;
+    opacity: 1 !important; /* Ensure it's always visible */
+    box-shadow: var(--shadow); /* Add shadow to make it stand out */
+    transition: transform 0.3s ease; /* Add smooth transition */
+    position: relative;
+    z-index: 1;
+}
+
+.flyer-download-container h3 {
+    margin-bottom: 15px;
+    color: var(--secondary-color);
+    text-align: center;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.flyer-download-container:hover {
+    transform: scale(1.02); /* Slight scale effect on hover */
 }
 
 .flyer-download-container .btn-primary,
@@ -538,6 +572,21 @@ section h2::after {
     margin: 10px 0;
     width: 80%;
     text-align: center;
+    opacity: 1 !important; /* Ensure buttons are always visible */
+    z-index: 2; /* Ensure buttons are above other elements */
+    font-weight: bold; /* Make text bolder */
+    font-size: 1.1rem; /* Slightly larger text */
+    padding: 15px 20px; /* More padding for better visibility */
+}
+
+/* Ensure flyer download container is visible even when not hovered */
+.gallery-item .flyer-download-container {
+    opacity: 1 !important;
+}
+
+.gallery-item .flyer-download-container .btn-primary,
+.gallery-item .flyer-download-container .btn-secondary {
+    opacity: 1 !important;
 }
 
 .video-modal {
@@ -585,12 +634,24 @@ section h2::after {
     position: relative;
     max-width: 90%;
     max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .image-modal-content img {
     max-width: 100%;
     max-height: 80vh;
     border-radius: 8px;
+}
+
+.image-modal-content .btn-secondary {
+    margin: 15px 0;
+    align-self: center;
+    padding: 12px 25px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .close-modal-btn {
@@ -640,6 +701,46 @@ section h2::after {
 /* Booking Section */
 .booking {
     background-color: var(--accent-color);
+}
+
+/* Airbnb booking option styling */
+.airbnb-option {
+    text-align: center;
+    margin-bottom: 20px;
+    padding: 25px;
+    background-color: var(--light-color);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.airbnb-option h3 {
+    color: var(--secondary-color);
+    margin-bottom: 15px;
+}
+
+.airbnb-option p {
+    margin-bottom: 15px;
+    color: var(--text-color);
+}
+
+.coming-soon-message {
+    text-align: center;
+    padding: 30px;
+    background-color: #f8f8f8;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+.coming-soon-message h3 {
+    color: var(--secondary-color);
+    margin-bottom: 15px;
+}
+
+.room-info .btn-secondary {
+    margin-top: 10px;
+    display: block;
+    text-align: center;
 }
 
 #booking-form {
