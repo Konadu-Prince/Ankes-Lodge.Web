@@ -703,6 +703,51 @@ section h2::after {
     background-color: var(--accent-color);
 }
 
+/* Booking Options Container - Side by side layout */
+.booking-options-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.airbnb-option, .booking-com-option {
+    flex: 1;
+    min-width: 300px;
+    padding: 25px;
+    background-color: #f8f8f8;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.airbnb-option:hover, .booking-com-option:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.airbnb-option h3, .booking-com-option h3 {
+    margin-top: 0;
+    color: #333;
+}
+
+.airbnb-option p, .booking-com-option p {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+/* Responsive design for booking options */
+@media (max-width: 768px) {
+    .booking-options-container {
+        flex-direction: column;
+    }
+    
+    .airbnb-option, .booking-com-option {
+        min-width: 100%;
+    }
+}
+
 /* Airbnb booking option styling */
 .airbnb-option {
     text-align: center;
