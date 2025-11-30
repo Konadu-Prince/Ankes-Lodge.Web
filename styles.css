@@ -752,6 +752,19 @@ section h2::after {
     margin-bottom: 20px;
 }
 
+/* Booking.com specific button styling */
+.booking-com-option .btn-secondary {
+    background-color: #757bcb;
+    border-color: #757bcb;
+    color: white;
+}
+
+.booking-com-option .btn-secondary:hover {
+    background-color: #5a60a0;
+    border-color: #5a60a0;
+    color: white;
+}
+
 /* Responsive design for booking options */
 @media (max-width: 768px) {
     .booking-options-container {
