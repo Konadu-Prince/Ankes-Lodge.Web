@@ -347,6 +347,44 @@ function handleFormSubmit(formId, successMessage) {
 
     form.addEventListener('submit', function(e) {
         e.preventDefault();
+        
+        // For contact form, do client-side validation first
+        if (formId === 'contact-form') {
+            const name = form.querySelector('#contact-name').value.trim();
+            const email = form.querySelector('#contact-email').value.trim();
+            const subject = form.querySelector('#subject').value.trim();
+            const message = form.querySelector('#contact-message').value.trim();
+            
+            let missingFields = [];
+            
+            if (!name) missingFields.push('Name');
+            if (!email) missingFields.push('Email');
+            if (!subject) missingFields.push('Subject');
+            if (!message) missingFields.push('Message');
+            
+            if (missingFields.length > 0) {
+                alert('Please fill in the following required fields: ' + missingFields.join(', '));
+                return;
+            }
+            
+            // Validate email format
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert('Please enter a valid email address.');
+                return;
+            }
+            
+            // Validate message length
+            if (message.length < 10) {
+                alert('Message must be at least 10 characters long.');
+                return;
+            }
+            
+            if (message.length > 1000) {
+                alert('Message must be less than 1000 characters.');
+                return;
+            }
+        }
 
         // Show loading spinner
         const spinner = document.createElement('div');
