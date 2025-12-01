@@ -21,8 +21,8 @@ try {
     transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
-            user: 'ankeslodge@gmail.com',
-            pass: 'uvyvtipfnavvkwwr' // Use App Password, not regular password
+            user: process.env.EMAIL_USER || 'konaduprince26@gmail.com',
+            pass: process.env.EMAIL_PASS || 'svvnrkgzmgxuskyl' // Use App Password, not regular password
         }
     });
 } catch (error) {
@@ -332,15 +332,47 @@ app.post('/process-booking',
 
 // Handle contact form submission
 app.post('/process-contact', (req, res) => {
-    const {
-        'contact-name': name,
-        'contact-email': email,
-        subject,
-        'contact-message': message
-    } = req.body;
-
+    // Debug: Log all incoming data
+    console.log('=== CONTACT FORM DEBUG ===');
+    console.log('Request body:', req.body);
+    console.log('Keys in body:', Object.keys(req.body));
+    
+    // Debug: Check each field individually
+    console.log('Checking individual fields:');
+    console.log('contact-name in body:', 'contact-name' in req.body);
+    console.log('contact-email in body:', 'contact-email' in req.body);
+    console.log('subject in body:', 'subject' in req.body);
+    console.log('contact-message in body:', 'contact-message' in req.body);
+    
+    // Debug: Log raw values
+    console.log('Raw values:');
+    console.log('req.body[\'contact-name\']:', req.body['contact-name']);
+    console.log('req.body[\'contact-email\']:', req.body['contact-email']);
+    console.log('req.body[\'subject\']:', req.body['subject']);
+    console.log('req.body[\'contact-message\']:', req.body['contact-message']);
+    
+    // Correctly extract form data
+    const name = req.body['contact-name'];
+    const email = req.body['contact-email'];
+    const subject = req.body['subject'];
+    const message = req.body['contact-message'];
+    
+    // Debug: Log extracted values
+    console.log('Extracted values:');
+    console.log('Name:', name);
+    console.log('Email:', email);
+    console.log('Subject:', subject);
+    console.log('Message:', message);
+    console.log('========================');
+    
     // Validate required fields
     if (!name || !email || !subject || !message) {
+        console.log('Validation failed: Missing required fields');
+        console.log('Missing fields check:');
+        console.log('!name:', !name, 'value:', name);
+        console.log('!email:', !email, 'value:', email);
+        console.log('!subject:', !subject, 'value:', subject);
+        console.log('!message:', !message, 'value:', message);
         return res.status(400).json({
             status: 'error',
             message: 'Please fill in all required fields.'
@@ -402,6 +434,38 @@ app.post('/process-contact', (req, res) => {
     try {
         fs.writeFileSync('contacts.json', JSON.stringify(contacts, null, 2));
         
+        // Send email notifications if transporter is configured
+        if (transporter) {
+            // Send confirmation email to the customer
+            sendContactConfirmationEmail(contact);
+            
+            // Send notification email to admin
+            sendContactAdminNotification(contact);
+        } else {
+            console.log('Email transporter not configured, skipping email notifications');
+            console.log('=== CONTACT CONFIRMATION EMAIL ===');
+            console.log(`To: ${contact.email}`);
+            console.log(`Subject: ${contact.subject}`);
+            console.log(`Body:`);
+            console.log(`Dear ${contact.name},`);
+            console.log(`Thank you for contacting Ankes Lodge. We have received your message and will get back to you soon.`);
+            console.log(`Your message: ${contact.message}`);
+            console.log(`Best regards, Ankes Lodge Team`);
+            console.log('====================================');
+            
+            console.log('=== ADMIN NOTIFICATION EMAIL ===');
+            console.log(`To: ankeslodge@gmail.com`);
+            console.log(`Subject: New Contact Message - ${contact.subject}`);
+            console.log(`Body:`);
+            console.log(`A new contact message has been received. Details:`);
+            console.log(`Name: ${contact.name}`);
+            console.log(`Email: ${contact.email}`);
+            console.log(`Subject: ${contact.subject}`);
+            console.log(`Message: ${contact.message}`);
+            console.log(`Timestamp: ${contact.timestamp}`);
+            console.log('================================');
+        }
+        
         res.json({
             status: 'success',
             message: 'Thank you for your message! We will get back to you soon.'
@@ -413,6 +477,75 @@ app.post('/process-contact', (req, res) => {
         });
     }
 });
+
+// Function to send confirmation email to customer for contact form
+function sendContactConfirmationEmail(contact) {
+    const mailOptions = {
+        from: 'ankeslodge@gmail.com',
+        to: contact.email,
+        subject: `Re: ${contact.subject}`,
+        html: `
+            <h2>Thank you for contacting Ankes Lodge</h2>
+            <p>Dear ${contact.name},</p>
+            <p>Thank you for contacting Ankes Lodge. We have received your message and will get back to you soon.</p>
+            
+            <h3>Your Message Details</h3>
+            <ul>
+                <li><strong>Subject:</strong> ${contact.subject}</li>
+                <li><strong>Message:</strong> ${contact.message}</li>
+                <li><strong>Received:</strong> ${contact.timestamp}</li>
+            </ul>
+            
+            <p>We typically respond within 24 hours. If you need immediate assistance, please call us at 0544904547 or 0558647156.</p>
+            
+            <p>You can also visit our website at <a href="https://konadu-prince.github.io/Ankes-Lodge.Web">https://konadu-prince.github.io/Ankes-Lodge.Web</a> for more information about our services.</p>
+            
+            <p>Best regards,<br>Ankes Lodge Team</p>
+            <p>Contact: 0544904547, 0558647156, 0248293512<br>
+            Email: ankeslodge@gmail.com</p>
+        `
+    };
+
+    transporter.sendMail(mailOptions, function(error, info) {
+        if (error) {
+            console.log('Contact confirmation email error:', error);
+        } else {
+            console.log('Contact confirmation email sent: ' + info.response);
+        }
+    });
+}
+
+// Function to send notification email to admin for contact form
+function sendContactAdminNotification(contact) {
+    const mailOptions = {
+        from: 'ankeslodge@gmail.com',
+        to: 'ankeslodge@gmail.com', // Admin email
+        subject: `New Contact Message - ${contact.subject}`,
+        html: `
+            <h2>New Contact Message - Ankes Lodge</h2>
+            <p>A new contact message has been received. Details:</p>
+            
+            <h3>Message Details</h3>
+            <ul>
+                <li><strong>Name:</strong> ${contact.name}</li>
+                <li><strong>Email:</strong> ${contact.email}</li>
+                <li><strong>Subject:</strong> ${contact.subject}</li>
+                <li><strong>Message:</strong> ${contact.message}</li>
+                <li><strong>Received:</strong> ${contact.timestamp}</li>
+            </ul>
+            
+            <p>Please follow up with the customer as soon as possible.</p>
+        `
+    };
+
+    transporter.sendMail(mailOptions, function(error, info) {
+        if (error) {
+            console.log('Contact admin notification error:', error);
+        } else {
+            console.log('Contact admin notification sent: ' + info.response);
+        }
+    });
+}
 
 app.listen(PORT, () => {
     console.log(`Server running at http://localhost:${PORT}`);

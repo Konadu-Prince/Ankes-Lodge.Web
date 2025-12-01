@@ -345,24 +345,51 @@ function handleFormSubmit(formId, successMessage) {
     const form = document.getElementById(formId);
     if (!form) return;
 
+    // Check if event listener is already attached
+    if (form.dataset.listenerAttached) {
+        console.log(`Event listener already attached to ${formId}`);
+        return;
+    }
+    
+    form.dataset.listenerAttached = 'true';
+    console.log(`Attaching event listener to ${formId}`);
+
     form.addEventListener('submit', function(e) {
+        console.log(`Form ${formId} submission intercepted`);
         e.preventDefault();
         
         // For contact form, do client-side validation first
         if (formId === 'contact-form') {
-            const name = form.querySelector('#contact-name').value.trim();
-            const email = form.querySelector('#contact-email').value.trim();
-            const subject = form.querySelector('#subject').value.trim();
-            const message = form.querySelector('#contact-message').value.trim();
+            console.log('Performing client-side validation for contact form');
+            // More robust field value extraction
+            const nameField = form.querySelector('#contact-name');
+            const emailField = form.querySelector('#contact-email');
+            const subjectField = form.querySelector('#subject');
+            const messageField = form.querySelector('#contact-message');
+            
+            // Check if fields exist
+            if (!nameField || !emailField || !subjectField || !messageField) {
+                alert('Form fields not found. Please refresh the page and try again.');
+                return;
+            }
+            
+            // Extract values with extra safety
+            const name = nameField.value ? nameField.value.toString().trim() : '';
+            const email = emailField.value ? emailField.value.toString().trim() : '';
+            const subject = subjectField.value ? subjectField.value.toString().trim() : '';
+            const message = messageField.value ? messageField.value.toString().trim() : '';
+            
+            console.log('Field values extracted:', { name, email, subject, message });
             
             let missingFields = [];
             
-            if (!name) missingFields.push('Name');
-            if (!email) missingFields.push('Email');
-            if (!subject) missingFields.push('Subject');
-            if (!message) missingFields.push('Message');
+            if (!name || name.length === 0) missingFields.push('Name');
+            if (!email || email.length === 0) missingFields.push('Email');
+            if (!subject || subject.length === 0) missingFields.push('Subject');
+            if (!message || message.length === 0) missingFields.push('Message');
             
             if (missingFields.length > 0) {
+                console.log('Validation failed: Missing fields:', missingFields);
                 alert('Please fill in the following required fields: ' + missingFields.join(', '));
                 return;
             }
@@ -386,24 +413,42 @@ function handleFormSubmit(formId, successMessage) {
             }
         }
 
+        console.log('Client-side validation passed');
+
         // Show loading spinner
         const spinner = document.createElement('div');
         spinner.className = 'loading-spinner active';
         spinner.innerHTML = '<div class="spinner"></div>';
         document.body.appendChild(spinner);
 
-        // Collect form data
+        // Collect form data and convert to URLSearchParams for proper form encoding
         const formData = new FormData(form);
+        const urlParams = new URLSearchParams();
+        for (let [key, value] of formData.entries()) {
+            urlParams.append(key, value);
+        }
+        
+        console.log('URLSearchParams collected:');
+        for (let [key, value] of urlParams.entries()) {
+            console.log(`${key}: ${value}`);
+        }
         
         // Determine endpoint based on form
         const endpoint = formId === 'booking-form' ? '/process-booking' : '/process-contact';
 
-        // Send data to backend
+        // Send data to backend with proper content type
+        console.log(`Sending data to ${endpoint}`);
         fetch(endpoint, {
             method: 'POST',
-            body: formData
+            body: urlParams,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
         })
-        .then(response => response.json())
+        .then(response => {
+            console.log(`Received response: ${response.status} ${response.statusText}`);
+            return response.json();
+        })
         .then(data => {
             // Hide spinner
             spinner.remove();
