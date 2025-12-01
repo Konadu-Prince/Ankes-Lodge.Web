@@ -55,14 +55,36 @@ document.querySelectorAll('.room-card .btn-primary').forEach(button => {
     });
 });
 
-// Handle room booking buttons for direct booking (disabled)
+// Handle room booking buttons for direct booking (now enabled)
 document.querySelectorAll('.room-card .btn-secondary').forEach(button => {
     button.addEventListener('click', function(e) {
-        // Prevent default behavior since direct booking is coming soon
+        // Prevent default behavior
         e.preventDefault();
         
-        // Show alert that direct booking is coming soon
-        alert('Our direct booking system is currently being enhanced and will be available soon. Please use the Airbnb option for immediate booking.');
+        // Get the room type from the data attribute
+        const roomType = this.getAttribute('data-room');
+        
+        // Scroll to the booking form
+        const bookingSection = document.getElementById('booking');
+        if (bookingSection) {
+            // Set the room type in the dropdown
+            const roomTypeSelect = document.getElementById('room-type');
+            if (roomTypeSelect) {
+                roomTypeSelect.value = roomType;
+            }
+            
+            // Scroll to the booking section
+            bookingSection.scrollIntoView({ behavior: 'smooth' });
+            
+            // Highlight the form for better UX
+            const bookingForm = document.getElementById('booking-form');
+            if (bookingForm) {
+                bookingForm.style.boxShadow = '0 0 15px rgba(255, 165, 0, 0.5)';
+                setTimeout(() => {
+                    bookingForm.style.boxShadow = '';
+                }, 3000);
+            }
+        }
     });
 });
 
