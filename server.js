@@ -485,24 +485,41 @@ function sendContactConfirmationEmail(contact) {
         to: contact.email,
         subject: `Re: ${contact.subject}`,
         html: `
-            <h2>Thank you for contacting Ankes Lodge</h2>
-            <p>Dear ${contact.name},</p>
-            <p>Thank you for contacting Ankes Lodge. We have received your message and will get back to you soon.</p>
-            
-            <h3>Your Message Details</h3>
-            <ul>
-                <li><strong>Subject:</strong> ${contact.subject}</li>
-                <li><strong>Message:</strong> ${contact.message}</li>
-                <li><strong>Received:</strong> ${contact.timestamp}</li>
-            </ul>
-            
-            <p>We typically respond within 24 hours. If you need immediate assistance, please call us at 0544904547 or 0558647156.</p>
-            
-            <p>You can also visit our website at <a href="https://konadu-prince.github.io/Ankes-Lodge.Web">https://konadu-prince.github.io/Ankes-Lodge.Web</a> for more information about our services.</p>
-            
-            <p>Best regards,<br>Ankes Lodge Team</p>
-            <p>Contact: 0544904547, 0558647156, 0248293512<br>
-            Email: ankeslodge@gmail.com</p>
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
+                <div style="text-align: center; padding: 20px 0; background-color: #fff; border-bottom: 3px solid #ffa500;">
+                    <img src="https://konadu-prince.github.io/Ankes-Lodge.Web/orangeLogo.png" alt="Ankes Lodge Logo" style="max-width: 100px; margin-bottom: 10px;">
+                    <h1 style="color: #333; margin: 0;">Ankes Lodge</h1>
+                    <p style="color: #666; margin: 5px 0;">Luxury Guest House in Abesim</p>
+                </div>
+                
+                <div style="background-color: #fff; padding: 30px; margin: 20px 0; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                    <h2 style="color: #333;">Thank you for contacting Ankes Lodge</h2>
+                    <p>Dear ${contact.name},</p>
+                    <p>Thank you for contacting Ankes Lodge. We have received your message and will get back to you soon.</p>
+                    
+                    <div style="background-color: #f8f9fa; padding: 20px; margin: 20px 0; border-left: 4px solid #ffa500; border-radius: 3px;">
+                        <h3 style="color: #333; margin-top: 0;">Your Message Details</h3>
+                        <p><strong>Subject:</strong> ${contact.subject}</p>
+                        <p><strong>Message:</strong> ${contact.message}</p>
+                        <p><strong>Received:</strong> ${contact.timestamp}</p>
+                    </div>
+                    
+                    <p>We typically respond within 24 hours. If you need immediate assistance, please call us at <strong>0544904547</strong> or <strong>0558647156</strong>.</p>
+                    
+                    <p>You can also visit our website for more information about our services:</p>
+                    <div style="text-align: center; margin: 20px 0;">
+                        <a href="https://konadu-prince.github.io/Ankes-Lodge.Web" style="display: inline-block; background-color: #007bff; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Visit Our Website</a>
+                    </div>
+                    
+                    <p>Best regards,<br><strong>Ankes Lodge Team</strong></p>
+                </div>
+                
+                <div style="text-align: center; padding: 20px; color: #666; font-size: 14px;">
+                    <p>Contact: 0544904547, 0558647156, 0248293512<br>
+                    Email: ankeslodge@gmail.com</p>
+                    <p>&copy; 2025 Ankes Lodge. All rights reserved.</p>
+                </div>
+            </div>
         `
     };
 
@@ -522,19 +539,42 @@ function sendContactAdminNotification(contact) {
         to: 'ankeslodge@gmail.com', // Admin email
         subject: `New Contact Message - ${contact.subject}`,
         html: `
-            <h2>New Contact Message - Ankes Lodge</h2>
-            <p>A new contact message has been received. Details:</p>
-            
-            <h3>Message Details</h3>
-            <ul>
-                <li><strong>Name:</strong> ${contact.name}</li>
-                <li><strong>Email:</strong> ${contact.email}</li>
-                <li><strong>Subject:</strong> ${contact.subject}</li>
-                <li><strong>Message:</strong> ${contact.message}</li>
-                <li><strong>Received:</strong> ${contact.timestamp}</li>
-            </ul>
-            
-            <p>Please follow up with the customer as soon as possible.</p>
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
+                <div style="text-align: center; padding: 20px 0; background-color: #fff; border-bottom: 3px solid #ffa500;">
+                    <img src="https://konadu-prince.github.io/Ankes-Lodge.Web/orangeLogo.png" alt="Ankes Lodge Logo" style="max-width: 100px; margin-bottom: 10px;">
+                    <h1 style="color: #333; margin: 0;">Ankes Lodge</h1>
+                    <p style="color: #666; margin: 5px 0;">Luxury Guest House in Abesim</p>
+                </div>
+                
+                <div style="background-color: #fff; padding: 30px; margin: 20px 0; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                    <h2 style="color: #333;">New Contact Message</h2>
+                    <p>A new contact message has been received. Details:</p>
+                    
+                    <div style="background-color: #f8f9fa; padding: 20px; margin: 20px 0; border-left: 4px solid #ffa500; border-radius: 3px;">
+                        <h3 style="color: #333; margin-top: 0;">Message Details</h3>
+                        <p><strong>Name:</strong> ${contact.name}</p>
+                        <p><strong>Email:</strong> ${contact.email}</p>
+                        <p><strong>Subject:</strong> ${contact.subject}</p>
+                        <p><strong>Message:</strong> ${contact.message}</p>
+                        <p><strong>Received:</strong> ${contact.timestamp}</p>
+                    </div>
+                    
+                    <p>You can view more information about our services on our website:</p>
+                    <div style="text-align: center; margin: 20px 0;">
+                        <a href="https://konadu-prince.github.io/Ankes-Lodge.Web" style="display: inline-block; background-color: #007bff; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Visit Our Website</a>
+                    </div>
+                    
+                    <p>Please follow up with the customer as soon as possible.</p>
+                    
+                    <div style="text-align: center; margin: 20px 0;">
+                        <a href="mailto:${contact.email}" style="display: inline-block; background-color: #28a745; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Reply to Customer</a>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; padding: 20px; color: #666; font-size: 14px;">
+                    <p>&copy; 2025 Ankes Lodge. All rights reserved.</p>
+                </div>
+            </div>
         `
     };
 
