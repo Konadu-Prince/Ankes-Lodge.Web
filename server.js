@@ -250,7 +250,7 @@ app.post('/process-booking',
     // Validation and sanitization middleware
     body('name').trim().escape().isLength({ min: 2, max: 50 }),
     body('email').trim().normalizeEmail().isEmail(),
-    body('phone').trim().escape().matches(/^(?:\+233|0)(?:20|50|24|54|27|57|26|56|23|28)\d{7}$/),
+    body('phone').trim().escape().matches(/^(?:\+233|0)(?:20|50|24|54|27|57|26|56|23|28|55|59)\d{7}$/),
     body('checkin').isISO8601(),
     body('checkout').isISO8601(),
     body('adults').isInt({ min: 1, max: 10 }),
