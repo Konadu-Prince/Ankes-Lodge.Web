@@ -117,9 +117,9 @@ document.addEventListener('DOMContentLoaded', function() {
 const scrollToTopButton = document.getElementById('scrollToTop');
 window.addEventListener('scroll', () => {
     if (window.pageYOffset > 300) {
-        scrollToTopButton.style.display = 'block';
+        scrollToTopButton.classList.add('visible');
     } else {
-        scrollToTopButton.style.display = 'none';
+        scrollToTopButton.classList.remove('visible');
     }
 });
 
