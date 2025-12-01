@@ -114,20 +114,26 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Scroll to top functionality
-const scrollToTopButton = document.getElementById('scrollToTop');
-window.addEventListener('scroll', () => {
-    if (window.pageYOffset > 300) {
-        scrollToTopButton.classList.add('visible');
-    } else {
-        scrollToTopButton.classList.remove('visible');
-    }
-});
+document.addEventListener('DOMContentLoaded', function() {
+    const scrollToTopButton = document.getElementById('scrollToTop');
+    
+    // Check if the button exists
+    if (scrollToTopButton) {
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                scrollToTopButton.classList.add('visible');
+            } else {
+                scrollToTopButton.classList.remove('visible');
+            }
+        });
 
-scrollToTopButton.addEventListener('click', () => {
-    window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-    });
+        scrollToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    }
 });
 
 // Gallery modal functionality
