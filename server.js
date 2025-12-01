@@ -646,6 +646,12 @@ function sendContactAdminNotification(contact) {
     });
 }
 
-app.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}`);
-});
+// For Vercel deployment, we need to export the app
+module.exports = app;
+
+// Only start the server if this file is run directly (not imported)
+if (require.main === module) {
+    app.listen(PORT, () => {
+        console.log(`Server running at http://localhost:${PORT}`);
+    });
+}
