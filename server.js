@@ -97,6 +97,14 @@ function sendConfirmationEmail(booking) {
                     
                     <p>We will contact you shortly to confirm your reservation and provide payment details.</p>
                     
+                    <div style="background-color: #e8f4e8; padding: 20px; margin: 20px 0; border-left: 4px solid #28a745; border-radius: 3px;">
+                        <h3 style="color: #333; margin-top: 0;">Contact Information</h3>
+                        <p>If you need immediate assistance, please contact our managers directly:</p>
+                        <p><strong>General Manager:</strong> 0544904547, 0558647156</p>
+                        <p><strong>Manager:</strong> 0248293512</p>
+                        <p><strong>Email:</strong> ankeslodge@gmail.com</p>
+                    </div>
+                    
                     <p>You can view more information about our accommodations on our website:</p>
                     <div style="text-align: center; margin: 20px 0;">
                         <a href="https://konadu-prince.github.io/Ankes-Lodge.Web" style="display: inline-block; background-color: #007bff; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">View Our Rooms</a>
@@ -191,6 +199,14 @@ function sendAdminNotification(booking) {
                     </div>
                     
                     <p>Please follow up with the customer to confirm the booking.</p>
+                    
+                    <div style="background-color: #e8f4e8; padding: 20px; margin: 20px 0; border-left: 4px solid #28a745; border-radius: 3px;">
+                        <h3 style="color: #333; margin-top: 0;">Contact Information</h3>
+                        <p>To reach the customer directly:</p>
+                        <p><strong>Customer Phone:</strong> <a href="tel:${booking.phone}">${booking.phone}</a></p>
+                        <p><strong>Customer Email:</strong> <a href="mailto:${booking.email}">${booking.email}</a></p>
+                        <p><strong>Manager Contact:</strong> 0248293512</p>
+                    </div>
                     
                     <div style="text-align: center; margin: 20px 0;">
                         <a href="mailto:${booking.email}" style="display: inline-block; background-color: #28a745; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; margin-right: 10px;">Email Customer</a>
