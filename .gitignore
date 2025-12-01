@@ -1,0 +1,13 @@
+# Environment variables
+.env
+
+# Node modules
+node_modules/
+
+# Log files
+*.log
+
+# IDE files
+.vscode/
+*.swp
+*.swo
