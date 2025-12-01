@@ -71,26 +71,45 @@ function sendConfirmationEmail(booking) {
         to: booking.email,
         subject: `Booking Confirmation - Ankes Lodge (Booking ID: ${booking.id})`,
         html: `
-            <h2>Booking Confirmation - Ankes Lodge</h2>
-            <p>Dear ${booking.name},</p>
-            <p>Thank you for booking with Ankes Lodge. Your booking details are as follows:</p>
-            
-            <h3>Booking Details</h3>
-            <ul>
-                <li><strong>Booking ID:</strong> ${booking.id}</li>
-                <li><strong>Name:</strong> ${booking.name}</li>
-                <li><strong>Check-in Date:</strong> ${booking.checkin}</li>
-                <li><strong>Check-out Date:</strong> ${booking.checkout}</li>
-                <li><strong>Adults:</strong> ${booking.adults}</li>
-                <li><strong>Children:</strong> ${booking.children}</li>
-                <li><strong>Room Type:</strong> ${getRoomTypeName(booking.roomType)}</li>
-                <li><strong>Special Requests:</strong> ${booking.message || 'None'}</li>
-            </ul>
-            
-            <p>We will contact you shortly to confirm your reservation and provide payment details.</p>
-            
-            <p>Best regards,<br>Ankes Lodge Team</p>
-            <p>Contact: 0544904547, 0558647156, 0248293512</p>
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
+                <div style="text-align: center; padding: 20px 0; background-color: #fff; border-bottom: 3px solid #ffa500;">
+                    <img src="https://konadu-prince.github.io/Ankes-Lodge.Web/orangeLogo.png" alt="Ankes Lodge Logo" style="max-width: 100px; margin-bottom: 10px;">
+                    <h1 style="color: #333; margin: 0;">Ankes Lodge</h1>
+                    <p style="color: #666; margin: 5px 0;">Luxury Guest House in Abesim</p>
+                </div>
+                
+                <div style="background-color: #fff; padding: 30px; margin: 20px 0; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                    <h2 style="color: #333;">Booking Confirmation</h2>
+                    <p>Dear ${booking.name},</p>
+                    <p>Thank you for booking with Ankes Lodge. Your booking details are as follows:</p>
+                    
+                    <div style="background-color: #f8f9fa; padding: 20px; margin: 20px 0; border-left: 4px solid #ffa500; border-radius: 3px;">
+                        <h3 style="color: #333; margin-top: 0;">Booking Details</h3>
+                        <p><strong>Booking ID:</strong> ${booking.id}</p>
+                        <p><strong>Name:</strong> ${booking.name}</p>
+                        <p><strong>Check-in Date:</strong> ${booking.checkin}</p>
+                        <p><strong>Check-out Date:</strong> ${booking.checkout}</p>
+                        <p><strong>Adults:</strong> ${booking.adults}</p>
+                        <p><strong>Children:</strong> ${booking.children}</p>
+                        <p><strong>Room Type:</strong> ${getRoomTypeName(booking.roomType)}</p>
+                        <p><strong>Special Requests:</strong> ${booking.message || 'None'}</p>
+                    </div>
+                    
+                    <p>We will contact you shortly to confirm your reservation and provide payment details.</p>
+                    
+                    <p>You can view more information about our accommodations on our website:</p>
+                    <div style="text-align: center; margin: 20px 0;">
+                        <a href="https://konadu-prince.github.io/Ankes-Lodge.Web" style="display: inline-block; background-color: #007bff; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">View Our Rooms</a>
+                    </div>
+                    
+                    <p>Best regards,<br><strong>Ankes Lodge Team</strong></p>
+                </div>
+                
+                <div style="text-align: center; padding: 20px; color: #666; font-size: 14px;">
+                    <p>Contact: 0544904547, 0558647156, 0248293512</p>
+                    <p>&copy; 2025 Ankes Lodge. All rights reserved.</p>
+                </div>
+            </div>
         `
     };
 
@@ -140,25 +159,49 @@ function sendAdminNotification(booking) {
         to: 'ankeslodge@gmail.com', // Admin email
         subject: `New Booking Request - Ankes Lodge (Booking ID: ${booking.id})`,
         html: `
-            <h2>New Booking Request - Ankes Lodge</h2>
-            <p>A new booking request has been submitted. Details:</p>
-            
-            <h3>Booking Details</h3>
-            <ul>
-                <li><strong>Booking ID:</strong> ${booking.id}</li>
-                <li><strong>Timestamp:</strong> ${booking.timestamp}</li>
-                <li><strong>Name:</strong> ${booking.name}</li>
-                <li><strong>Email:</strong> ${booking.email}</li>
-                <li><strong>Phone:</strong> ${booking.phone}</li>
-                <li><strong>Check-in Date:</strong> ${booking.checkin}</li>
-                <li><strong>Check-out Date:</strong> ${booking.checkout}</li>
-                <li><strong>Adults:</strong> ${booking.adults}</li>
-                <li><strong>Children:</strong> ${booking.children}</li>
-                <li><strong>Room Type:</strong> ${getRoomTypeName(booking.roomType)}</li>
-                <li><strong>Special Requests:</strong> ${booking.message || 'None'}</li>
-            </ul>
-            
-            <p>Please follow up with the customer to confirm the booking.</p>
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
+                <div style="text-align: center; padding: 20px 0; background-color: #fff; border-bottom: 3px solid #ffa500;">
+                    <img src="https://konadu-prince.github.io/Ankes-Lodge.Web/orangeLogo.png" alt="Ankes Lodge Logo" style="max-width: 100px; margin-bottom: 10px;">
+                    <h1 style="color: #333; margin: 0;">Ankes Lodge</h1>
+                    <p style="color: #666; margin: 5px 0;">Luxury Guest House in Abesim</p>
+                </div>
+                
+                <div style="background-color: #fff; padding: 30px; margin: 20px 0; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                    <h2 style="color: #333;">New Booking Request</h2>
+                    <p>A new booking request has been submitted. Details:</p>
+                    
+                    <div style="background-color: #f8f9fa; padding: 20px; margin: 20px 0; border-left: 4px solid #ffa500; border-radius: 3px;">
+                        <h3 style="color: #333; margin-top: 0;">Booking Details</h3>
+                        <p><strong>Booking ID:</strong> ${booking.id}</p>
+                        <p><strong>Timestamp:</strong> ${booking.timestamp}</p>
+                        <p><strong>Name:</strong> ${booking.name}</p>
+                        <p><strong>Email:</strong> ${booking.email}</p>
+                        <p><strong>Phone:</strong> ${booking.phone}</p>
+                        <p><strong>Check-in Date:</strong> ${booking.checkin}</p>
+                        <p><strong>Check-out Date:</strong> ${booking.checkout}</p>
+                        <p><strong>Adults:</strong> ${booking.adults}</p>
+                        <p><strong>Children:</strong> ${booking.children}</p>
+                        <p><strong>Room Type:</strong> ${getRoomTypeName(booking.roomType)}</p>
+                        <p><strong>Special Requests:</strong> ${booking.message || 'None'}</p>
+                    </div>
+                    
+                    <p>You can view more information about our services on our website:</p>
+                    <div style="text-align: center; margin: 20px 0;">
+                        <a href="https://konadu-prince.github.io/Ankes-Lodge.Web" style="display: inline-block; background-color: #007bff; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Visit Our Website</a>
+                    </div>
+                    
+                    <p>Please follow up with the customer to confirm the booking.</p>
+                    
+                    <div style="text-align: center; margin: 20px 0;">
+                        <a href="mailto:${booking.email}" style="display: inline-block; background-color: #28a745; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; margin-right: 10px;">Email Customer</a>
+                        <a href="tel:${booking.phone}" style="display: inline-block; background-color: #ffc107; color: #000; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Call Customer</a>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; padding: 20px; color: #666; font-size: 14px;">
+                    <p>&copy; 2025 Ankes Lodge. All rights reserved.</p>
+                </div>
+            </div>
         `
     };
 
