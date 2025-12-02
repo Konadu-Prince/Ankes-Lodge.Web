@@ -22,11 +22,17 @@ try {
     const emailUser = process.env.EMAIL_USER;
     const emailPass = process.env.EMAIL_PASS;
     
+    // Debug logging for environment variables
+    console.log('=== EMAIL CONFIGURATION DEBUG ===');
+    console.log('EMAIL_USER env var:', emailUser ? `${emailUser.substring(0, 5)}...` : 'NOT SET');
+    console.log('EMAIL_PASS env var:', emailPass ? 'SET (hidden for security)' : 'NOT SET');
+    
     if (!emailUser || !emailPass) {
         console.log('EMAIL_USER and EMAIL_PASS environment variables are required for email functionality');
         console.log('Please set these environment variables in your deployment platform');
         transporter = null;
     } else {
+        console.log('Creating transporter with provided credentials...');
         transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
@@ -35,20 +41,27 @@ try {
             }
         });
     }
+    console.log('=== END EMAIL CONFIGURATION DEBUG ===');
 } catch (error) {
     console.log('Email configuration error:', error);
     transporter = null;
 }
 
 // Test transporter configuration
+console.log('Checking transporter configuration...');
 if (transporter) {
+    console.log('Transporter exists, attempting verification...');
     transporter.verify(function(error, success) {
         if (error) {
-            console.log('Email configuration error:', error);
+            console.log('Email configuration error:', error.message);
+            console.log('Error code:', error.code);
+            console.log('Error command:', error.command);
         } else {
             console.log('Email server is ready to send messages');
         }
     });
+} else {
+    console.log('No transporter configured - email functionality will be disabled');
 }
 
 // Function to send confirmation email to customer
@@ -109,15 +122,11 @@ function sendConfirmationEmail(booking) {
                     
                     <div style="background-color: #e8f4e8; padding: 20px; margin: 20px 0; border-left: 4px solid #28a745; border-radius: 3px;">
                         <h3 style="color: #333; margin-top: 0;">Contact Information</h3>
-                        <p>If you need immediate assistance, please contact our managers directly:</p>
-                        <p><strong>General Manager:</strong> 0544904547, 0558647156</p>
-                        <p><strong>Manager:</strong> 0248293512</p>
-                        <p><strong>Email:</strong> ankeslodge@gmail.com</p>
-                    </div>
-                    
-                    <p>You can view more information about our accommodations on our website:</p>
-                    <div style="text-align: center; margin: 20px 0;">
-                        <a href="https://konadu-prince.github.io/Ankes-Lodge.Web" style="display: inline-block; background-color: #007bff; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">View Our Rooms</a>
+                        <p>To reach the customer directly:</p>
+                        <p><strong>Customer Phone:</strong> <a href="tel:${booking.phone}">${booking.phone}</a></p>
+                        <p><strong>Customer Email:</strong> <a href="mailto:${booking.email}">${booking.email}</a></p>
+                        <p><strong>Manager Contact:</strong> 0248293512</p>
+                        <p><strong>Website:</strong> <a href="https://konadu-prince.github.io/Ankes-Lodge.Web">View Our Website</a></p>
                     </div>
                     
                     <p>Best regards,<br><strong>Ankes Lodge Team</strong></p>
@@ -601,12 +610,14 @@ function sendContactConfirmationEmail(contact) {
                         <p><strong>Received:</strong> ${contact.timestamp}</p>
                     </div>
                     
-                    <p>We typically respond within 24 hours. If you need immediate assistance, please call us at <strong>0544904547</strong> or <strong>0558647156</strong>.</p>
-                    
-                    <p>You can also visit our website for more information about our services:</p>
-                    <div style="text-align: center; margin: 20px 0;">
-                        <a href="https://konadu-prince.github.io/Ankes-Lodge.Web" style="display: inline-block; background-color: #007bff; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Visit Our Website</a>
+                    <div style="background-color: #e8f4e8; padding: 20px; margin: 20px 0; border-left: 4px solid #28a745; border-radius: 3px;">
+                        <h3 style="color: #333; margin-top: 0;">Contact Information</h3>
+                        <p>If you need immediate assistance, please contact our managers directly:</p>
+                        <p><strong>Manager:</strong> 0248293512</p>
+                        <p><strong>Website:</strong> <a href="https://konadu-prince.github.io/Ankes-Lodge.Web">View Our Website</a></p>
                     </div>
+                    
+                    <p>We typically respond within 24 hours. If you need immediate assistance, please call us at <strong>0544904547</strong> or <strong>0558647156</strong>.</p>
                     
                     <p>Best regards,<br><strong>Ankes Lodge Team</strong></p>
                 </div>
@@ -677,9 +688,10 @@ function sendContactAdminNotification(contact) {
                         <p><strong>Received:</strong> ${contact.timestamp}</p>
                     </div>
                     
-                    <p>You can view more information about our services on our website:</p>
-                    <div style="text-align: center; margin: 20px 0;">
-                        <a href="https://konadu-prince.github.io/Ankes-Lodge.Web" style="display: inline-block; background-color: #007bff; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Visit Our Website</a>
+                    <div style="background-color: #e8f4e8; padding: 20px; margin: 20px 0; border-left: 4px solid #28a745; border-radius: 3px;">
+                        <h3 style="color: #333; margin-top: 0;">Contact Information</h3>
+                        <p>Manager Contact: 0248293512</p>
+                        <p>Website: <a href="https://konadu-prince.github.io/Ankes-Lodge.Web">View Our Website</a></p>
                     </div>
                     
                     <p>Please follow up with the customer as soon as possible.</p>
@@ -729,11 +741,14 @@ if (require.main === module) {
         console.log(`- PORT: ${PORT}`);
         
         // Test email configuration if credentials are provided
+        console.log('Testing email configuration...');
         if (transporter) {
-            console.log('Testing email configuration...');
+            console.log('Transporter is configured, testing connection...');
             transporter.verify(function(error, success) {
                 if (error) {
                     console.log('Email configuration test FAILED:', error.message);
+                    console.log('Error code:', error.code);
+                    console.log('This is likely due to Render.com SMTP restrictions');
                     console.log('Emails will be logged to console instead of sent.');
                 } else {
                     console.log('Email configuration test PASSED - emails will be sent.');
@@ -741,6 +756,7 @@ if (require.main === module) {
             });
         } else {
             console.log('Email transporter not configured - emails will be logged to console.');
+            console.log('Please ensure EMAIL_USER and EMAIL_PASS environment variables are set.');
         }
     });
     
