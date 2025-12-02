@@ -763,8 +763,12 @@ module.exports = app;
 
 // Only start the server if this file is run directly (not imported)
 if (require.main === module) {
-    const server = app.listen(PORT, () => {
-        console.log(`Server running at http://localhost:${PORT}`);
+    console.log('Starting server...');
+    console.log(`PORT environment variable: ${process.env.PORT}`);
+    console.log(`Using PORT: ${PORT}`);
+    
+    const server = app.listen(PORT, '0.0.0.0', () => {
+        console.log(`Server running at http://0.0.0.0:${PORT}`);
         console.log(`Environment variables status:`);
         console.log(`- EMAIL_USER: ${process.env.EMAIL_USER ? 'SET' : 'NOT SET'}`);
         console.log(`- EMAIL_PASS: ${process.env.EMAIL_PASS ? 'SET' : 'NOT SET'}`);
@@ -788,6 +792,11 @@ if (require.main === module) {
             console.log('Email transporter not configured - emails will be logged to console.');
             console.log('Please ensure EMAIL_USER and EMAIL_PASS environment variables are set.');
         }
+    });
+    
+    // Handle server errors
+    server.on('error', (error) => {
+        console.error('Server error:', error);
     });
     
     // Graceful shutdown

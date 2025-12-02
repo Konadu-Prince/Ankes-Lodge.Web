@@ -462,7 +462,9 @@ function handleFormSubmit(formId, successMessage) {
         }
         
         // Determine endpoint based on form
-        const endpoint = formId === 'booking-form' ? '/process-booking' : '/process-contact';
+        // Use absolute URL to ensure it works correctly when hosted
+        const baseUrl = window.location.origin;
+        const endpoint = formId === 'booking-form' ? `${baseUrl}/process-booking` : `${baseUrl}/process-contact`;
 
         // Send data to backend with proper content type
         console.log(`Sending data to ${endpoint}`);
