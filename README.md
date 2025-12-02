@@ -2,16 +2,18 @@
 
 A luxury guest house website with booking system and contact form functionality.
 
-## Deployment to Vercel
+## Deployment Options
 
-This project is configured for deployment to Vercel with both server and client functionality.
+This project can be deployed to either Vercel or Render with both server and client functionality.
 
-### Prerequisites
+### Deployment to Vercel
+
+#### Prerequisites
 
 1. A Vercel account (free at [vercel.com](https://vercel.com))
 2. This repository connected to your Vercel account
 
-### Deployment Steps
+#### Deployment Steps
 
 1. Go to your Vercel dashboard
 2. Click "New Project"
@@ -26,13 +28,46 @@ This project is configured for deployment to Vercel with both server and client 
    - `EMAIL_PASS` - Your Gmail app password
 6. Deploy!
 
+### Deployment to Render
+
+#### Prerequisites
+
+1. A Render account (free at [render.com](https://render.com))
+2. This repository connected to your Render account
+
+#### Deployment Steps
+
+1. Go to your Render dashboard
+2. Click "New+" and select "Web Service"
+3. Connect your GitHub repository
+4. Configure the service settings:
+   - Name: ankes-lodge
+   - Region: Choose the region closest to you
+   - Branch: master or hosting
+   - Root Directory: Leave empty
+   - Environment: Node
+   - Build Command: `npm install`
+   - Start Command: `node server.js`
+5. Add environment variables:
+   - `EMAIL_USER` - Your Gmail address for sending emails
+   - `EMAIL_PASS` - Your Gmail app password
+6. Click "Create Web Service"
+
 ### Environment Variables
 
-For email functionality to work, you need to set the following environment variables in your Vercel project settings:
+For email functionality to work on either platform, you need to set the following environment variables:
 
 ```
 EMAIL_USER=your-email@gmail.com
 EMAIL_PASS=your-app-password
+```
+
+Important: For Gmail, you must use an App Password, not your regular password. Generate an App Password at: https://myaccount.google.com/apppasswords
+
+Example:
+```
+EMAIL_USER=konaduprince26@gmail.com
+EMAIL_PASS=svvnrkgzmgxuskyl
 ```
 
 ### Project Structure
