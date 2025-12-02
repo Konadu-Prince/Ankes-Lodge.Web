@@ -18,13 +18,23 @@ app.use(express.static('.'));
 // Note: In production, use environment variables for credentials
 let transporter;
 try {
-    transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: process.env.EMAIL_USER || 'konaduprince26@gmail.com',
-            pass: process.env.EMAIL_PASS || 'svvnrkgzmgxuskyl' // Use App Password, not regular password
-        }
-    });
+    // Check if environment variables are set
+    const emailUser = process.env.EMAIL_USER;
+    const emailPass = process.env.EMAIL_PASS;
+    
+    if (!emailUser || !emailPass) {
+        console.log('EMAIL_USER and EMAIL_PASS environment variables are required for email functionality');
+        console.log('Please set these environment variables in your deployment platform');
+        transporter = null;
+    } else {
+        transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: emailUser,
+                pass: emailPass
+            }
+        });
+    }
 } catch (error) {
     console.log('Email configuration error:', error);
     transporter = null;

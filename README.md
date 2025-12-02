@@ -55,7 +55,7 @@ This project can be deployed to either Vercel or Render with both server and cli
 
 ### Environment Variables
 
-For email functionality to work on either platform, you need to set the following environment variables:
+**IMPORTANT**: For email functionality to work on either platform, you **MUST** set the following environment variables. Hardcoded credentials have been removed for security reasons.
 
 ```
 EMAIL_USER=your-email@gmail.com
@@ -69,6 +69,8 @@ Example:
 EMAIL_USER=konaduprince26@gmail.com
 EMAIL_PASS=svvnrkgzmgxuskyl
 ```
+
+Without these environment variables, the email functionality will be disabled and only logged to the console.
 
 ### Project Structure
 
