@@ -625,6 +625,21 @@ app.post('/process-contact', (req, res) => {
 
 // Function to send confirmation email to customer for contact form
 function sendContactConfirmationEmail(contact) {
+    // If transporter is not configured, skip email sending
+    if (!transporter) {
+        console.log('Email transporter not configured, logging contact confirmation to console');
+        console.log('=== CONTACT CONFIRMATION EMAIL ===');
+        console.log(`To: ${contact.email}`);
+        console.log(`Subject: Re: ${contact.subject}`);
+        console.log(`Body:`);
+        console.log(`Dear ${contact.name},`);
+        console.log(`Thank you for contacting Ankes Lodge. We have received your message and will get back to you soon.`);
+        console.log(`Your message: ${contact.message}`);
+        console.log(`Best regards, Ankes Lodge Team`);
+        console.log('====================================');
+        return Promise.resolve(); // Return a resolved promise for consistency
+    }
+    
     const mailOptions = {
         from: 'ankeslodge@gmail.com',
         to: contact.email,
