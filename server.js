@@ -73,7 +73,7 @@ function sendConfirmationEmail(booking) {
         console.log(`We will contact you shortly to confirm your reservation and provide payment details.`);
         console.log(`Best regards, Ankes Lodge Team`);
         console.log('====================================');
-        return;
+        return Promise.resolve(); // Return a resolved promise for consistency
     }
     
     const mailOptions = {
@@ -131,18 +131,23 @@ function sendConfirmationEmail(booking) {
         `
     };
 
-    transporter.sendMail(mailOptions, function(error, info) {
-        if (error) {
-            console.log('Email sending error:', error);
-            // Log the email content as fallback
-            console.log('=== EMAIL FALLBACK LOG ===');
-            console.log(`To: ${booking.email}`);
-            console.log(`Subject: Booking Confirmation - Ankes Lodge (Booking ID: ${booking.id})`);
-            console.log('Content:', mailOptions.html);
-            console.log('=========================');
-        } else {
-            console.log('Confirmation email sent: ' + info.response);
-        }
+    // Return a promise for better error handling
+    return new Promise((resolve, reject) => {
+        transporter.sendMail(mailOptions, function(error, info) {
+            if (error) {
+                console.log('Email sending error:', error.message);
+                // Log the email content as fallback
+                console.log('=== EMAIL FALLBACK LOG ===');
+                console.log(`To: ${booking.email}`);
+                console.log(`Subject: Booking Confirmation - Ankes Lodge (Booking ID: ${booking.id})`);
+                console.log('Content:', mailOptions.html);
+                console.log('=========================');
+                resolve(); // Resolve anyway since this is not a critical error for the user experience
+            } else {
+                console.log('Confirmation email sent: ' + info.response);
+                resolve();
+            }
+        });
     });
 }
 
@@ -169,7 +174,7 @@ function sendAdminNotification(booking) {
         console.log(`Special Requests: ${booking.message || 'None'}`);
         console.log(`Please follow up with the customer to confirm the booking.`);
         console.log('================================');
-        return;
+        return Promise.resolve(); // Return a resolved promise for consistency
     }
     
     const mailOptions = {
@@ -230,19 +235,24 @@ function sendAdminNotification(booking) {
             </div>
         `
     };
-
-    transporter.sendMail(mailOptions, function(error, info) {
-        if (error) {
-            console.log('Admin notification error:', error);
-            // Log the email content as fallback
-            console.log('=== ADMIN EMAIL FALLBACK LOG ===');
-            console.log(`To: ankeslodge@gmail.com`);
-            console.log(`Subject: New Booking Request - Ankes Lodge (Booking ID: ${booking.id})`);
-            console.log('Content:', mailOptions.html);
-            console.log('================================');
-        } else {
-            console.log('Admin notification sent: ' + info.response);
-        }
+    
+    // Return a promise for better error handling
+    return new Promise((resolve, reject) => {
+        transporter.sendMail(mailOptions, function(error, info) {
+            if (error) {
+                console.log('Admin notification error:', error.message);
+                // Log the email content as fallback
+                console.log('=== ADMIN EMAIL FALLBACK LOG ===');
+                console.log(`To: ankeslodge@gmail.com`);
+                console.log(`Subject: New Booking Request - Ankes Lodge (Booking ID: ${booking.id})`);
+                console.log('Content:', mailOptions.html);
+                console.log('================================');
+                resolve(); // Resolve anyway since this is not a critical error for the user experience
+            } else {
+                console.log('Admin notification sent: ' + info.response);
+                resolve();
+            }
+        });
     });
 }
 
@@ -379,16 +389,23 @@ app.post('/process-booking',
         try {
             fs.writeFileSync('bookings.json', JSON.stringify(bookings, null, 2));
             
-            // Send confirmation email to customer
-            sendConfirmationEmail(booking);
-            
-            // Send notification to admin
-            sendAdminNotification(booking);
-            
-            res.json({
-                status: 'success',
-                message: 'Booking request submitted successfully! A confirmation email has been sent to your email address. We will contact you shortly to confirm your reservation.',
-                bookingId: booking.id
+            // Send confirmation email to customer and notification to admin
+            Promise.all([
+                sendConfirmationEmail(booking),
+                sendAdminNotification(booking)
+            ]).then(() => {
+                res.json({
+                    status: 'success',
+                    message: 'Booking request submitted successfully! A confirmation email has been sent to your email address. We will contact you shortly to confirm your reservation.',
+                    bookingId: booking.id
+                });
+            }).catch((error) => {
+                console.log('Error sending emails:', error);
+                res.json({
+                    status: 'success',
+                    message: 'Booking request submitted successfully! We will contact you shortly to confirm your reservation.',
+                    bookingId: booking.id
+                });
             });
         } catch (err) {
             res.status(500).json({
@@ -502,14 +519,25 @@ app.post('/process-contact', (req, res) => {
     // Save contacts to file
     try {
         fs.writeFileSync('contacts.json', JSON.stringify(contacts, null, 2));
-        
+            
         // Send email notifications if transporter is configured
         if (transporter) {
-            // Send confirmation email to the customer
-            sendContactConfirmationEmail(contact);
-            
-            // Send notification email to admin
-            sendContactAdminNotification(contact);
+            // Send confirmation email to the customer and notification to admin
+            Promise.all([
+                sendContactConfirmationEmail(contact),
+                sendContactAdminNotification(contact)
+            ]).then(() => {
+                res.json({
+                    status: 'success',
+                    message: 'Thank you for your message! We will get back to you soon.'
+                });
+            }).catch((error) => {
+                console.log('Error sending contact emails:', error);
+                res.json({
+                    status: 'success',
+                    message: 'Thank you for your message! We will get back to you soon.'
+                });
+            });
         } else {
             console.log('Email transporter not configured, skipping email notifications');
             console.log('=== CONTACT CONFIRMATION EMAIL ===');
@@ -533,12 +561,12 @@ app.post('/process-contact', (req, res) => {
             console.log(`Message: ${contact.message}`);
             console.log(`Timestamp: ${contact.timestamp}`);
             console.log('================================');
+            
+            res.json({
+                status: 'success',
+                message: 'Thank you for your message! We will get back to you soon.'
+            });
         }
-        
-        res.json({
-            status: 'success',
-            message: 'Thank you for your message! We will get back to you soon.'
-        });
     } catch (err) {
         res.status(500).json({
             status: 'error',
@@ -584,25 +612,46 @@ function sendContactConfirmationEmail(contact) {
                 </div>
                 
                 <div style="text-align: center; padding: 20px; color: #666; font-size: 14px;">
-                    <p>Contact: 0544904547, 0558647156, 0248293512<br>
-                    Email: ankeslodge@gmail.com</p>
+                    <p>Contact: 0544904547, 0558647156</p>
                     <p>&copy; 2025 Ankes Lodge. All rights reserved.</p>
                 </div>
             </div>
         `
     };
 
-    transporter.sendMail(mailOptions, function(error, info) {
-        if (error) {
-            console.log('Contact confirmation email error:', error);
-        } else {
-            console.log('Contact confirmation email sent: ' + info.response);
-        }
+    // Return a promise for better error handling
+    return new Promise((resolve, reject) => {
+        transporter.sendMail(mailOptions, function(error, info) {
+            if (error) {
+                console.log('Contact confirmation email error:', error.message);
+                resolve(); // Resolve anyway since this is not a critical error for the user experience
+            } else {
+                console.log('Contact confirmation email sent: ' + info.response);
+                resolve();
+            }
+        });
     });
 }
 
 // Function to send notification email to admin for contact form
 function sendContactAdminNotification(contact) {
+    // If transporter is not configured, skip email sending
+    if (!transporter) {
+        console.log('Email transporter not configured, logging contact notification to console');
+        console.log('=== CONTACT NOTIFICATION EMAIL ===');
+        console.log(`To: ankeslodge@gmail.com`);
+        console.log(`Subject: New Contact Message - ${contact.subject}`);
+        console.log(`Body:`);
+        console.log(`A new contact message has been received. Details:`);
+        console.log(`Name: ${contact.name}`);
+        console.log(`Email: ${contact.email}`);
+        console.log(`Subject: ${contact.subject}`);
+        console.log(`Message: ${contact.message}`);
+        console.log(`Received: ${contact.timestamp}`);
+        console.log('==================================');
+        return Promise.resolve(); // Return a resolved promise for consistency
+    }
+    
     const mailOptions = {
         from: 'ankeslodge@gmail.com',
         to: 'ankeslodge@gmail.com', // Admin email
@@ -647,12 +696,23 @@ function sendContactAdminNotification(contact) {
         `
     };
 
-    transporter.sendMail(mailOptions, function(error, info) {
-        if (error) {
-            console.log('Contact admin notification error:', error);
-        } else {
-            console.log('Contact admin notification sent: ' + info.response);
-        }
+    // Return a promise for better error handling
+    return new Promise((resolve, reject) => {
+        transporter.sendMail(mailOptions, function(error, info) {
+            if (error) {
+                console.log('Contact admin notification error:', error.message);
+                // Log the email content as fallback
+                console.log('=== CONTACT EMAIL FALLBACK LOG ===');
+                console.log(`To: ankeslodge@gmail.com`);
+                console.log(`Subject: New Contact Message - ${contact.subject}`);
+                console.log('Content:', mailOptions.html);
+                console.log('===================================');
+                resolve(); // Resolve anyway since this is not a critical error for the user experience
+            } else {
+                console.log('Contact admin notification sent: ' + info.response);
+                resolve();
+            }
+        });
     });
 }
 
@@ -661,7 +721,34 @@ module.exports = app;
 
 // Only start the server if this file is run directly (not imported)
 if (require.main === module) {
-    app.listen(PORT, () => {
+    const server = app.listen(PORT, () => {
         console.log(`Server running at http://localhost:${PORT}`);
+        console.log(`Environment variables status:`);
+        console.log(`- EMAIL_USER: ${process.env.EMAIL_USER ? 'SET' : 'NOT SET'}`);
+        console.log(`- EMAIL_PASS: ${process.env.EMAIL_PASS ? 'SET' : 'NOT SET'}`);
+        console.log(`- PORT: ${PORT}`);
+        
+        // Test email configuration if credentials are provided
+        if (transporter) {
+            console.log('Testing email configuration...');
+            transporter.verify(function(error, success) {
+                if (error) {
+                    console.log('Email configuration test FAILED:', error.message);
+                    console.log('Emails will be logged to console instead of sent.');
+                } else {
+                    console.log('Email configuration test PASSED - emails will be sent.');
+                }
+            });
+        } else {
+            console.log('Email transporter not configured - emails will be logged to console.');
+        }
+    });
+    
+    // Graceful shutdown
+    process.on('SIGTERM', () => {
+        console.log('SIGTERM received, shutting down gracefully');
+        server.close(() => {
+            console.log('Process terminated');
+        });
     });
 }
