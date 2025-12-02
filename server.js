@@ -6,6 +6,9 @@ const nodemailer = require('nodemailer');
 const rateLimit = require('express-rate-limit');
 const { body, validationResult } = require('express-validator');
 
+// Load environment variables from .env file
+require('dotenv').config();
+
 const app = express();
 const PORT = process.env.PORT || 8000;
 
