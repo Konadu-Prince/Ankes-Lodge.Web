@@ -12,6 +12,24 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 8000;
 
+// CORS middleware - Allow requests from any origin with better configuration
+app.use((req, res, next) => {
+    // Allow all origins for development and production
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    res.header('Access-Control-Max-Age', '86400'); // Cache preflight requests for 24 hours
+    
+    // Handle preflight requests
+    if (req.method === 'OPTIONS') {
+        res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+        res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+        return res.status(200).json({});
+    }
+    
+    next();
+});
+
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -730,6 +748,15 @@ function sendContactAdminNotification(contact) {
         });
     });
 }
+
+// Add error handling middleware
+app.use((err, req, res, next) => {
+    console.error('Unhandled error:', err);
+    res.status(500).json({
+        status: 'error',
+        message: 'Internal server error occurred. Please try again later.'
+    });
+});
 
 // For Vercel deployment, we need to export the app
 module.exports = app;

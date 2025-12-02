@@ -475,6 +475,10 @@ function handleFormSubmit(formId, successMessage) {
         })
         .then(response => {
             console.log(`Received response: ${response.status} ${response.statusText}`);
+            // Check if response is ok before parsing JSON
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
             return response.json();
         })
         .then(data => {
@@ -503,9 +507,15 @@ function handleFormSubmit(formId, successMessage) {
             // Hide spinner
             spinner.remove();
             
-            // Show error message
-            alert('Network error: Failed to submit form. Please try again later.');
+            // Show more detailed error message
             console.error('Error:', error);
+            if (error instanceof TypeError && error.message.includes('fetch')) {
+                alert('Network error: Failed to connect to server. Please check your internet connection and try again.');
+            } else if (error.message.includes('HTTP error')) {
+                alert('Server error: ' + error.message + '. Please try again later.');
+            } else {
+                alert('Network error: Failed to submit form. Please try again later.\n\nError details: ' + error.message);
+            }
         });
     });
 }
