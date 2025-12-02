@@ -466,16 +466,23 @@ function handleFormSubmit(formId, successMessage) {
         const baseUrl = window.location.origin;
         const endpoint = formId === 'booking-form' ? `${baseUrl}/process-booking` : `${baseUrl}/process-contact`;
 
-        // Send data to backend with proper content type
+        // Send data to backend with proper content type and timeout
         console.log(`Sending data to ${endpoint}`);
+        
+        // Create AbortController for timeout handling
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+        
         fetch(endpoint, {
             method: 'POST',
             body: urlParams,
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
-            }
+            },
+            signal: controller.signal
         })
         .then(response => {
+            clearTimeout(timeoutId);
             console.log(`Received response: ${response.status} ${response.statusText}`);
             // Check if response is ok before parsing JSON
             if (!response.ok) {
@@ -506,6 +513,7 @@ function handleFormSubmit(formId, successMessage) {
             }
         })
         .catch(error => {
+            clearTimeout(timeoutId);
             // Hide spinner
             spinner.remove();
             
@@ -513,6 +521,8 @@ function handleFormSubmit(formId, successMessage) {
             console.error('Error:', error);
             if (error instanceof TypeError && error.message.includes('fetch')) {
                 alert('Network error: Failed to connect to server. Please check your internet connection and try again.');
+            } else if (error.name === 'AbortError') {
+                alert('Request timeout: The server is taking too long to respond. Please try again later.');
             } else if (error.message.includes('HTTP error')) {
                 alert('Server error: ' + error.message + '. Please try again later.');
             } else {

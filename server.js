@@ -323,9 +323,16 @@ app.post('/process-booking',
     body('children').isInt({ min: 0, max: 10 }),
     body('message').trim().escape().isLength({ max: 500 }),
     (req, res) => {
+        // Debug: Log request start
+        console.log('=== BOOKING FORM REQUEST START ===');
+        console.log('Request method:', req.method);
+        console.log('Request URL:', req.url);
+        console.log('Request headers:', req.headers);
+        
         // Check for validation errors
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
+            console.log('Validation errors:', errors.array());
             return res.status(400).json({
                 status: 'error',
                 message: 'Please check your input and try again.',
@@ -347,6 +354,7 @@ app.post('/process-booking',
 
         // Validate required fields
         if (!name || !email || !phone || !checkin || !checkout || !roomType) {
+            console.log('Missing required fields');
             return res.status(400).json({
                 status: 'error',
                 message: 'Please fill in all required fields.'
@@ -424,6 +432,7 @@ app.post('/process-booking',
                 sendConfirmationEmail(booking),
                 sendAdminNotification(booking)
             ]).then(() => {
+                console.log('Booking form processed successfully - emails sent');
                 res.json({
                     status: 'success',
                     message: 'Booking request submitted successfully! A confirmation email has been sent to your email address. We will contact you shortly to confirm your reservation.',
@@ -438,6 +447,7 @@ app.post('/process-booking',
                 });
             });
         } catch (err) {
+            console.error('Error processing booking form:', err);
             res.status(500).json({
                 status: 'error',
                 message: 'Failed to save booking. Please try again later.'
@@ -448,6 +458,12 @@ app.post('/process-booking',
 
 // Handle contact form submission
 app.post('/process-contact', (req, res) => {
+    // Debug: Log request start
+    console.log('=== CONTACT FORM REQUEST START ===');
+    console.log('Request method:', req.method);
+    console.log('Request URL:', req.url);
+    console.log('Request headers:', req.headers);
+    
     // Debug: Log all incoming data
     console.log('=== CONTACT FORM DEBUG ===');
     console.log('Request body:', req.body);
@@ -549,7 +565,7 @@ app.post('/process-contact', (req, res) => {
     // Save contacts to file
     try {
         fs.writeFileSync('contacts.json', JSON.stringify(contacts, null, 2));
-            
+        
         // Send email notifications if transporter is configured
         if (transporter) {
             // Send confirmation email to the customer and notification to admin
@@ -557,6 +573,7 @@ app.post('/process-contact', (req, res) => {
                 sendContactConfirmationEmail(contact),
                 sendContactAdminNotification(contact)
             ]).then(() => {
+                console.log('Contact form processed successfully - emails sent');
                 res.json({
                     status: 'success',
                     message: 'Thank you for your message! We will get back to you soon.'
@@ -598,6 +615,7 @@ app.post('/process-contact', (req, res) => {
             });
         }
     } catch (err) {
+        console.error('Error processing contact form:', err);
         res.status(500).json({
             status: 'error',
             message: 'Failed to save message. Please try again later.'
