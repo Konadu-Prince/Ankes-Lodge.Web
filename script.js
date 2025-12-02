@@ -471,7 +471,7 @@ function handleFormSubmit(formId, successMessage) {
         
         // Create AbortController for timeout handling
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // Increase to 30 seconds
         
         fetch(endpoint, {
             method: 'POST',

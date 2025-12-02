@@ -163,7 +163,13 @@ function sendConfirmationEmail(booking) {
 
     // Return a promise for better error handling
     return new Promise((resolve, reject) => {
+        console.log('Attempting to send confirmation email to:', booking.email);
+        const startTime = Date.now();
+        
         transporter.sendMail(mailOptions, function(error, info) {
+            const endTime = Date.now();
+            console.log(`Email sending attempt took ${endTime - startTime}ms`);
+            
             if (error) {
                 console.log('Email sending error:', error.message);
                 // Log the email content as fallback
@@ -268,7 +274,13 @@ function sendAdminNotification(booking) {
     
     // Return a promise for better error handling
     return new Promise((resolve, reject) => {
+        console.log('Attempting to send admin notification email to: ankeslodge@gmail.com');
+        const startTime = Date.now();
+        
         transporter.sendMail(mailOptions, function(error, info) {
+            const endTime = Date.now();
+            console.log(`Admin email sending attempt took ${endTime - startTime}ms`);
+            
             if (error) {
                 console.log('Admin notification error:', error.message);
                 // Log the email content as fallback
@@ -686,7 +698,13 @@ function sendContactConfirmationEmail(contact) {
 
     // Return a promise for better error handling
     return new Promise((resolve, reject) => {
+        console.log('Attempting to send contact confirmation email to:', contact.email);
+        const startTime = Date.now();
+        
         transporter.sendMail(mailOptions, function(error, info) {
+            const endTime = Date.now();
+            console.log(`Contact confirmation email sending attempt took ${endTime - startTime}ms`);
+            
             if (error) {
                 console.log('Contact confirmation email error:', error.message);
                 resolve(); // Resolve anyway since this is not a critical error for the user experience
@@ -764,7 +782,13 @@ function sendContactAdminNotification(contact) {
 
     // Return a promise for better error handling
     return new Promise((resolve, reject) => {
+        console.log('Attempting to send contact admin notification email to: ankeslodge@gmail.com');
+        const startTime = Date.now();
+        
         transporter.sendMail(mailOptions, function(error, info) {
+            const endTime = Date.now();
+            console.log(`Contact admin email sending attempt took ${endTime - startTime}ms`);
+        
             if (error) {
                 console.log('Contact admin notification error:', error.message);
                 // Log the email content as fallback
