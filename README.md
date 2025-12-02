@@ -66,8 +66,8 @@ Important: For Gmail, you must use an App Password, not your regular password. G
 
 Example:
 ```
-EMAIL_USER=konaduprince26@gmail.com
-EMAIL_PASS=svvnrkgzmgxuskyl
+EMAIL_USER=konaduprince@gmail.com
+EMAIL_PASS=svvnrkgzmgxuskyk
 ```
 
 Without these environment variables, the email functionality will be disabled and only logged to the console.
