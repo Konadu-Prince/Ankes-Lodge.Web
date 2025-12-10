@@ -6,6 +6,9 @@ const nodemailer = require('nodemailer');
 const rateLimit = require('express-rate-limit');
 const { body, validationResult } = require('express-validator');
 
+// Add path module for file operations
+const path = require('path');
+
 // Load environment variables from .env file
 require('dotenv').config();
 
@@ -316,6 +319,11 @@ app.get('/', (req, res) => {
 // Serve bookings.json file
 app.get('/bookings.json', (req, res) => {
     res.sendFile(path.join(__dirname, 'bookings.json'));
+});
+
+// Serve testimonials.json file
+app.get('/testimonials.json', (req, res) => {
+    res.sendFile(path.join(__dirname, 'testimonials.json'));
 });
 
 // Serve admin page
@@ -805,6 +813,93 @@ function sendContactAdminNotification(contact) {
         });
     });
 }
+
+// Endpoint to add new testimonial
+app.post('/add-testimonial', (req, res) => {
+    const { name, location, comment, rating } = req.body;
+    
+    // Validate required fields
+    if (!name || !comment) {
+        return res.status(400).json({
+            status: 'error',
+            message: 'Name and comment are required.'
+        });
+    }
+    
+    // Validate rating
+    const ratingValue = parseInt(rating);
+    if (isNaN(ratingValue) || ratingValue < 1 || ratingValue > 5) {
+        return res.status(400).json({
+            status: 'error',
+            message: 'Rating must be a number between 1 and 5.'
+        });
+    }
+    
+    // Read existing testimonials
+    let testimonials = [];
+    if (fs.existsSync('testimonials.json')) {
+        try {
+            const data = fs.readFileSync('testimonials.json', 'utf8');
+            testimonials = JSON.parse(data);
+        } catch (err) {
+            testimonials = [];
+        }
+    }
+    
+    // Create new testimonial
+    const newTestimonial = {
+        id: testimonials.length > 0 ? Math.max(...testimonials.map(t => t.id)) + 1 : 1,
+        name,
+        location: location || '',
+        comment,
+        rating: ratingValue,
+        date: new Date().toISOString().split('T')[0]
+    };
+    
+    // Add new testimonial
+    testimonials.unshift(newTestimonial); // Add to beginning of array
+    
+    // Save testimonials to file
+    try {
+        fs.writeFileSync('testimonials.json', JSON.stringify(testimonials, null, 2));
+        res.json({
+            status: 'success',
+            message: 'Thank you for your testimonial!',
+            testimonial: newTestimonial
+        });
+    } catch (err) {
+        console.error('Error saving testimonial:', err);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to save testimonial. Please try again later.'
+        });
+    }
+});
+
+// Endpoint to get visitor count
+app.get('/visitor-count', (req, res) => {
+    let counter = { count: 0 };
+    if (fs.existsSync('visitor-counter.json')) {
+        try {
+            const data = fs.readFileSync('visitor-counter.json', 'utf8');
+            counter = JSON.parse(data);
+        } catch (err) {
+            counter = { count: 0 };
+        }
+    }
+    
+    // Increment counter
+    counter.count += 1;
+    
+    // Save updated counter
+    try {
+        fs.writeFileSync('visitor-counter.json', JSON.stringify(counter, null, 2));
+    } catch (err) {
+        console.error('Error updating visitor counter:', err);
+    }
+    
+    res.json({ count: counter.count });
+});
 
 // Add error handling middleware
 app.use((err, req, res, next) => {

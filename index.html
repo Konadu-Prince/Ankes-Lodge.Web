@@ -189,36 +189,62 @@
     <section class="testimonials">
         <div class="container">
             <h2>Guest Experiences</h2>
-            <div class="testimonial-grid">
-                <div class="testimonial-card">
-                    <div class="testimonial-content">
-                        <p>"Ankes Lodge provided the perfect retreat for our family vacation. The staff was incredibly welcoming and the facilities were spotless."</p>
-                    </div>
-                    <div class="testimonial-author">
-                        <h4>Samuel K.</h4>
-                        <p>Kumasi, Ghana</p>
+            <div class="testimonial-header">
+                <h3>What Our Guests Say</h3>
+                <div class="visitor-counter">
+                    <span id="visitor-count">0</span> visitors
+                </div>
+            </div>
+            <div class="testimonial-slider-container">
+                <div class="testimonial-slider">
+                    <div class="testimonial-slide active">
+                        <div class="testimonial-card">
+                            <div class="testimonial-rating">
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                            </div>
+                            <div class="testimonial-content">
+                                <p>"Loading testimonials..."</p>
+                            </div>
+                            <div class="testimonial-author">
+                                <h4>Loading...</h4>
+                                <p>Loading...</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                
-                <div class="testimonial-card">
-                    <div class="testimonial-content">
-                        <p>"As a business traveler, I appreciate the quiet environment and reliable WiFi. The executive room exceeded my expectations."</p>
+                <button class="slider-nav prev-btn" aria-label="Previous testimonial">❮</button>
+                <button class="slider-nav next-btn" aria-label="Next testimonial">❯</button>
+            </div>
+            
+            <!-- Add Testimonial Form -->
+            <div class="add-testimonial-section">
+                <h3>Share Your Experience</h3>
+                <form id="testimonial-form" class="testimonial-form">
+                    <div class="form-group">
+                        <input type="text" id="testimonial-name" name="name" placeholder="Your Name *" required>
                     </div>
-                    <div class="testimonial-author">
-                        <h4>Grace A.</h4>
-                        <p>Accra, Ghana</p>
+                    <div class="form-group">
+                        <input type="text" id="testimonial-location" name="location" placeholder="Your Location (optional)">
                     </div>
-                </div>
-                
-                <div class="testimonial-card">
-                    <div class="testimonial-content">
-                        <p>"The full house booking was perfect for our company retreat. The event hall and accommodation made our planning stress-free."</p>
+                    <div class="form-group">
+                        <select id="testimonial-rating" name="rating" required>
+                            <option value="">Select Rating *</option>
+                            <option value="5">★★★★★ - Excellent</option>
+                            <option value="4">★★★★☆ - Very Good</option>
+                            <option value="3">★★★☆☆ - Good</option>
+                            <option value="2">★★☆☆☆ - Fair</option>
+                            <option value="1">★☆☆☆☆ - Poor</option>
+                        </select>
                     </div>
-                    <div class="testimonial-author">
-                        <h4>Michael T.</h4>
-                        <p>Tech Solutions Ltd</p>
+                    <div class="form-group">
+                        <textarea id="testimonial-comment" name="comment" placeholder="Share your experience *" rows="4" required></textarea>
                     </div>
-                </div>
+                    <button type="submit" class="btn-primary">Submit Review</button>
+                </form>
             </div>
         </div>
     </section>

@@ -1,0 +1,26 @@
+[
+  {
+    "id": 1,
+    "name": "Samuel K.",
+    "location": "Kumasi, Ghana",
+    "comment": "Ankes Lodge provided the perfect retreat for our family vacation. The staff was incredibly welcoming and the facilities were spotless.",
+    "rating": 5,
+    "date": "2025-11-15"
+  },
+  {
+    "id": 2,
+    "name": "Grace A.",
+    "location": "Accra, Ghana",
+    "comment": "As a business traveler, I appreciate the quiet environment and reliable WiFi. The executive room exceeded my expectations.",
+    "rating": 5,
+    "date": "2025-10-22"
+  },
+  {
+    "id": 3,
+    "name": "Michael T.",
+    "location": "Tech Solutions Ltd",
+    "comment": "The full house booking was perfect for our company retreat. The event hall and accommodation made our planning stress-free.",
+    "rating": 5,
+    "date": "2025-09-30"
+  }
+]
