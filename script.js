@@ -111,15 +111,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize flyer preview functionality
     initFlyerPreview();
-    
-    // Initialize testimonial slider
-    initTestimonialSlider();
-    
-    // Initialize visitor counter
-    initVisitorCounter();
-    
-    // Initialize testimonial form
-    initTestimonialForm();
 });
 
 // Scroll to top functionality
@@ -592,158 +583,21 @@ function initFlyerPreview() {
     }
 }
 
-// Testimonial slider functionality
-function initTestimonialSlider() {
-    let currentSlide = 0;
-    let slides = [];
-    let slideInterval;
-    
-    // Fetch testimonials from server
-    fetch('/testimonials.json')
+// Old testimonial slider functionality removed
+
+// Initialize visitor counter
+function initVisitorCounter() {
+    fetch('/visitor-count')
         .then(response => response.json())
-        .then(testimonials => {
-            slides = testimonials;
-            renderTestimonials(slides);
-            startSlider();
+        .then(data => {
+            const counterElement = document.getElementById('visitor-count');
+            if (counterElement) {
+                counterElement.textContent = data.count.toLocaleString();
+            }
         })
         .catch(error => {
-            console.error('Error fetching testimonials:', error);
-            // Use default testimonials if fetch fails
-            const defaultTestimonials = [
-                {
-                    name: "Samuel K.",
-                    location: "Kumasi, Ghana",
-                    comment: "Ankes Lodge provided the perfect retreat for our family vacation. The staff was incredibly welcoming and the facilities were spotless.",
-                    rating: 5,
-                    date: "2025-11-15"
-                },
-                {
-                    name: "Grace A.",
-                    location: "Accra, Ghana",
-                    comment: "As a business traveler, I appreciate the quiet environment and reliable WiFi. The executive room exceeded my expectations.",
-                    rating: 5,
-                    date: "2025-10-22"
-                },
-                {
-                    name: "Michael T.",
-                    location: "Tech Solutions Ltd",
-                    comment: "The full house booking was perfect for our company retreat. The event hall and accommodation made our planning stress-free.",
-                    rating: 5,
-                    date: "2025-09-30"
-                }
-            ];
-            slides = defaultTestimonials;
-            renderTestimonials(slides);
-            startSlider();
+            console.error('Error fetching visitor count:', error);
         });
-    
-    function renderTestimonials(testimonials) {
-        const sliderContainer = document.querySelector('.testimonial-slider');
-        if (!sliderContainer) return;
-        
-        // Clear existing slides
-        sliderContainer.innerHTML = '';
-        
-        // Create slides for each testimonial
-        testimonials.forEach((testimonial, index) => {
-            const slide = document.createElement('div');
-            slide.className = `testimonial-slide ${index === 0 ? 'active' : ''}`;
-            
-            // Create star rating
-            let stars = '';
-            for (let i = 1; i <= 5; i++) {
-                stars += `<span class="star">${i <= testimonial.rating ? '★' : '☆'}</span>`;
-            }
-            
-            slide.innerHTML = `
-                <div class="testimonial-card">
-                    <div class="testimonial-rating">
-                        ${stars}
-                    </div>
-                    <div class="testimonial-content">
-                        <p>"${testimonial.comment}"</p>
-                    </div>
-                    <div class="testimonial-author">
-                        <h4>${testimonial.name}</h4>
-                        <p>${testimonial.location || 'Guest'} • ${testimonial.date}</p>
-                    </div>
-                </div>
-            `;
-            
-            sliderContainer.appendChild(slide);
-        });
-        
-        // Update slides array
-        slides = Array.from(document.querySelectorAll('.testimonial-slide'));
-    }
-    
-    function showSlide(index) {
-        if (slides.length === 0) return;
-        
-        // Hide all slides
-        slides.forEach(slide => slide.classList.remove('active'));
-        
-        // Show current slide
-        slides[index].classList.add('active');
-        
-        currentSlide = index;
-    }
-    
-    function nextSlide() {
-        if (slides.length === 0) return;
-        
-        currentSlide = (currentSlide + 1) % slides.length;
-        showSlide(currentSlide);
-    }
-    
-    function prevSlide() {
-        if (slides.length === 0) return;
-        
-        currentSlide = (currentSlide - 1 + slides.length) % slides.length;
-        showSlide(currentSlide);
-    }
-    
-    function startSlider() {
-        // Clear any existing interval
-        if (slideInterval) {
-            clearInterval(slideInterval);
-        }
-        
-        // Start new interval
-        if (slides.length > 1) {
-            slideInterval = setInterval(nextSlide, 5000); // Change slide every 5 seconds
-        }
-        
-        // Add event listeners to navigation buttons
-        const prevBtn = document.querySelector('.prev-btn');
-        const nextBtn = document.querySelector('.next-btn');
-        
-        if (prevBtn) {
-            prevBtn.addEventListener('click', function() {
-                prevSlide();
-                // Reset interval
-                if (slideInterval) {
-                    clearInterval(slideInterval);
-                    if (slides.length > 1) {
-                        slideInterval = setInterval(nextSlide, 5000);
-                    }
-                }
-            });
-        }
-        
-        if (nextBtn) {
-            nextBtn.addEventListener('click', function() {
-                nextSlide();
-                // Reset interval
-                if (slideInterval) {
-                    clearInterval(slideInterval);
-                    if (slides.length > 1) {
-                        slideInterval = setInterval(nextSlide, 5000);
-                    }
-                }
-            });
-        }
-    }
 }
 
 // Testimonial marquee functionality
@@ -902,6 +756,88 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     }
+});
+
+// Testimonial form functionality
+function initTestimonialForm() {
+    const form = document.getElementById('testimonial-form');
+    if (!form) return;
+    
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Get form data
+        const name = document.getElementById('testimonial-name').value;
+        const location = document.getElementById('testimonial-location').value;
+        const rating = document.getElementById('testimonial-rating').value;
+        const comment = document.getElementById('testimonial-comment').value;
+        
+        // Validate form
+        if (!name || !rating || !comment) {
+            alert('Please fill in all required fields.');
+            return;
+        }
+        
+        // Create loading spinner
+        const submitButton = form.querySelector('button[type="submit"]');
+        const originalText = submitButton.textContent;
+        submitButton.textContent = 'Submitting...';
+        submitButton.disabled = true;
+        
+        // Submit testimonial
+        fetch('/add-testimonial', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                name: name,
+                location: location,
+                rating: rating,
+                comment: comment
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert(data.message);
+                form.reset();
+                
+                // Refresh testimonials
+                fetch('/testimonials.json')
+                    .then(response => response.json())
+                    .then(testimonials => {
+                        const marquee = document.querySelector('.testimonial-marquee');
+                        if (marquee) {
+                            // Reinitialize marquee with new testimonials
+                            initTestimonialMarquee();
+                        }
+                    });
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error submitting testimonial:', error);
+            alert('Failed to submit testimonial. Please try again later.');
+        })
+        .finally(() => {
+            submitButton.textContent = originalText;
+            submitButton.disabled = false;
+        });
+    });
+}
+
+// Initialize visitor counter
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize testimonial marquee
+    initTestimonialMarquee();
+    
+    // Initialize visitor counter
+    initVisitorCounter();
+    
+    // Initialize testimonial form
+    initTestimonialForm();
 });
 
 // Apply to both forms
