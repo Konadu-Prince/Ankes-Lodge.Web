@@ -914,10 +914,21 @@ app.post('/add-testimonial', (req, res) => {
     // Save testimonials to file
     try {
         fs.writeFileSync('testimonials.json', JSON.stringify(testimonials, null, 2));
-        res.json({
-            status: 'success',
-            message: 'Thank you for your testimonial!',
-            testimonial: newTestimonial
+        
+        // Send notification email to admin
+        sendTestimonialAdminNotification(newTestimonial).then(() => {
+            res.json({
+                status: 'success',
+                message: 'Thank you for your testimonial!',
+                testimonial: newTestimonial
+            });
+        }).catch((error) => {
+            console.log('Error sending testimonial notification email:', error);
+            res.json({
+                status: 'success',
+                message: 'Thank you for your testimonial!',
+                testimonial: newTestimonial
+            });
         });
     } catch (err) {
         console.error('Error saving testimonial:', err);
@@ -927,6 +938,99 @@ app.post('/add-testimonial', (req, res) => {
         });
     }
 });
+
+// Function to send notification email to admin for new testimonial
+function sendTestimonialAdminNotification(testimonial) {
+    // If transporter is not configured, skip email sending
+    if (!transporter) {
+        console.log('Email transporter not configured, logging testimonial admin notification to console');
+        console.log('=== TESTIMONIAL ADMIN NOTIFICATION EMAIL ===');
+        console.log(`To: ankeslodge@gmail.com`);
+        console.log(`Subject: New Testimonial Submitted - Ankes Lodge`);
+        console.log(`Body:`);
+        console.log(`A new testimonial has been submitted. Details:`);
+        console.log(`Name: ${testimonial.name}`);
+        console.log(`Location: ${testimonial.location || 'Not provided'}`);
+        console.log(`Rating: ${testimonial.rating}/5 stars`);
+        console.log(`Comment: ${testimonial.comment}`);
+        console.log(`Date: ${testimonial.date}`);
+        console.log(`Testimonial ID: ${testimonial.id}`);
+        console.log('============================================');
+        return Promise.resolve(); // Return a resolved promise for consistency
+    }
+    
+    const mailOptions = {
+        from: 'ankeslodge@gmail.com',
+        to: 'ankeslodge@gmail.com', // Admin email
+        subject: `New Testimonial Submitted - Ankes Lodge`,
+        html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
+                <div style="text-align: center; padding: 20px 0; background-color: #fff; border-bottom: 3px solid #ffa500;">
+                    <img src="https://konadu-prince.github.io/Ankes-Lodge.Web/orangeLogo.png" alt="Ankes Lodge Logo" style="max-width: 100px; margin-bottom: 10px;">
+                    <h1 style="color: #333; margin: 0;">Ankes Lodge</h1>
+                    <p style="color: #666; margin: 5px 0;">Luxury Guest House in Abesim</p>
+                </div>
+                
+                <div style="background-color: #fff; padding: 30px; margin: 20px 0; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                    <h2 style="color: #333;">New Testimonial Received</h2>
+                    <p>A visitor has submitted a new testimonial for Ankes Lodge.</p>
+                    
+                    <div style="background-color: #f8f9fa; padding: 20px; margin: 20px 0; border-left: 4px solid #ffa500; border-radius: 3px;">
+                        <h3 style="color: #333; margin-top: 0;">Testimonial Details</h3>
+                        <p><strong>Testimonial ID:</strong> ${testimonial.id}</p>
+                        <p><strong>Name:</strong> ${testimonial.name}</p>
+                        <p><strong>Location:</strong> ${testimonial.location || 'Not provided'}</p>
+                        <p><strong>Rating:</strong> ${'★'.repeat(testimonial.rating)}${'☆'.repeat(5 - testimonial.rating)} (${testimonial.rating}/5 stars)</p>
+                        <p><strong>Date:</strong> ${testimonial.date}</p>
+                        <p><strong>Comment:</strong></p>
+                        <div style="background-color: #fff; padding: 15px; border-radius: 4px; border-left: 3px solid #ffa500;">
+                            <p style="margin: 0; font-style: italic;">"${testimonial.comment}"</p>
+                        </div>
+                    </div>
+                    
+                    <div style="background-color: #e8f4e8; padding: 20px; margin: 20px 0; border-left: 4px solid #28a745; border-radius: 3px;">
+                        <h3 style="color: #333; margin-top: 0;">Admin Actions</h3>
+                        <p>You can view and manage this testimonial in the admin panel:</p>
+                        <div style="text-align: center; margin: 20px 0;">
+                            <a href="https://your-domain.onrender.com/admin.html" style="display: inline-block; background-color: #FFA500; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">View Testimonials</a>
+                        </div>
+                        <p style="margin-bottom: 0;">Log in to approve, edit, or remove this testimonial as needed.</p>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; padding: 20px; color: #666; font-size: 14px;">
+                    <p>Contact: 0544904547, 0558647156, 0248293512</p>
+                    <p>&copy; 2025 Ankes Lodge. All rights reserved.</p>
+                </div>
+            </div>
+        `
+    };
+
+    // Return a promise for better error handling
+    return new Promise((resolve, reject) => {
+        console.log('Attempting to send testimonial admin notification email to: ankeslodge@gmail.com');
+        const startTime = Date.now();
+        
+        transporter.sendMail(mailOptions, function(error, info) {
+            const endTime = Date.now();
+            console.log(`Testimonial admin email sending attempt took ${endTime - startTime}ms`);
+            
+            if (error) {
+                console.log('Testimonial admin notification error:', error.message);
+                // Log the email content as fallback
+                console.log('=== TESTIMONIAL ADMIN EMAIL FALLBACK LOG ===');
+                console.log(`To: ankeslodge@gmail.com`);
+                console.log(`Subject: New Testimonial Submitted - Ankes Lodge`);
+                console.log('Content:', mailOptions.html);
+                console.log('================================================');
+                resolve(); // Resolve anyway since this is not a critical error for the user experience
+            } else {
+                console.log('Testimonial admin notification sent: ' + info.response);
+                resolve();
+            }
+        });
+    });
+}
 
 // Endpoint to get visitor count
 app.get('/visitor-count', (req, res) => {
