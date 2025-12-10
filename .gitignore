@@ -11,3 +11,9 @@ node_modules/
 .vscode/
 *.swp
 *.swo
+
+# Data files
+bookings.json
+contacts.json
+testimonials.json
+visitor-counter.json
