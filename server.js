@@ -992,10 +992,11 @@ function sendTestimonialAdminNotification(testimonial) {
                         <h3 style="color: #333; margin-top: 0;">Admin Actions</h3>
                         <p>You can view and manage this testimonial in the admin panel:</p>
                         <div style="text-align: center; margin: 20px 0;">
-                            <a href="https://your-domain.onrender.com/admin.html" style="display: inline-block; background-color: #FFA500; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">View Testimonials</a>
+                            <a href="https://ankes-lodge.onrender.com/admin.html" style="display: inline-block; background-color: #FFA500; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">View Testimonials</a>
                         </div>
                         <p style="margin-bottom: 0;">Log in to approve, edit, or remove this testimonial as needed.</p>
                     </div>
+
                 </div>
                 
                 <div style="text-align: center; padding: 20px; color: #666; font-size: 14px;">
