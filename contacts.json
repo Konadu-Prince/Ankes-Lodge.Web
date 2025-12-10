@@ -174,5 +174,13 @@
     "email": "konaduprince26@gmail.com",
     "subject": "this is a test from the local hosting",
     "message": "yestt ithis is a test from the local hosting"
+  },
+  {
+    "id": "test456",
+    "timestamp": "2025-12-10 08:29:51",
+    "name": "Test Contact",
+    "email": "contact@example.com",
+    "subject": "Test Subject",
+    "message": "This is a test contact message"
   }
 ]
