@@ -101,6 +101,7 @@
             </div>
             <nav>
                 <ul>
+                    <li><a href="/" id="logoutLink">Logout</a></li>
                     <li><a href="/">Back to Website</a></li>
                 </ul>
             </nav>
@@ -366,6 +367,32 @@
                 // Show corresponding content
                 const tabName = this.getAttribute('data-tab');
                 document.getElementById(tabName + '-tab').classList.add('active');
+            });
+        });
+        
+        // Logout functionality
+        document.getElementById('logoutLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Send logout request
+            fetch('/admin/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Redirect to login page
+                    window.location.href = '/login.html';
+                } else {
+                    alert('Error logging out. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Logout error:', error);
+                alert('Error logging out. Please try again.');
             });
         });
     </script>

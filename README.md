@@ -86,7 +86,19 @@ Without these environment variables, the email functionality will be disabled an
 - `POST /process-booking` - Handle booking form submissions
 - `POST /process-contact` - Handle contact form submissions
 - `GET /bookings.json` - Retrieve booking data (for admin interface)
+- `POST /admin/login` - Admin login endpoint
+- `POST /admin/logout` - Admin logout endpoint
 - `GET /` - Serve the main website
+
+### Admin Access
+
+The admin panel is now protected with a login system:
+- Visit `/login.html` to access the admin login page
+- Default credentials:
+  - Username: `admin`
+  - Password: `ankeslodge2025`
+- After successful login, you'll be redirected to the admin panel
+- To change credentials, modify the `admin-credentials.json` file
 
 ### Local Development
 

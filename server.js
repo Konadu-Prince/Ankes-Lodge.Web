@@ -15,6 +15,9 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 8000;
 
+// Session storage for logged-in admins
+const adminSessions = new Map();
+
 // CORS middleware - Allow requests from any origin with better configuration
 app.use((req, res, next) => {
     // Allow all origins for development and production
@@ -33,10 +36,35 @@ app.use((req, res, next) => {
     next();
 });
 
-// Middleware
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+// Middleware to serve static files
 app.use(express.static('.'));
+
+// Middleware to parse JSON bodies
+app.use(bodyParser.json());
+
+// Authentication middleware
+function requireAuth(req, res, next) {
+    // Check if this is a request to login page or login endpoint (allow without auth)
+    if (req.path === '/login.html' || req.path === '/admin/login' || req.path === '/admin/logout') {
+        return next();
+    }
+    
+    // Check if this is a request to admin panel
+    if (req.path === '/admin.html' || req.path.startsWith('/admin/')) {
+        // Check for session cookie
+        const sessionId = req.headers.authorization || req.query.session;
+        
+        if (!sessionId || !adminSessions.has(sessionId)) {
+            // Redirect to login page
+            return res.redirect('/login.html');
+        }
+    }
+    
+    next();
+}
+
+// Apply authentication middleware to all routes
+app.use(requireAuth);
 
 // Create a reusable transporter object using Gmail SMTP
 // Note: In production, use environment variables for credentials
@@ -953,6 +981,60 @@ app.delete('/delete-testimonial/:id', (req, res) => {
             message: 'Failed to save testimonials. Please try again later.'
         });
     }
+});
+
+// Add login endpoint
+app.post('/admin/login', (req, res) => {
+    const { username, password } = req.body;
+    
+    // Read admin credentials
+    let adminCredentials = { username: 'admin', password: 'ankeslodge2025' };
+    try {
+        if (fs.existsSync('admin-credentials.json')) {
+            const data = fs.readFileSync('admin-credentials.json', 'utf8');
+            adminCredentials = JSON.parse(data);
+        }
+    } catch (err) {
+        console.error('Error reading admin credentials:', err);
+    }
+    
+    // Check credentials
+    if (username === adminCredentials.username && password === adminCredentials.password) {
+        // Generate session ID
+        const sessionId = uuidv4();
+        
+        // Store session (in production, use a proper session store like Redis)
+        adminSessions.set(sessionId, {
+            username: username,
+            loginTime: new Date()
+        });
+        
+        // Send success response with session ID
+        res.json({
+            success: true,
+            sessionId: sessionId
+        });
+    } else {
+        // Send failure response
+        res.status(401).json({
+            success: false,
+            message: 'Invalid credentials'
+        });
+    }
+});
+
+// Add logout endpoint
+app.post('/admin/logout', (req, res) => {
+    const sessionId = req.headers.authorization || req.query.session;
+    
+    if (sessionId && adminSessions.has(sessionId)) {
+        adminSessions.delete(sessionId);
+    }
+    
+    res.json({
+        success: true,
+        message: 'Logged out successfully'
+    });
 });
 
 // Add error handling middleware
