@@ -463,7 +463,14 @@ function handleFormSubmit(formId, successMessage) {
         
         // Determine endpoint based on form
         // Use absolute URL to ensure it works correctly when hosted
-        const baseUrl = window.location.origin;
+        let baseUrl = window.location.origin;
+        
+        // Check if we're on GitHub Pages and use Render.com server instead
+        if (window.location.hostname.includes('github.io')) {
+            // Use your Render.com server URL for form submissions when hosted on GitHub Pages
+            baseUrl = 'https://ankes-lodge.onrender.com';
+        }
+        
         const endpoint = formId === 'booking-form' ? `${baseUrl}/process-booking` : `${baseUrl}/process-contact`;
 
         // Send data to backend with proper content type and timeout
@@ -587,7 +594,16 @@ function initFlyerPreview() {
 
 // Initialize visitor counter
 function initVisitorCounter() {
-    fetch('/visitor-count')
+    // Determine the correct base URL (Render.com when on GitHub Pages)
+    let baseUrl = window.location.origin;
+    
+    // Check if we're on GitHub Pages and use Render.com server instead
+    if (window.location.hostname.includes('github.io')) {
+        // Use your Render.com server URL for form submissions when hosted on GitHub Pages
+        baseUrl = 'https://ankes-lodge.onrender.com'; // Replace with your actual Render.com URL
+    }
+    
+    fetch(`${baseUrl}/visitor-count`)
         .then(response => response.json())
         .then(data => {
             const counterElement = document.getElementById('visitor-count');
@@ -625,8 +641,17 @@ function initTestimonialMarquee() {
         }, 3000);
     });
     
+    // Determine the correct base URL (Render.com when on GitHub Pages)
+    let baseUrl = window.location.origin;
+    
+    // Check if we're on GitHub Pages and use Render.com server instead
+    if (window.location.hostname.includes('github.io')) {
+        // Use your Render.com server URL for form submissions when hosted on GitHub Pages
+        baseUrl = 'https://ankes-lodge.onrender.com'; // Replace with your actual Render.com URL
+    }
+    
     // Fetch testimonials from server
-    fetch('/testimonials.json')
+    fetch(`${baseUrl}/testimonials.json`)
         .then(response => response.json())
         .then(testimonials => {
             renderMarqueeTestimonials(testimonials);
@@ -659,7 +684,7 @@ function initTestimonialMarquee() {
             ];
             renderMarqueeTestimonials(defaultTestimonials);
         });
-    
+
     function renderMarqueeTestimonials(testimonials) {
         const marqueeContainer = document.querySelector('.testimonial-marquee');
         if (!marqueeContainer) return;
@@ -785,7 +810,16 @@ function initTestimonialForm() {
         submitButton.disabled = true;
         
         // Submit testimonial
-        fetch('/add-testimonial', {
+        // Determine the correct base URL (Render.com when on GitHub Pages)
+        let baseUrl = window.location.origin;
+        
+        // Check if we're on GitHub Pages and use Render.com server instead
+        if (window.location.hostname.includes('github.io')) {
+            // Use your Render.com server URL for form submissions when hosted on GitHub Pages
+            baseUrl = 'https://ankes-lodge.onrender.com'; // Replace with your actual Render.com URL
+        }
+        
+        fetch(`${baseUrl}/add-testimonial`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
