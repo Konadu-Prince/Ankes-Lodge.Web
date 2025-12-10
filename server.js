@@ -15,6 +15,22 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 8000;
 
+// Improved static file serving for Render.com
+app.use(express.static('.', {
+  etag: true,
+  lastModified: true,
+  setHeaders: (res, path) => {
+    // Set cache control for different file types
+    if (path.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-cache');
+    } else if (path.endsWith('.css') || path.endsWith('.js')) {
+      res.setHeader('Cache-Control', 'public, max-age=31536000');
+    } else {
+      res.setHeader('Cache-Control', 'public, max-age=86400');
+    }
+  }
+}));
+
 // Session storage for logged-in admins
 const adminSessions = new Map();
 
@@ -354,9 +370,14 @@ app.get('/testimonials.json', (req, res) => {
     res.sendFile(path.join(__dirname, 'testimonials.json'));
 });
 
-// Serve admin page
+// Serve admin page with proper routing
 app.get('/admin', (req, res) => {
-    res.sendFile(path.join(__dirname, 'admin.html'));
+  res.sendFile(path.join(__dirname, 'admin.html'));
+});
+
+// Serve login page with proper routing
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'login.html'));
 });
 
 // Handle booking form submission

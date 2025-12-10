@@ -28,30 +28,27 @@ This project can be deployed to either Vercel or Render with both server and cli
    - `EMAIL_PASS` - Your Gmail app password
 6. Deploy!
 
-### Deployment to Render
+### Deployment to Render.com
 
-#### Prerequisites
+To deploy this application to Render.com:
 
-1. A Render account (free at [render.com](https://render.com))
-2. This repository connected to your Render account
-
-#### Deployment Steps
-
-1. Go to your Render dashboard
-2. Click "New+" and select "Web Service"
-3. Connect your GitHub repository
-4. Configure the service settings:
-   - Name: ankes-lodge
-   - Region: Choose the region closest to you
-   - Branch: master or hosting
-   - Root Directory: Leave empty
-   - Environment: Node
-   - Build Command: `npm install`
-   - Start Command: `node server.js`
-5. Add environment variables:
+1. Fork this repository to your GitHub account
+2. Create a new Web Service on Render.com
+3. Connect it to your forked repository
+4. Set the following environment variables in Render.com dashboard:
    - `EMAIL_USER` - Your Gmail address for sending emails
-   - `EMAIL_PASS` - Your Gmail app password
-6. Click "Create Web Service"
+   - `EMAIL_PASS` - Your Gmail App Password (not regular password)
+5. Set Build Command to: `npm install`
+6. Set Start Command to: `node server.js`
+7. Add the following environment variable in Render.com:
+   - Key: `NODE_ENV` 
+   - Value: `production`
+8. Deploy the application
+
+Note: For email functionality to work, you must:
+- Enable 2-factor authentication on your Gmail account
+- Generate an App Password at https://myaccount.google.com/apppasswords
+- Use the App Password (not your regular Gmail password) as the `EMAIL_PASS` value
 
 ### Environment Variables
 
@@ -96,7 +93,7 @@ The admin panel is now protected with a login system:
 - Visit `/login.html` to access the admin login page
 - Default credentials:
   - Username: `admin`
-  - Password: `ankeslodge2025`
+  - Password: `ankeslodge0000`
 - After successful login, you'll be redirected to the admin panel
 - To change credentials, modify the `admin-credentials.json` file
 

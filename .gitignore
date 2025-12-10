@@ -17,3 +17,7 @@ bookings.json
 contacts.json
 testimonials.json
 visitor-counter.json
+
+# OS generated files
+.DS_Store
+Thumbs.db
