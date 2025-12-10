@@ -50,6 +50,32 @@ Note: For email functionality to work, you must:
 - Generate an App Password at https://myaccount.google.com/apppasswords
 - Use the App Password (not your regular Gmail password) as the `EMAIL_PASS` value
 
+### Keeping the Server Awake on Render.com Free Tier
+
+Render.com's free tier puts applications to sleep after 15 minutes of inactivity. While this project includes a self-pinging mechanism to prevent sleep, you can also use external services:
+
+#### Option 1: Built-in Self-Pinger (Automatic)
+- The application automatically pings itself every 14 minutes when deployed on Render.com
+- No additional configuration needed
+
+#### Option 2: External Cron Services
+You can use external services to ping your application:
+- [cron-job.org](https://cron-job.org/) - Free cron job service
+- [uptimerobot.com](https://uptimerobot.com/) - Website monitoring service
+- [kaffeine.herokuapp.com](https://kaffeine.herokuapp.com/) - Keeps Heroku apps awake (also works with Render.com)
+
+To set up external monitoring:
+1. Get your Render.com URL (usually https://your-app-name.onrender.com)
+2. Create an account with one of the services above
+3. Set up a job to ping your URL every 10-14 minutes
+4. Use the `/health` or `/ping` endpoint for monitoring
+
+Example URLs for monitoring:
+- `https://your-app-name.onrender.com/health`
+- `https://your-app-name.onrender.com/ping`
+
+Note: Using external services may be more reliable than the built-in self-pinger.
+
 ### Environment Variables
 
 **IMPORTANT**: For email functionality to work on either platform, you **MUST** set the following environment variables. Hardcoded credentials have been removed for security reasons.

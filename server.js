@@ -6,6 +6,9 @@ const nodemailer = require('nodemailer');
 const rateLimit = require('express-rate-limit');
 const { body, validationResult } = require('express-validator');
 
+// Add node-fetch for self-pinging
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+
 // Add path module for file operations
 const path = require('path');
 
@@ -1067,6 +1070,51 @@ app.use((err, req, res, next) => {
     });
 });
 
+// Add health check endpoint for external monitoring
+app.get('/health', (req, res) => {
+    res.status(200).json({
+        status: 'OK',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+        memory: process.memoryUsage(),
+        environment: process.env.NODE_ENV || 'development'
+    });
+});
+
+// Add simple ping endpoint for self-pinging
+app.get('/ping', (req, res) => {
+    res.status(200).send('pong');
+});
+
+// Add self-pinging mechanism to prevent sleep on Render.com free tier
+function startSelfPinger() {
+    // Only run on Render.com and in production
+    if (process.env.RENDER && process.env.NODE_ENV === 'production') {
+        console.log('Starting self-pinger to prevent sleep on Render.com free tier');
+        
+        // Ping the server every 14 minutes (840000 ms)
+        setInterval(async () => {
+            try {
+                const url = `http://${process.env.RENDER_SERVICE_NAME}.onrender.com`;
+                console.log(`Pinging self at ${url} to prevent sleep`);
+                
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'User-Agent': 'Self-Pinger/1.0'
+                    }
+                });
+                
+                console.log(`Self-ping response: ${response.status}`);
+            } catch (error) {
+                console.error('Self-ping failed:', error.message);
+            }
+        }, 14 * 60 * 1000); // 14 minutes
+    } else {
+        console.log('Self-pinger not started - not running on Render.com or not in production');
+    }
+}
+
 // For Vercel deployment, we need to export the app
 module.exports = app;
 
@@ -1082,6 +1130,9 @@ if (require.main === module) {
         console.log(`- EMAIL_USER: ${process.env.EMAIL_USER ? 'SET' : 'NOT SET'}`);
         console.log(`- EMAIL_PASS: ${process.env.EMAIL_PASS ? 'SET' : 'NOT SET'}`);
         console.log(`- PORT: ${PORT}`);
+        
+        // Start self-pinger after server is running
+        startSelfPinger();
         
         // Test email configuration if credentials are provided
         console.log('Testing email configuration...');
