@@ -746,91 +746,143 @@ function initTestimonialSlider() {
     }
 }
 
-// Visitor counter functionality
-function initVisitorCounter() {
-    fetch('/visitor-count')
+// Testimonial marquee functionality
+function initTestimonialMarquee() {
+    const marqueeContainer = document.querySelector('.testimonial-marquee');
+    if (!marqueeContainer) return;
+    
+    // Fetch testimonials from server
+    fetch('/testimonials.json')
         .then(response => response.json())
-        .then(data => {
-            const counterElement = document.getElementById('visitor-count');
-            if (counterElement) {
-                counterElement.textContent = data.count.toLocaleString();
-            }
+        .then(testimonials => {
+            renderMarqueeTestimonials(testimonials);
         })
         .catch(error => {
-            console.error('Error fetching visitor count:', error);
+            console.error('Error fetching testimonials:', error);
+            // Use default testimonials if fetch fails
+            const defaultTestimonials = [
+                {
+                    name: "Samuel K.",
+                    location: "Kumasi, Ghana",
+                    comment: "Ankes Lodge provided the perfect retreat for our family vacation. The staff was incredibly welcoming and the facilities were spotless.",
+                    rating: 5,
+                    date: "2025-11-15"
+                },
+                {
+                    name: "Grace A.",
+                    location: "Accra, Ghana",
+                    comment: "As a business traveler, I appreciate the quiet environment and reliable WiFi. The executive room exceeded my expectations.",
+                    rating: 5,
+                    date: "2025-10-22"
+                },
+                {
+                    name: "Michael T.",
+                    location: "Tech Solutions Ltd",
+                    comment: "The full house booking was perfect for our company retreat. The event hall and accommodation made our planning stress-free.",
+                    rating: 5,
+                    date: "2025-09-30"
+                }
+            ];
+            renderMarqueeTestimonials(defaultTestimonials);
         });
+    
+    function renderMarqueeTestimonials(testimonials) {
+        const marqueeContainer = document.querySelector('.testimonial-marquee');
+        if (!marqueeContainer) return;
+        
+        // Clear existing content
+        marqueeContainer.innerHTML = '';
+        
+        // Create testimonial cards for marquee
+        testimonials.forEach(testimonial => {
+            // Create star rating
+            let stars = '';
+            for (let i = 1; i <= 5; i++) {
+                stars += `<span class="star">${i <= testimonial.rating ? '★' : '☆'}</span>`;
+            }
+            
+            // Create testimonial card
+            const card = document.createElement('div');
+            card.className = 'testimonial-card';
+            card.innerHTML = `
+                <div class="testimonial-rating">
+                    ${stars}
+                </div>
+                <div class="testimonial-content">
+                    <p>"${testimonial.comment}"</p>
+                </div>
+                <div class="testimonial-author">
+                    <h4>${testimonial.name}</h4>
+                    <p>${testimonial.location || 'Guest'} • ${testimonial.date}</p>
+                </div>
+            `;
+            
+            marqueeContainer.appendChild(card);
+        });
+        
+        // Duplicate testimonials for continuous scrolling effect
+        testimonials.forEach(testimonial => {
+            // Create star rating
+            let stars = '';
+            for (let i = 1; i <= 5; i++) {
+                stars += `<span class="star">${i <= testimonial.rating ? '★' : '☆'}</span>`;
+            }
+            
+            // Create duplicate testimonial card
+            const card = document.createElement('div');
+            card.className = 'testimonial-card';
+            card.innerHTML = `
+                <div class="testimonial-rating">
+                    ${stars}
+                </div>
+                <div class="testimonial-content">
+                    <p>"${testimonial.comment}"</p>
+                </div>
+                <div class="testimonial-author">
+                    <h4>${testimonial.name}</h4>
+                    <p>${testimonial.location || 'Guest'} • ${testimonial.date}</p>
+                </div>
+            `;
+            
+            marqueeContainer.appendChild(card);
+        });
+    }
 }
 
-// Testimonial form functionality
-function initTestimonialForm() {
-    const form = document.getElementById('testimonial-form');
-    if (!form) return;
+// Initialize visitor counter
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize testimonial marquee
+    initTestimonialMarquee();
     
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        // Get form data
-        const name = document.getElementById('testimonial-name').value;
-        const location = document.getElementById('testimonial-location').value;
-        const rating = document.getElementById('testimonial-rating').value;
-        const comment = document.getElementById('testimonial-comment').value;
-        
-        // Validate form
-        if (!name || !rating || !comment) {
-            alert('Please fill in all required fields.');
-            return;
-        }
-        
-        // Create loading spinner
-        const submitButton = form.querySelector('button[type="submit"]');
-        const originalText = submitButton.textContent;
-        submitButton.textContent = 'Submitting...';
-        submitButton.disabled = true;
-        
-        // Submit testimonial
-        fetch('/add-testimonial', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                name: name,
-                location: location,
-                rating: rating,
-                comment: comment
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === 'success') {
-                alert(data.message);
-                form.reset();
-                
-                // Refresh testimonials
-                fetch('/testimonials.json')
-                    .then(response => response.json())
-                    .then(testimonials => {
-                        const slider = document.querySelector('.testimonial-slider');
-                        if (slider) {
-                            // Reinitialize slider with new testimonials
-                            const event = new Event('DOMContentLoaded');
-                            document.dispatchEvent(event);
-                        }
-                    });
+    // Initialize visitor counter
+    initVisitorCounter();
+    
+    // Initialize testimonial form
+    initTestimonialForm();
+});
+
+// Scroll to top functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const scrollToTopButton = document.getElementById('scrollToTop');
+    
+    // Check if the button exists
+    if (scrollToTopButton) {
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                scrollToTopButton.classList.add('visible');
             } else {
-                alert('Error: ' + data.message);
+                scrollToTopButton.classList.remove('visible');
             }
-        })
-        .catch(error => {
-            console.error('Error submitting testimonial:', error);
-            alert('Failed to submit testimonial. Please try again later.');
-        })
-        .finally(() => {
-            submitButton.textContent = originalText;
-            submitButton.disabled = false;
         });
-    });
-}
+
+        scrollToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    }
+});
 
 // Apply to both forms
 document.addEventListener('DOMContentLoaded', function() {

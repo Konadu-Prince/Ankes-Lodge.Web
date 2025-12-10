@@ -397,44 +397,65 @@ section h2::after {
     font-weight: bold;
 }
 
-.testimonial-slider-container {
+/* Marquee Container */
+.testimonial-marquee-container {
+    overflow: hidden;
+    white-space: nowrap;
     position: relative;
     margin-bottom: 50px;
+    background-color: var(--light-color);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    padding: 20px 0;
 }
 
-.testimonial-slider {
-    overflow: hidden;
-    position: relative;
-    height: 300px;
-}
-
-.testimonial-slide {
-    display: none;
+.testimonial-marquee-container::before,
+.testimonial-marquee-container::after {
     position: absolute;
     top: 0;
-    left: 0;
-    width: 100%;
+    width: 100px;
     height: 100%;
-    opacity: 0;
-    transition: opacity 0.5s ease-in-out;
+    content: "";
+    z-index: 2;
 }
 
-.testimonial-slide.active {
-    display: block;
-    opacity: 1;
+.testimonial-marquee-container::before {
+    left: 0;
+    background: linear-gradient(to right, var(--accent-color), transparent);
 }
 
+.testimonial-marquee-container::after {
+    right: 0;
+    background: linear-gradient(to left, var(--accent-color), transparent);
+}
+
+/* Marquee Animation */
+.testimonial-marquee {
+    display: inline-block;
+    animation: marquee 30s linear infinite;
+    padding-left: 100%;
+}
+
+@keyframes marquee {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+/* Testimonial Card Styles */
 .testimonial-card {
-    background-color: var(--light-color);
-    padding: 30px;
+    background-color: white;
+    padding: 20px;
     border-radius: 8px;
     box-shadow: var(--shadow);
     position: relative;
-    max-width: 800px;
-    margin: 0 auto;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
+    display: inline-block;
+    width: 300px;
+    margin: 0 20px;
+    vertical-align: top;
 }
 
 .testimonial-card::before {
@@ -442,7 +463,7 @@ section h2::after {
     position: absolute;
     top: 10px;
     left: 20px;
-    font-size: 5rem;
+    font-size: 3rem;
     color: var(--primary-color);
     opacity: 0.2;
     font-family: Georgia, serif;
@@ -454,64 +475,27 @@ section h2::after {
 
 .testimonial-rating .star {
     color: #ffc107;
-    font-size: 1.5rem;
-}
-
-.testimonial-content {
-    flex-grow: 1;
-    display: flex;
-    align-items: center;
+    font-size: 1.2rem;
 }
 
 .testimonial-content p {
     font-style: italic;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     position: relative;
     z-index: 1;
-    font-size: 1.1rem;
-    line-height: 1.6;
-}
-
-.testimonial-author {
-    margin-top: auto;
+    font-size: 1rem;
+    line-height: 1.5;
 }
 
 .testimonial-author h4 {
     color: var(--secondary-color);
     margin-bottom: 5px;
+    font-size: 1.1rem;
 }
 
-.slider-nav {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    font-size: 1.5rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: var(--shadow);
-    transition: var(--transition);
-    z-index: 10;
-}
-
-.slider-nav:hover {
-    background-color: #e69500;
-    transform: translateY(-50%) scale(1.1);
-}
-
-.prev-btn {
-    left: 10px;
-}
-
-.next-btn {
-    right: 10px;
+.testimonial-author p {
+    color: #666;
+    font-size: 0.9rem;
 }
 
 /* Add Testimonial Form */
@@ -572,50 +556,52 @@ section h2::after {
 }
 
 @media (max-width: 768px) {
-    .testimonial-slider {
-        height: 350px;
+    .testimonial-marquee-container {
+        padding: 15px 0;
+    }
+    
+    .testimonial-card {
+        width: 250px;
+        margin: 0 15px;
     }
     
     .testimonial-content p {
-        font-size: 1rem;
+        font-size: 0.9rem;
     }
     
-    .slider-nav {
-        width: 40px;
-        height: 40px;
-        font-size: 1.2rem;
-    }
-    
-    .prev-btn {
-        left: 5px;
-    }
-    
-    .next-btn {
-        right: 5px;
-    }
-    
-    .add-testimonial-section {
-        padding: 20px;
+    @keyframes marquee {
+        0% {
+            transform: translateX(0);
+        }
+        100% {
+            transform: translateX(-100%);
+        }
     }
 }
 
 @media (max-width: 480px) {
-    .testimonial-slider {
-        height: 400px;
-    }
-    
     .testimonial-header {
         flex-direction: column;
         gap: 15px;
         text-align: center;
     }
     
+    .testimonial-marquee-container {
+        padding: 10px 0;
+    }
+    
     .testimonial-card {
-        padding: 20px;
+        width: 200px;
+        margin: 0 10px;
+        padding: 15px;
     }
     
     .testimonial-content p {
-        font-size: 0.95rem;
+        font-size: 0.85rem;
+    }
+    
+    .testimonial-author h4 {
+        font-size: 1rem;
     }
 }
 
