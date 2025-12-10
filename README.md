@@ -1,6 +1,16 @@
 # Ankes Lodge Website
 
-A luxury guest house website with booking system and contact form functionality.
+Welcome to the official website for Ankes Lodge, a premium guest house located in the serene neighborhood of Abesim, Sunyani, Ghana.
+
+This website showcases our accommodations, facilities, and services, and provides an easy way for guests to book their stay with us.
+
+## Deployment
+
+The website is deployed on two platforms:
+1. **Render.com** - Main deployment with full functionality (https://ankes-lodge.onrender.com/)
+2. **GitHub Pages** - Static version for backup (https://konadu-prince.github.io/Ankes-Lodge.Web/)
+
+Forms submitted on the GitHub Pages version will automatically redirect to the Render.com server for processing.
 
 ## Deployment Options
 
