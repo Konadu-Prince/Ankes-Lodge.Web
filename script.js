@@ -838,7 +838,16 @@ function initTestimonialForm() {
                 form.reset();
                 
                 // Refresh testimonials
-                fetch('/testimonials.json')
+                // Determine the correct base URL (Render.com when on GitHub Pages)
+                let baseUrl = window.location.origin;
+                
+                // Check if we're on GitHub Pages and use Render.com server instead
+                if (window.location.hostname.includes('github.io')) {
+                    // Use your Render.com server URL for form submissions when hosted on GitHub Pages
+                    baseUrl = 'https://ankes-lodge.onrender.com';
+                }
+                
+                fetch(`${baseUrl}/testimonials.json`)
                     .then(response => response.json())
                     .then(testimonials => {
                         const marquee = document.querySelector('.testimonial-marquee');
@@ -847,6 +856,7 @@ function initTestimonialForm() {
                             initTestimonialMarquee();
                         }
                     });
+
             } else {
                 alert('Error: ' + data.message);
             }
