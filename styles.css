@@ -933,6 +933,21 @@ footer {
     color: #ccc;
 }
 
+.social-links p {
+    margin-bottom: 8px;
+}
+
+.social-links a {
+    color: #ccc;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.social-links a:hover {
+    color: var(--primary-color);
+    text-decoration: underline;
+}
+
 .copyright {
     text-align: center;
     padding-top: 20px;
