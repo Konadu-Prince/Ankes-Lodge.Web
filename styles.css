@@ -436,6 +436,11 @@ section h2::after {
     padding-left: 100%;
 }
 
+.testimonial-marquee:hover,
+.testimonial-marquee:active {
+    animation-play-state: paused;
+}
+
 @keyframes marquee {
     0% {
         transform: translateX(0);
@@ -453,9 +458,14 @@ section h2::after {
     box-shadow: var(--shadow);
     position: relative;
     display: inline-block;
-    width: 300px;
+    width: 350px;
     margin: 0 20px;
     vertical-align: top;
+    transition: transform 0.3s ease;
+}
+
+.testimonial-card:hover {
+    transform: translateY(-5px);
 }
 
 .testimonial-card::before {
@@ -478,6 +488,12 @@ section h2::after {
     font-size: 1.2rem;
 }
 
+.testimonial-content {
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+}
+
 .testimonial-content p {
     font-style: italic;
     margin-bottom: 15px;
@@ -485,6 +501,9 @@ section h2::after {
     z-index: 1;
     font-size: 1rem;
     line-height: 1.5;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
 }
 
 .testimonial-author h4 {

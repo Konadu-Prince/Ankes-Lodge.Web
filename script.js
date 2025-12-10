@@ -751,6 +751,26 @@ function initTestimonialMarquee() {
     const marqueeContainer = document.querySelector('.testimonial-marquee');
     if (!marqueeContainer) return;
     
+    // Add event listeners to pause/resume animation on hover/click
+    marqueeContainer.addEventListener('mouseenter', function() {
+        this.style.animationPlayState = 'paused';
+    });
+    
+    marqueeContainer.addEventListener('mouseleave', function() {
+        this.style.animationPlayState = 'running';
+    });
+    
+    marqueeContainer.addEventListener('touchstart', function() {
+        this.style.animationPlayState = 'paused';
+    });
+    
+    marqueeContainer.addEventListener('touchend', function() {
+        // Resume after a short delay to allow user to read
+        setTimeout(() => {
+            this.style.animationPlayState = 'running';
+        }, 3000);
+    });
+    
     // Fetch testimonials from server
     fetch('/testimonials.json')
         .then(response => response.json())
