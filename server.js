@@ -901,6 +901,60 @@ app.get('/visitor-count', (req, res) => {
     res.json({ count: counter.count });
 });
 
+// Endpoint to delete a testimonial
+app.delete('/delete-testimonial/:id', (req, res) => {
+    const id = parseInt(req.params.id);
+    
+    if (isNaN(id)) {
+        return res.status(400).json({
+            status: 'error',
+            message: 'Invalid testimonial ID.'
+        });
+    }
+    
+    // Read existing testimonials
+    let testimonials = [];
+    if (fs.existsSync('testimonials.json')) {
+        try {
+            const data = fs.readFileSync('testimonials.json', 'utf8');
+            testimonials = JSON.parse(data);
+        } catch (err) {
+            return res.status(500).json({
+                status: 'error',
+                message: 'Failed to read testimonials data.'
+            });
+        }
+    }
+    
+    // Find the testimonial to delete
+    const testimonialIndex = testimonials.findIndex(t => t.id === id);
+    
+    if (testimonialIndex === -1) {
+        return res.status(404).json({
+            status: 'error',
+            message: 'Testimonial not found.'
+        });
+    }
+    
+    // Remove the testimonial
+    testimonials.splice(testimonialIndex, 1);
+    
+    // Save updated testimonials to file
+    try {
+        fs.writeFileSync('testimonials.json', JSON.stringify(testimonials, null, 2));
+        res.json({
+            status: 'success',
+            message: 'Testimonial deleted successfully.'
+        });
+    } catch (err) {
+        console.error('Error saving testimonials:', err);
+        res.status(500).json({
+            status: 'error',
+            message: 'Failed to save testimonials. Please try again later.'
+        });
+    }
+});
+
 // Add error handling middleware
 app.use((err, req, res, next) => {
     console.error('Unhandled error:', err);
