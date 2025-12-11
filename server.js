@@ -39,27 +39,27 @@ const adminSessions = new Map();
 
 // CORS middleware - Allow requests from any origin with better configuration
 app.use((req, res, next) => {
-    // Allow all origins for development and production
-    res.header('Access-Control-Allow-Origin', '*');
+  // Allow all origins for development and production
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.header('Access-Control-Max-Age', '86400'); // Cache preflight requests for 24 hours
+  
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-    res.header('Access-Control-Max-Age', '86400'); // Cache preflight requests for 24 hours
-    
-    // Handle preflight requests
-    if (req.method === 'OPTIONS') {
-        res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-        res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-        return res.status(200).json({});
-    }
-    
-    next();
+    return res.status(200).json({});
+  }
+  
+  next();
 });
-
-// Middleware to serve static files
-app.use(express.static('.'));
 
 // Middleware to parse JSON bodies
 app.use(bodyParser.json());
+
+// Middleware to parse URL-encoded bodies (for form submissions)
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // Authentication middleware
 function requireAuth(req, res, next) {
@@ -77,6 +77,14 @@ function requireAuth(req, res, next) {
             // Redirect to login page
             return res.redirect('/login.html');
         }
+    }
+    
+    // Allow public API endpoints without authentication
+    if (req.path === '/process-contact' || req.path === '/process-booking' || 
+        req.path === '/add-testimonial' || req.path === '/visitor-count' ||
+        req.path === '/testimonials.json' || req.path === '/bookings.json' ||
+        req.path === '/contacts.json') {
+        return next();
     }
     
     next();
