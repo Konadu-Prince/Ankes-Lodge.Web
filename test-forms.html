@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Forms</title>
+</head>
+<body>
+    <h1>Test Contact Form</h1>
+    <form action="http://localhost:8000/process-contact" method="POST">
+        <input type="text" name="contact-name" placeholder="Name" required><br><br>
+        <input type="email" name="contact-email" placeholder="Email" required><br><br>
+        <input type="text" name="subject" placeholder="Subject" required><br><br>
+        <textarea name="contact-message" placeholder="Message" required></textarea><br><br>
+        <button type="submit">Submit Contact Form</button>
+    </form>
+
+    <h1>Test Booking Form</h1>
+    <form action="http://localhost:8000/process-booking" method="POST">
+        <input type="text" name="name" placeholder="Full Name" required><br><br>
+        <input type="email" name="email" placeholder="Email" required><br><br>
+        <input type="tel" name="phone" placeholder="Phone" required><br><br>
+        <input type="date" name="checkin" placeholder="Check-in Date" required><br><br>
+        <input type="date" name="checkout" placeholder="Check-out Date" required><br><br>
+        <select name="adults" required>
+            <option value="">Select Adults</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+        </select><br><br>
+        <select name="children">
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+        </select><br><br>
+        <select name="room-type" required>
+            <option value="">Select Room Type</option>
+            <option value="executive">Executive Room</option>
+            <option value="regular">Regular Bedroom</option>
+        </select><br><br>
+        <textarea name="message" placeholder="Special Requests"></textarea><br><br>
+        <button type="submit">Submit Booking Form</button>
+    </form>
+
+    <h1>Test Testimonial Form</h1>
+    <form action="http://localhost:8000/add-testimonial" method="POST">
+        <input type="text" name="name" placeholder="Your Name" required><br><br>
+        <input type="text" name="location" placeholder="Your Location"><br><br>
+        <select name="rating" required>
+            <option value="">Select Rating</option>
+            <option value="5">★★★★★ - Excellent</option>
+            <option value="4">★★★★☆ - Very Good</option>
+            <option value="3">★★★☆☆ - Good</option>
+            <option value="2">★★☆☆☆ - Fair</option>
+            <option value="1">★☆☆☆☆ - Poor</option>
+        </select><br><br>
+        <textarea name="comment" placeholder="Share your experience" required></textarea><br><br>
+        <button type="submit">Submit Testimonial</button>
+    </form>
+</body>
+</html>
