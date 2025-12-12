@@ -16,7 +16,8 @@
     "jsdom": "^27.0.1",
     "node-fetch": "^3.3.2",
     "nodemailer": "^6.10.1",
-    "uuid": "^13.0.0"
+    "uuid": "^13.0.0",
+    "mongodb": "^6.3.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
