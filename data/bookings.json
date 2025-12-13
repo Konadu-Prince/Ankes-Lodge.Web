@@ -542,5 +542,14 @@
     "roomType": "executive",
     "message": "This is a test booking",
     "status": "pending"
+  },
+  {
+    "id": "f07fc6b3",
+    "timestamp": "2025-12-13 05:19:49",
+    "name": "File Storage Test",
+    "email": "file@test.com",
+    "message": "Testing file-based storage",
+    "collection": "bookings",
+    "testId": "dfbe"
   }
 ]

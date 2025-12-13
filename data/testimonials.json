@@ -30,5 +30,14 @@
     "comment": "The full house booking was perfect for our company retreat. The event hall and accommodation made our planning stress-free.",
     "rating": 5,
     "date": "2025-09-30"
+  },
+  {
+    "id": "f07fc6b3",
+    "timestamp": "2025-12-13 05:19:49",
+    "name": "File Storage Test",
+    "email": "file@test.com",
+    "message": "Testing file-based storage",
+    "collection": "testimonials",
+    "testId": "7f14"
   }
 ]

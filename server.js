@@ -6,6 +6,15 @@ const nodemailer = require('nodemailer');
 const rateLimit = require('express-rate-limit');
 const { body, validationResult } = require('express-validator');
 
+// Add MongoDB support
+let MongoClient;
+try {
+    ({ MongoClient } = require('mongodb'));
+} catch (err) {
+    console.log('MongoDB driver not available, falling back to file-based storage');
+    MongoClient = null;
+}
+
 // Add node-fetch for self-pinging
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
@@ -14,7 +23,6 @@ const path = require('path');
 
 // Load environment variables from .env file
 require('dotenv').config();
-
 const app = express();
 const PORT = process.env.PORT || 8000;
 
@@ -126,6 +134,264 @@ try {
     transporter = null;
 }
 
+// Add MongoDB connection and database adapters
+let db;
+let mongoClient;
+
+async function connectToMongo() {
+    try {
+        // Get MongoDB URI from environment variables
+        const uri = process.env.MONGODB_URI;
+        if (!uri || !MongoClient) {
+            console.log('MONGODB_URI not set or MongoDB driver not available, falling back to file-based storage');
+            return false;
+        }
+        
+        mongoClient = new MongoClient(uri);
+        await mongoClient.connect();
+        db = mongoClient.db('ankes-lodge');
+        console.log('Connected to MongoDB Atlas');
+        return true;
+    } catch (error) {
+        console.error('Failed to connect to MongoDB Atlas:', error);
+        return false;
+    }
+}
+
+// MongoDB Database Adapter
+class MongoDatabase {
+    constructor(collectionName) {
+        this.collectionName = collectionName;
+    }
+
+    async read() {
+        try {
+            if (!db) return [];
+            const collection = db.collection(this.collectionName);
+            return await collection.find({}).toArray();
+        } catch (err) {
+            console.error(`Error reading from MongoDB collection ${this.collectionName}:`, err);
+            return [];
+        }
+    }
+
+    async write(data) {
+        try {
+            if (!db) return false;
+            const collection = db.collection(this.collectionName);
+            // Clear existing data
+            await collection.deleteMany({});
+            // Insert new data
+            if (data.length > 0) {
+                await collection.insertMany(data);
+            }
+            return true;
+        } catch (err) {
+            console.error(`Error writing to MongoDB collection ${this.collectionName}:`, err);
+            return false;
+        }
+    }
+
+    async append(newItem) {
+        try {
+            if (!db) return false;
+            const collection = db.collection(this.collectionName);
+            await collection.insertOne(newItem);
+            return true;
+        } catch (err) {
+            console.error(`Error appending to MongoDB collection ${this.collectionName}:`, err);
+            return false;
+        }
+    }
+
+    async find(filter) {
+        try {
+            if (!db) return [];
+            const collection = db.collection(this.collectionName);
+            return await collection.find(filter).toArray();
+        } catch (err) {
+            console.error(`Error finding in MongoDB collection ${this.collectionName}:`, err);
+            return [];
+        }
+    }
+
+    async findOne(filter) {
+        try {
+            if (!db) return null;
+            const collection = db.collection(this.collectionName);
+            return await collection.findOne(filter);
+        } catch (err) {
+            console.error(`Error finding one in MongoDB collection ${this.collectionName}:`, err);
+            return null;
+        }
+    }
+
+    async update(filter, update) {
+        try {
+            if (!db) return false;
+            const collection = db.collection(this.collectionName);
+            const result = await collection.updateMany(filter, { $set: update });
+            return result.modifiedCount > 0;
+        } catch (err) {
+            console.error(`Error updating in MongoDB collection ${this.collectionName}:`, err);
+            return false;
+        }
+    }
+
+    async delete(filter) {
+        try {
+            if (!db) return 0;
+            const collection = db.collection(this.collectionName);
+            const result = await collection.deleteMany(filter);
+            return result.deletedCount;
+        } catch (err) {
+            console.error(`Error deleting from MongoDB collection ${this.collectionName}:`, err);
+            return 0;
+        }
+    }
+}
+
+// File-based Database Adapter (fallback)
+class FileDatabase {
+    constructor(filename) {
+        this.filename = filename;
+        this.locks = new Map();
+    }
+
+    // Acquire a lock for the file
+    async acquireLock() {
+        return new Promise((resolve) => {
+            const checkLock = () => {
+                if (!this.locks.has(this.filename)) {
+                    this.locks.set(this.filename, true);
+                    resolve();
+                } else {
+                    setTimeout(checkLock, 10); // Check every 10ms
+                }
+            };
+            checkLock();
+        });
+    }
+
+    // Release a lock for the file
+    releaseLock() {
+        this.locks.delete(this.filename);
+    }
+
+    // Read data from file with locking
+    async read() {
+        await this.acquireLock();
+        try {
+            if (fs.existsSync(this.filename)) {
+                const data = fs.readFileSync(this.filename, 'utf8');
+                return JSON.parse(data);
+            }
+            return [];
+        } catch (err) {
+            console.error(`Error reading ${this.filename}:`, err);
+            return [];
+        } finally {
+            this.releaseLock();
+        }
+    }
+
+    // Write data to file with locking
+    async write(data) {
+        await this.acquireLock();
+        try {
+            // Ensure directory exists
+            const dir = path.dirname(this.filename);
+            if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir, { recursive: true });
+            }
+            
+            fs.writeFileSync(this.filename, JSON.stringify(data, null, 2));
+            return true;
+        } catch (err) {
+            console.error(`Error writing ${this.filename}:`, err);
+            return false;
+        } finally {
+            this.releaseLock();
+        }
+    }
+
+    // Append data to file
+    async append(newItem) {
+        const data = await this.read();
+        data.push(newItem);
+        return await this.write(data);
+    }
+
+    // Find items in the data
+    async find(filterFn) {
+        const data = await this.read();
+        return data.filter(filterFn);
+    }
+
+    // Find one item in the data
+    async findOne(filterFn) {
+        const data = await this.read();
+        return data.find(filterFn);
+    }
+
+    // Update items in the data
+    async update(filterFn, updateFn) {
+        const data = await this.read();
+        let updated = false;
+        const updatedData = data.map(item => {
+            if (filterFn(item)) {
+                updated = true;
+                return updateFn(item);
+            }
+            return item;
+        });
+        if (updated) {
+            return await this.write(updatedData);
+        }
+        return false;
+    }
+
+    // Delete items from the data
+    async delete(filterFn) {
+        const data = await this.read();
+        const filteredData = data.filter(item => !filterFn(item));
+        if (filteredData.length !== data.length) {
+            return await this.write(filteredData);
+        }
+        return false;
+    }
+}
+
+// Database instances
+let bookingsDB;
+let contactsDB;
+let testimonialsDB;
+let visitorCounterDB;
+
+// Initialize database connections
+async function initializeDatabases() {
+    const useMongo = await connectToMongo();
+    
+    if (useMongo) {
+        // Use MongoDB
+        bookingsDB = new MongoDatabase('bookings');
+        contactsDB = new MongoDatabase('contacts');
+        testimonialsDB = new MongoDatabase('testimonials');
+        visitorCounterDB = new MongoDatabase('visitorCounter');
+    } else {
+        // Fallback to file-based storage
+        bookingsDB = new FileDatabase('data/bookings.json');
+        contactsDB = new FileDatabase('data/contacts.json');
+        testimonialsDB = new FileDatabase('data/testimonials.json');
+        visitorCounterDB = new FileDatabase('data/visitor-counter.json');
+        
+        // Ensure data directory exists
+        if (!fs.existsSync('data')) {
+            fs.mkdirSync('data');
+        }
+    }
+}
+
 // Test transporter configuration
 console.log('Checking transporter configuration...');
 if (transporter) {
@@ -142,7 +408,6 @@ if (transporter) {
 } else {
     console.log('No transporter configured - email functionality will be disabled');
 }
-
 // Function to send confirmation email to customer
 function sendConfirmationEmail(booking) {
     // If transporter is not configured, skip email sending
@@ -402,7 +667,7 @@ app.post('/process-booking',
     body('adults').isInt({ min: 1, max: 10 }),
     body('children').isInt({ min: 0, max: 10 }),
     body('message').trim().escape().isLength({ max: 500 }),
-    (req, res) => {
+    async (req, res) => {
         // Debug: Log request start
         console.log('=== BOOKING FORM REQUEST START ===');
         console.log('Request method:', req.method);
@@ -470,7 +735,7 @@ app.post('/process-booking',
             });
         }
 
-        // Create booking record
+        // Create booking record using database abstraction
         const booking = {
             id: uuidv4().substring(0, 8),
             timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
@@ -486,26 +751,9 @@ app.post('/process-booking',
             status: 'pending'
         };
 
-        // Read existing bookings
-        let bookings = [];
-        if (fs.existsSync('bookings.json')) {
-            try {
-                const data = fs.readFileSync('bookings.json', 'utf8');
-                bookings = JSON.parse(data);
-                if (!Array.isArray(bookings)) {
-                    bookings = [];
-                }
-            } catch (err) {
-                bookings = [];
-            }
-        }
-
-        // Add new booking
-        bookings.push(booking);
-
-        // Save bookings to file
         try {
-            fs.writeFileSync('bookings.json', JSON.stringify(bookings, null, 2));
+            // Save booking using database abstraction
+            await bookingsDB.append(booking);
             
             // Send confirmation email to customer and notification to admin
             Promise.all([
@@ -535,9 +783,8 @@ app.post('/process-booking',
         }
     }
 );
-
 // Handle contact form submission
-app.post('/process-contact', (req, res) => {
+app.post('/process-contact', async (req, res) => {
     // Debug: Log request start
     console.log('=== CONTACT FORM REQUEST START ===');
     console.log('Request method:', req.method);
@@ -615,7 +862,7 @@ app.post('/process-contact', (req, res) => {
         });
     }
 
-    // Create contact record
+    // Create contact record using database abstraction
     const contact = {
         id: uuidv4().substring(0, 8),
         timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
@@ -625,26 +872,9 @@ app.post('/process-contact', (req, res) => {
         message
     };
 
-    // Read existing contacts
-    let contacts = [];
-    if (fs.existsSync('contacts.json')) {
-        try {
-            const data = fs.readFileSync('contacts.json', 'utf8');
-            contacts = JSON.parse(data);
-            if (!Array.isArray(contacts)) {
-                contacts = [];
-            }
-        } catch (err) {
-            contacts = [];
-        }
-    }
-
-    // Add new contact
-    contacts.push(contact);
-
-    // Save contacts to file
     try {
-        fs.writeFileSync('contacts.json', JSON.stringify(contacts, null, 2));
+        // Save contact using database abstraction
+        await contactsDB.append(contact);
         
         // Send email notifications if transporter is configured
         if (transporter) {
@@ -702,7 +932,6 @@ app.post('/process-contact', (req, res) => {
         });
     }
 });
-
 // Function to send confirmation email to customer for contact form
 function sendContactConfirmationEmail(contact) {
     // If transporter is not configured, skip email sending
@@ -875,7 +1104,7 @@ function sendContactAdminNotification(contact) {
 }
 
 // Endpoint to add new testimonial
-app.post('/add-testimonial', (req, res) => {
+app.post('/add-testimonial', async (req, res) => {
     const { name, location, comment, rating } = req.body;
     
     // Validate required fields
@@ -895,15 +1124,12 @@ app.post('/add-testimonial', (req, res) => {
         });
     }
     
-    // Read existing testimonials
+    // Read existing testimonials using database abstraction
     let testimonials = [];
-    if (fs.existsSync('testimonials.json')) {
-        try {
-            const data = fs.readFileSync('testimonials.json', 'utf8');
-            testimonials = JSON.parse(data);
-        } catch (err) {
-            testimonials = [];
-        }
+    try {
+        testimonials = await testimonialsDB.read();
+    } catch (err) {
+        testimonials = [];
     }
     
     // Create new testimonial
@@ -916,12 +1142,9 @@ app.post('/add-testimonial', (req, res) => {
         date: new Date().toISOString().split('T')[0]
     };
     
-    // Add new testimonial
-    testimonials.unshift(newTestimonial); // Add to beginning of array
-    
-    // Save testimonials to file
     try {
-        fs.writeFileSync('testimonials.json', JSON.stringify(testimonials, null, 2));
+        // Save testimonial using database abstraction
+        await testimonialsDB.append(newTestimonial);
         
         // Send notification email to admin
         sendTestimonialAdminNotification(newTestimonial).then(() => {
@@ -945,9 +1168,7 @@ app.post('/add-testimonial', (req, res) => {
             message: 'Failed to save testimonial. Please try again later.'
         });
     }
-});
-
-// Function to send notification email to admin for new testimonial
+});// Function to send notification email to admin for new testimonial
 function sendTestimonialAdminNotification(testimonial) {
     // If transporter is not configured, skip email sending
     if (!transporter) {
@@ -1042,32 +1263,32 @@ function sendTestimonialAdminNotification(testimonial) {
 }
 
 // Endpoint to get visitor count
-app.get('/visitor-count', (req, res) => {
+app.get('/visitor-count', async (req, res) => {
     let counter = { count: 0 };
-    if (fs.existsSync('visitor-counter.json')) {
-        try {
-            const data = fs.readFileSync('visitor-counter.json', 'utf8');
-            counter = JSON.parse(data);
-        } catch (err) {
-            counter = { count: 0 };
+    
+    // Read existing counter using database abstraction
+    try {
+        const counters = await visitorCounterDB.read();
+        if (counters.length > 0) {
+            counter = counters[0];
         }
+    } catch (err) {
+        counter = { count: 0 };
     }
     
     // Increment counter
     counter.count += 1;
     
-    // Save updated counter
+    // Save updated counter using database abstraction
     try {
-        fs.writeFileSync('visitor-counter.json', JSON.stringify(counter, null, 2));
+        await visitorCounterDB.write([counter]);
     } catch (err) {
         console.error('Error updating visitor counter:', err);
     }
     
     res.json({ count: counter.count });
-});
-
-// Endpoint to delete a testimonial
-app.delete('/delete-testimonial/:id', (req, res) => {
+});// Endpoint to delete a testimonial
+app.delete('/delete-testimonial/:id', async (req, res) => {
     const id = parseInt(req.params.id);
     
     if (isNaN(id)) {
@@ -1077,18 +1298,15 @@ app.delete('/delete-testimonial/:id', (req, res) => {
         });
     }
     
-    // Read existing testimonials
+    // Read existing testimonials using database abstraction
     let testimonials = [];
-    if (fs.existsSync('testimonials.json')) {
-        try {
-            const data = fs.readFileSync('testimonials.json', 'utf8');
-            testimonials = JSON.parse(data);
-        } catch (err) {
-            return res.status(500).json({
-                status: 'error',
-                message: 'Failed to read testimonials data.'
-            });
-        }
+    try {
+        testimonials = await testimonialsDB.read();
+    } catch (err) {
+        return res.status(500).json({
+            status: 'error',
+            message: 'Failed to read testimonials data.'
+        });
     }
     
     // Find the testimonial to delete
@@ -1104,9 +1322,9 @@ app.delete('/delete-testimonial/:id', (req, res) => {
     // Remove the testimonial
     testimonials.splice(testimonialIndex, 1);
     
-    // Save updated testimonials to file
+    // Save updated testimonials using database abstraction
     try {
-        fs.writeFileSync('testimonials.json', JSON.stringify(testimonials, null, 2));
+        await testimonialsDB.write(testimonials);
         res.json({
             status: 'success',
             message: 'Testimonial deleted successfully.'
@@ -1118,9 +1336,7 @@ app.delete('/delete-testimonial/:id', (req, res) => {
             message: 'Failed to save testimonials. Please try again later.'
         });
     }
-});
-
-// Add login endpoint
+});// Add login endpoint
 app.post('/admin/login', (req, res) => {
     const { username, password } = req.body;
     
@@ -1237,46 +1453,59 @@ if (require.main === module) {
     console.log(`PORT environment variable: ${process.env.PORT}`);
     console.log(`Using PORT: ${PORT}`);
     
-    const server = app.listen(PORT, '0.0.0.0', () => {
-        console.log(`Server running at http://0.0.0.0:${PORT}`);
-        console.log(`Environment variables status:`);
-        console.log(`- EMAIL_USER: ${process.env.EMAIL_USER ? 'SET' : 'NOT SET'}`);
-        console.log(`- EMAIL_PASS: ${process.env.EMAIL_PASS ? 'SET' : 'NOT SET'}`);
-        console.log(`- PORT: ${PORT}`);
+    // Initialize databases before starting the server
+    initializeDatabases().then(() => {
+        console.log('Database initialization complete');
         
-        // Start self-pinger after server is running
-        startSelfPinger();
-        
-        // Test email configuration if credentials are provided
-        console.log('Testing email configuration...');
-        if (transporter) {
-            console.log('Transporter is configured, testing connection...');
-            transporter.verify(function(error, success) {
-                if (error) {
-                    console.log('Email configuration test FAILED:', error.message);
-                    console.log('Error code:', error.code);
-                    console.log('This is likely due to Render.com SMTP restrictions');
-                    console.log('Emails will be logged to console instead of sent.');
-                } else {
-                    console.log('Email configuration test PASSED - emails will be sent.');
-                }
-            });
-        } else {
-            console.log('Email transporter not configured - emails will be logged to console.');
-            console.log('Please ensure EMAIL_USER and EMAIL_PASS environment variables are set.');
-        }
-    });
-    
-    // Handle server errors
-    server.on('error', (error) => {
-        console.error('Server error:', error);
-    });
-    
-    // Graceful shutdown
-    process.on('SIGTERM', () => {
-        console.log('SIGTERM received, shutting down gracefully');
-        server.close(() => {
-            console.log('Process terminated');
+        const server = app.listen(PORT, '0.0.0.0', () => {
+            console.log(`Server running at http://0.0.0.0:${PORT}`);
+            console.log(`Environment variables status:`);
+            console.log(`- EMAIL_USER: ${process.env.EMAIL_USER ? 'SET' : 'NOT SET'}`);
+            console.log(`- EMAIL_PASS: ${process.env.EMAIL_PASS ? 'SET' : 'NOT SET'}`);
+            console.log(`- MONGODB_URI: ${process.env.MONGODB_URI ? 'SET' : 'NOT SET'}`);
+            console.log(`- PORT: ${PORT}`);
+            
+            // Start self-pinger after server is running
+            startSelfPinger();
+            
+            // Test email configuration if credentials are provided
+            console.log('Testing email configuration...');
+            if (transporter) {
+                console.log('Transporter is configured, testing connection...');
+                transporter.verify(function(error, success) {
+                    if (error) {
+                        console.log('Email configuration test FAILED:', error.message);
+                        console.log('Error code:', error.code);
+                        console.log('This is likely due to Render.com SMTP restrictions');
+                        console.log('Emails will be logged to console instead of sent.');
+                    } else {
+                        console.log('Email configuration test PASSED - emails will be sent.');
+                    }
+                });
+            } else {
+                console.log('Email transporter not configured - emails will be logged to console.');
+                console.log('Please ensure EMAIL_USER and EMAIL_PASS environment variables are set.');
+            }
         });
+        
+        // Handle server errors
+        server.on('error', (error) => {
+            console.error('Server error:', error);
+        });
+        
+        // Graceful shutdown
+        process.on('SIGTERM', () => {
+            console.log('SIGTERM received, shutting down gracefully');
+            // Close MongoDB connection if it exists
+            if (mongoClient) {
+                mongoClient.close();
+            }
+            server.close(() => {
+                console.log('Process terminated');
+            });
+        });
+    }).catch(err => {
+        console.error('Failed to initialize databases:', err);
+        process.exit(1);
     });
 }
