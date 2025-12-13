@@ -636,16 +636,36 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Serve bookings.json file
-app.get('/bookings.json', (req, res) => {
-    res.sendFile(path.join(__dirname, 'bookings.json'));
+// Serve bookings.json data
+app.get('/bookings.json', async (req, res) => {
+    try {
+        const bookings = await bookingsDB.read();
+        res.json(bookings);
+    } catch (err) {
+        console.error('Error reading bookings:', err);
+        res.status(500).json({ error: 'Failed to load bookings' });
+    }
+});// Serve testimonials.json data
+app.get('/testimonials.json', async (req, res) => {
+    try {
+        const testimonials = await testimonialsDB.read();
+        res.json(testimonials);
+    } catch (err) {
+        console.error('Error reading testimonials:', err);
+        res.status(500).json({ error: 'Failed to load testimonials' });
+    }
 });
 
-// Serve testimonials.json file
-app.get('/testimonials.json', (req, res) => {
-    res.sendFile(path.join(__dirname, 'testimonials.json'));
+// Serve contacts.json data
+app.get('/contacts.json', async (req, res) => {
+    try {
+        const contacts = await contactsDB.read();
+        res.json(contacts);
+    } catch (err) {
+        console.error('Error reading contacts:', err);
+        res.status(500).json({ error: 'Failed to load contacts' });
+    }
 });
-
 // Serve admin page with proper routing
 app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'admin.html'));
