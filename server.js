@@ -1,10 +1,12 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const fs = require('fs');
+const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const nodemailer = require('nodemailer');
 const rateLimit = require('express-rate-limit');
 const { body, validationResult } = require('express-validator');
+require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -15,14 +17,14 @@ app.use(bodyParser.json());
 app.use(express.static('.'));
 
 // Create a reusable transporter object using Gmail SMTP
-// Note: In production, use environment variables for credentials
+// Using environment variables for credentials
 let transporter;
 try {
     transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
-            user: 'konaduprince26@gmail.com',
-            pass: 'uvyvtipfnavvkwwr' // Use App Password, not regular password
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS
         }
     });
 } catch (error) {
@@ -67,7 +69,7 @@ function sendConfirmationEmail(booking) {
     }
     
     const mailOptions = {
-        from: 'konaduprince26@gmail.com',
+        from: process.env.EMAIL_USER,
         to: booking.email,
         subject: `Booking Confirmation - Ankes Lodge (Booking ID: ${booking.id})`,
         html: `
@@ -136,8 +138,8 @@ function sendAdminNotification(booking) {
     }
     
     const mailOptions = {
-        from: 'konaduprince26@gmail.com',
-        to: 'konaduprince26@gmail.com', // Admin email
+        from: process.env.EMAIL_USER,
+        to: process.env.ADMIN_EMAIL, // Admin email
         subject: `New Booking Request - Ankes Lodge (Booking ID: ${booking.id})`,
         html: `
             <h2>New Booking Request - Ankes Lodge</h2>
