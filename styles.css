@@ -799,6 +799,85 @@ footer {
     font-size: 1.1rem;
 }
 
+.tiktok-embed {
+    margin-top: 15px;
+    border-radius: 8px;
+    overflow: hidden;
+    max-width: 100%;
+    min-width: 250px;
+}
+
+@media (max-width: 768px) {
+    .menu-toggle {
+        display: flex;
+    }
+    
+    nav ul {
+        position: fixed;
+        top: 70px;
+        left: -100%;
+        flex-direction: column;
+        background-color: rgba(255, 255, 255, 0.95);
+        width: 100%;
+        text-align: center;
+        transition: var(--transition);
+        box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px 0;
+        margin-top: 0;
+    }
+    
+    nav ul.active {
+        left: 0;
+    }
+    
+    nav ul li {
+        margin: 15px 0;
+    }
+    
+    header .container {
+        flex-direction: row;
+        align-items: center;
+    }
+    
+    .hero h1 {
+        font-size: 2.2rem;
+    }
+    
+    .hero p {
+        font-size: 1.2rem;
+    }
+    
+    section h2 {
+        font-size: 2rem;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+    
+    .room-types,
+    .facility-grid,
+    .gallery-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .testimonial-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .footer-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+    
+    .footer-links ul {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
 .copyright {
     text-align: center;
     padding-top: 20px;
@@ -903,6 +982,7 @@ footer {
     .map-placeholder {
         height: 250px;
     }
+    
     
     .testimonial-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -1040,6 +1120,11 @@ footer {
         width: 40px;
         height: 40px;
         font-size: 1rem;
+    }
+    
+    .tiktok-embed {
+        max-width: 100%;
+        min-width: 250px;
     }
 }
 
