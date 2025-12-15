@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test PHP Booking</title>
+</head>
+<body>
+    <h1>Test PHP Booking Endpoint</h1>
+    <form action="booking-handler.php" method="POST">
+        <div>
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" value="John Doe" required>
+        </div>
+        <div>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" value="johndoe@example.com" required>
+        </div>
+        <div>
+            <label for="phone">Phone:</label>
+            <input type="tel" id="phone" name="phone" value="0544904547" required>
+        </div>
+        <div>
+            <label for="checkin">Check-in:</label>
+            <input type="date" id="checkin" name="checkin" value="2025-12-01" required>
+        </div>
+        <div>
+            <label for="checkout">Check-out:</label>
+            <input type="date" id="checkout" name="checkout" value="2025-12-05" required>
+        </div>
+        <div>
+            <label for="adults">Adults:</label>
+            <input type="number" id="adults" name="adults" value="2" min="1" max="10">
+        </div>
+        <div>
+            <label for="children">Children:</label>
+            <input type="number" id="children" name="children" value="1" min="0" max="10">
+        </div>
+        <div>
+            <label for="room-type">Room Type:</label>
+            <select id="room-type" name="room-type">
+                <option value="executive">Executive Room</option>
+                <option value="regular">Regular Bedroom</option>
+                <option value="full-house">Full House</option>
+            </select>
+        </div>
+        <div>
+            <label for="message">Message:</label>
+            <textarea id="message" name="message">Test booking for debugging purposes</textarea>
+        </div>
+        <button type="submit">Submit Booking</button>
+    </form>
+</body>
+</html>
