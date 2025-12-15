@@ -781,6 +781,24 @@ footer {
     color: #ccc;
 }
 
+.social-media a {
+    color: var(--light-color);
+    text-decoration: none;
+    display: block;
+    margin: 10px 0;
+    transition: var(--transition);
+}
+
+.social-media a:hover {
+    color: var(--primary-color);
+    transform: scale(1.05);
+}
+
+.social-media a p {
+    color: var(--light-color);
+    font-size: 1.1rem;
+}
+
 .copyright {
     text-align: center;
     padding-top: 20px;
