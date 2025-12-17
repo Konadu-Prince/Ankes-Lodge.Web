@@ -300,6 +300,8 @@ function initVideoAutoplay() {
     // Get all videos that should have autoplay functionality
     const videos = [
         document.getElementById('gallery-video'),
+        document.getElementById('gallery-video-2'),
+        document.getElementById('gallery-video-3'),
         document.getElementById('motivation-video-1'),
         document.getElementById('motivation-video-2'),
         document.getElementById('different-video')
