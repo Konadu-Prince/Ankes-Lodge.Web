@@ -541,21 +541,29 @@ function sendConfirmationEmail(booking) {
         console.log('Attempting to send confirmation email to:', booking.email);
         const startTime = Date.now();
         
+        // Always log email content to console for debugging purposes
+        console.log('=== BOOKING CONFIRMATION EMAIL CONTENT ===');
+        console.log(`To: ${booking.email}`);
+        console.log(`Subject: Booking Confirmation - Ankes Lodge (Booking ID: ${booking.id})`);
+        console.log('Content:');
+        console.log(mailOptions.html);
+        console.log('=========================================');
+        
+        // If transporter is not configured, skip actual sending
+        if (!transporter) {
+            console.log('Email transporter not configured - email not sent, content logged above for debugging');
+            return resolve();
+        }
+        
         transporter.sendMail(mailOptions, function(error, info) {
             const endTime = Date.now();
             console.log(`Email sending attempt took ${endTime - startTime}ms`);
             
             if (error) {
                 console.log('Email sending error:', error.message);
-                // Log the email content as fallback
-                console.log('=== EMAIL FALLBACK LOG ===');
-                console.log(`To: ${booking.email}`);
-                console.log(`Subject: Booking Confirmation - Ankes Lodge (Booking ID: ${booking.id})`);
-                console.log('Content:', mailOptions.html);
-                console.log('=========================');
                 resolve(); // Resolve anyway since this is not a critical error for the user experience
             } else {
-                console.log('Confirmation email sent: ' + info.response);
+                console.log('Confirmation email sent successfully: ' + info.response);
                 resolve();
             }
         });
@@ -652,21 +660,29 @@ function sendAdminNotification(booking) {
         console.log('Attempting to send admin notification email to: ankeslodge@gmail.com');
         const startTime = Date.now();
         
+        // Always log email content to console for debugging purposes
+        console.log('=== ADMIN NOTIFICATION EMAIL CONTENT ===');
+        console.log(`To: ankeslodge@gmail.com`);
+        console.log(`Subject: New Booking Request - Ankes Lodge (Booking ID: ${booking.id})`);
+        console.log('Content:');
+        console.log(mailOptions.html);
+        console.log('=======================================');
+        
+        // If transporter is not configured, skip actual sending
+        if (!transporter) {
+            console.log('Email transporter not configured - email not sent, content logged above for debugging');
+            return resolve();
+        }
+        
         transporter.sendMail(mailOptions, function(error, info) {
             const endTime = Date.now();
             console.log(`Admin email sending attempt took ${endTime - startTime}ms`);
             
             if (error) {
                 console.log('Admin notification error:', error.message);
-                // Log the email content as fallback
-                console.log('=== ADMIN EMAIL FALLBACK LOG ===');
-                console.log(`To: ankeslodge@gmail.com`);
-                console.log(`Subject: New Booking Request - Ankes Lodge (Booking ID: ${booking.id})`);
-                console.log('Content:', mailOptions.html);
-                console.log('================================');
                 resolve(); // Resolve anyway since this is not a critical error for the user experience
             } else {
-                console.log('Admin notification sent: ' + info.response);
+                console.log('Admin notification sent successfully: ' + info.response);
                 resolve();
             }
         });
@@ -1126,6 +1142,20 @@ function sendContactConfirmationEmail(contact) {
         console.log('Attempting to send contact confirmation email to:', contact.email);
         const startTime = Date.now();
         
+        // Always log email content to console for debugging purposes
+        console.log('=== CONTACT CONFIRMATION EMAIL CONTENT ===');
+        console.log(`To: ${contact.email}`);
+        console.log(`Subject: Re: ${contact.subject}`);
+        console.log('Content:');
+        console.log(mailOptions.html);
+        console.log('============================================');
+        
+        // If transporter is not configured, skip actual sending
+        if (!transporter) {
+            console.log('Email transporter not configured - email not sent, content logged above for debugging');
+            return resolve();
+        }
+        
         transporter.sendMail(mailOptions, function(error, info) {
             const endTime = Date.now();
             console.log(`Contact confirmation email sending attempt took ${endTime - startTime}ms`);
@@ -1134,7 +1164,7 @@ function sendContactConfirmationEmail(contact) {
                 console.log('Contact confirmation email error:', error.message);
                 resolve(); // Resolve anyway since this is not a critical error for the user experience
             } else {
-                console.log('Contact confirmation email sent: ' + info.response);
+                console.log('Contact confirmation email sent successfully: ' + info.response);
                 resolve();
             }
         });
@@ -1210,21 +1240,29 @@ function sendContactAdminNotification(contact) {
         console.log('Attempting to send contact admin notification email to: ankeslodge@gmail.com');
         const startTime = Date.now();
         
+        // Always log email content to console for debugging purposes
+        console.log('=== CONTACT ADMIN NOTIFICATION EMAIL CONTENT ===');
+        console.log(`To: ankeslodge@gmail.com`);
+        console.log(`Subject: New Contact Message - ${contact.subject}`);
+        console.log('Content:');
+        console.log(mailOptions.html);
+        console.log('================================================');
+        
+        // If transporter is not configured, skip actual sending
+        if (!transporter) {
+            console.log('Email transporter not configured - email not sent, content logged above for debugging');
+            return resolve();
+        }
+        
         transporter.sendMail(mailOptions, function(error, info) {
             const endTime = Date.now();
             console.log(`Contact admin email sending attempt took ${endTime - startTime}ms`);
         
             if (error) {
                 console.log('Contact admin notification error:', error.message);
-                // Log the email content as fallback
-                console.log('=== CONTACT EMAIL FALLBACK LOG ===');
-                console.log(`To: ankeslodge@gmail.com`);
-                console.log(`Subject: New Contact Message - ${contact.subject}`);
-                console.log('Content:', mailOptions.html);
-                console.log('===================================');
                 resolve(); // Resolve anyway since this is not a critical error for the user experience
             } else {
-                console.log('Contact admin notification sent: ' + info.response);
+                console.log('Contact admin notification sent successfully: ' + info.response);
                 resolve();
             }
         });
