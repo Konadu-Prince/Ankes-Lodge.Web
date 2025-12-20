@@ -151,10 +151,44 @@ async function connectToMongo() {
         await mongoClient.connect();
         db = mongoClient.db('ankes-lodge');
         console.log('Connected to MongoDB Atlas');
+        
+        // Create indexes for better query performance
+        await createIndexes();
+        
         return true;
     } catch (error) {
         console.error('Failed to connect to MongoDB Atlas:', error);
         return false;
+    }
+}
+
+// Create indexes for better query performance
+async function createIndexes() {
+    try {
+        if (!db) return;
+        
+        // Create indexes for bookings collection
+        const bookingsCollection = db.collection('bookings');
+        await bookingsCollection.createIndex({ email: 1 });
+        await bookingsCollection.createIndex({ timestamp: -1 });
+        await bookingsCollection.createIndex({ status: 1 });
+        
+        // Create indexes for contacts collection
+        const contactsCollection = db.collection('contacts');
+        await contactsCollection.createIndex({ email: 1 });
+        await contactsCollection.createIndex({ timestamp: -1 });
+        
+        // Create indexes for testimonials collection
+        const testimonialsCollection = db.collection('testimonials');
+        await testimonialsCollection.createIndex({ timestamp: -1 });
+        
+        // Create indexes for visitorCounter collection
+        const visitorCounterCollection = db.collection('visitorCounter');
+        await visitorCounterCollection.createIndex({ id: 1 });
+        
+        console.log('MongoDB indexes created successfully');
+    } catch (error) {
+        console.error('Failed to create MongoDB indexes:', error);
     }
 }
 
@@ -179,12 +213,18 @@ class MongoDatabase {
         try {
             if (!db) return false;
             const collection = db.collection(this.collectionName);
-            // Clear existing data
+            
+            // For small datasets, separate operations might be more efficient than bulk
+            // Delete all existing documents
             await collection.deleteMany({});
-            // Insert new data
+            
+            // Insert all new documents in a single batch if data is not empty
             if (data.length > 0) {
-                await collection.insertMany(data);
+                // Flatten the data array if it contains arrays
+                const flattenedData = Array.isArray(data[0]) ? [].concat(...data) : data;
+                await collection.insertMany(flattenedData);
             }
+            
             return true;
         } catch (err) {
             console.error(`Error writing to MongoDB collection ${this.collectionName}:`, err);
@@ -234,6 +274,18 @@ class MongoDatabase {
             return result.modifiedCount > 0;
         } catch (err) {
             console.error(`Error updating in MongoDB collection ${this.collectionName}:`, err);
+            return false;
+        }
+    }
+
+    async createIndex(indexSpec, options = {}) {
+        try {
+            if (!db) return false;
+            const collection = db.collection(this.collectionName);
+            await collection.createIndex(indexSpec, options);
+            return true;
+        } catch (err) {
+            console.error(`Error creating index on ${this.collectionName}:`, err);
             return false;
         }
     }
