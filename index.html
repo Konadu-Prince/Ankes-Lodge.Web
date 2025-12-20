@@ -3,11 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ankes Lodge - Luxury Guest House in Abesim</title>
+    <meta name="description" content="Ankes Lodge is a luxury guest house in Abesim, Sunyani, Ghana. Book comfortable accommodations with modern amenities for business and leisure travel.">
+    <meta name="keywords" content="Ankes Lodge, guest house, hotel, accommodation, Sunyani, Abesim, Ghana, luxury lodging, business travel, leisure travel">
+    <meta name="author" content="Ankes Lodge">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://konadu-prince.github.io/Ankes-Lodge.Web/">
+    <meta property="og:title" content="Ankes Lodge - Luxury Guest House in Abesim, Sunyani">
+    <meta property="og:description" content="Book comfortable accommodations at Ankes Lodge in Abesim, Sunyani. Modern amenities, excellent service, and convenient location for business and leisure travel.">
+    <meta property="og:image" content="https://konadu-prince.github.io/Ankes-Lodge.Web/main-flyer.jpg">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://konadu-prince.github.io/Ankes-Lodge.Web/">
+    <meta property="twitter:title" content="Ankes Lodge - Luxury Guest House in Abesim, Sunyani">
+    <meta property="twitter:description" content="Book comfortable accommodations at Ankes Lodge in Abesim, Sunyani. Modern amenities, excellent service, and convenient location for business and leisure travel.">
+    <meta property="twitter:image" content="https://konadu-prince.github.io/Ankes-Lodge.Web/main-flyer.jpg">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://konadu-prince.github.io/Ankes-Lodge.Web/">
+    
+    <title>Ankes Lodge - Luxury Guest House in Abesim, Sunyani</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="icon" href="orangeLogo.png" type="image/png">
 </head>
 <body>
+    <!-- Schema.org structured data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Hotel",
+      "name": "Ankes Lodge",
+      "description": "Ankes Lodge is a luxury guest house in Abesim, Sunyani, Ghana. Book comfortable accommodations with modern amenities for business and leisure travel.",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Sunyani Abesim - After Olistar School - Nkran Kese Road, Opposite Omega Water Production Centre",
+        "addressLocality": "Abesim",
+        "addressRegion": "Sunyani",
+        "postalCode": "BS-0484-4619",
+        "addressCountry": "GH"
+      },
+      "telephone": "+233 544904547",
+      "email": "ankeslodge@gmail.com",
+      "url": "https://konadu-prince.github.io/Ankes-Lodge.Web/",
+      "priceRange": "₵199 - ₵350 per night",
+      "amenityFeature": [
+        {"@type": "LocationFeatureSpecification", "name": "Free WiFi"},
+        {"@type": "LocationFeatureSpecification", "name": "Laundry Service"},
+        {"@type": "LocationFeatureSpecification", "name": "DStv"},
+        {"@type": "LocationFeatureSpecification", "name": "Air Conditioning"},
+        {"@type": "LocationFeatureSpecification", "name": "Security System"},
+        {"@type": "LocationFeatureSpecification", "name": "Kitchen & Dining"},
+        {"@type": "LocationFeatureSpecification", "name": "Parking"}
+      ],
+      "starRating": {
+        "@type": "Rating",
+        "ratingValue": "5"
+      }
+    }
+    </script>
     <!-- Header Section -->
     <header>
         <div class="container">
@@ -382,75 +438,76 @@
                 <h3>Direct Booking with Ankes Lodge</h3>
                 <p>Book directly with us for a personalized experience. Fill out the form below and we'll contact you shortly to confirm your reservation.</p>
                 
-                <form id="booking-form">
+                <form id="booking-form" aria-labelledby="booking-form-title">
                     <div class="form-group">
-                        <label for="name">Full Name *</label>
-                        <input type="text" id="name" name="name" required>
+                        <label for="name">Full Name <span aria-label="required">*</span></label>
+                        <input type="text" id="name" name="name" required aria-required="true" placeholder="Enter your full name">
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="email">Email *</label>
-                            <input type="email" id="email" name="email" required>
+                            <label for="email">Email <span aria-label="required">*</span></label>
+                            <input type="email" id="email" name="email" required aria-required="true" placeholder="your.email@example.com">
                         </div>
                         
                         <div class="form-group">
-                            <label for="phone">Phone Number *</label>
-                            <input type="tel" id="phone" name="phone" required>
+                            <label for="phone">Phone Number <span aria-label="required">*</span></label>
+                            <input type="tel" id="phone" name="phone" required aria-required="true" placeholder="+233XXXXXXXXX">
+                            <small class="form-help">Please include country code (+233 for Ghana)</small>
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="checkin">Check-in Date *</label>
-                            <input type="date" id="checkin" name="checkin" required>
+                            <label for="checkin">Check-in Date <span aria-label="required">*</span></label>
+                            <input type="date" id="checkin" name="checkin" required aria-required="true">
                         </div>
                         
                         <div class="form-group">
-                            <label for="checkout">Check-out Date *</label>
-                            <input type="date" id="checkout" name="checkout" required>
+                            <label for="checkout">Check-out Date <span aria-label="required">*</span></label>
+                            <input type="date" id="checkout" name="checkout" required aria-required="true">
                         </div>
                     </div>
                     
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="adults">Adults *</label>
-                            <select id="adults" name="adults" required>
-                                <option value="">Select Adults</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                                <option value="6">6</option>
-                                <option value="7">7</option>
-                                <option value="8">8</option>
-                                <option value="9">9</option>
-                                <option value="10">10</option>
+                            <label for="adults">Adults <span aria-label="required">*</span></label>
+                            <select id="adults" name="adults" required aria-required="true">
+                                <option value="">Select Number of Adults</option>
+                                <option value="1">1 Adult</option>
+                                <option value="2">2 Adults</option>
+                                <option value="3">3 Adults</option>
+                                <option value="4">4 Adults</option>
+                                <option value="5">5 Adults</option>
+                                <option value="6">6 Adults</option>
+                                <option value="7">7 Adults</option>
+                                <option value="8">8 Adults</option>
+                                <option value="9">9 Adults</option>
+                                <option value="10">10 Adults</option>
                             </select>
                         </div>
                         
                         <div class="form-group">
                             <label for="children">Children</label>
                             <select id="children" name="children">
-                                <option value="0" selected>0</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                                <option value="6">6</option>
-                                <option value="7">7</option>
-                                <option value="8">8</option>
-                                <option value="9">9</option>
-                                <option value="10">10</option>
+                                <option value="0" selected>0 Children</option>
+                                <option value="1">1 Child</option>
+                                <option value="2">2 Children</option>
+                                <option value="3">3 Children</option>
+                                <option value="4">4 Children</option>
+                                <option value="5">5 Children</option>
+                                <option value="6">6 Children</option>
+                                <option value="7">7 Children</option>
+                                <option value="8">8 Children</option>
+                                <option value="9">9 Children</option>
+                                <option value="10">10 Children</option>
                             </select>
                         </div>
                     </div>
                     
                     <div class="form-group">
-                        <label for="room-type">Room Type *</label>
-                        <select id="room-type" name="room-type" required>
+                        <label for="room-type">Room Type <span aria-label="required">*</span></label>
+                        <select id="room-type" name="room-type" required aria-required="true">
                             <option value="">Select Room Type</option>
                             <option value="executive">Executive Room (₵299/night)</option>
                             <option value="regular">Regular Bedroom (₵199/night)</option>
@@ -461,9 +518,14 @@
                     <div class="form-group">
                         <label for="message">Special Requests</label>
                         <textarea id="message" name="message" rows="4" placeholder="Any special requests or requirements..."></textarea>
+                        <small class="form-help">Please include any dietary requirements, accessibility needs, or other special requests</small>
                     </div>
                     
-                    <button type="submit" class="btn-primary">Submit Booking Request</button>
+                    <div class="form-group">
+                        <button type="submit" class="btn-primary">Submit Booking Request</button>
+                    </div>
+                    
+                    <div id="booking-form-feedback" class="form-feedback" aria-live="polite" role="alert"></div>
                 </form>
             </div>
         </div>

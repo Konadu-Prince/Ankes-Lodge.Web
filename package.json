@@ -1,7 +1,7 @@
 {
   "name": "ankes-lodge-website",
   "version": "1.0.0",
-  "description": "Ankes Lodge Guest House Website with Booking System",
+  "description": "Ankes Lodge Guest House Website with Robust Booking System, SEO Optimization, and Enhanced User Experience",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

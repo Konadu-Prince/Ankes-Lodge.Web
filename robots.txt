@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+Sitemap: https://konadu-prince.github.io/Ankes-Lodge.Web/sitemap.xml
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Baiduspider
+Allow: /
+
+User-agent: Yandex
+Allow: /

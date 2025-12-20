@@ -475,6 +475,196 @@ function handleFormSubmit(formId, successMessage) {
                 return;
             }
         }
+        
+        // For booking form, do enhanced client-side validation
+        if (formId === 'booking-form') {
+            console.log('Performing enhanced client-side validation for booking form');
+            
+            // Get all form fields
+            const nameField = form.querySelector('#name');
+            const emailField = form.querySelector('#email');
+            const phoneField = form.querySelector('#phone');
+            const checkinField = form.querySelector('#checkin');
+            const checkoutField = form.querySelector('#checkout');
+            const adultsField = form.querySelector('#adults');
+            const roomTypeField = form.querySelector('#room-type');
+            
+            // Check if fields exist
+            if (!nameField || !emailField || !phoneField || !checkinField || !checkoutField || !adultsField || !roomTypeField) {
+                alert('Booking form fields not found. Please refresh the page and try again.');
+                return;
+            }
+            
+            // Extract values
+            const name = nameField.value ? nameField.value.toString().trim() : '';
+            const email = emailField.value ? emailField.value.toString().trim() : '';
+            const phone = phoneField.value ? phoneField.value.toString().trim() : '';
+            const checkin = checkinField.value ? checkinField.value.toString().trim() : '';
+            const checkout = checkoutField.value ? checkoutField.value.toString().trim() : '';
+            const adults = adultsField.value ? adultsField.value.toString().trim() : '';
+            const roomType = roomTypeField.value ? roomTypeField.value.toString().trim() : '';
+            
+            console.log('Booking field values extracted:', { name, email, phone, checkin, checkout, adults, roomType });
+            
+            // Show feedback container
+            const feedbackContainer = document.getElementById('booking-form-feedback');
+            
+            // Check for missing required fields
+            let missingFields = [];
+            
+            if (!name || name.length === 0) missingFields.push('Full Name');
+            if (!email || email.length === 0) missingFields.push('Email');
+            if (!phone || phone.length === 0) missingFields.push('Phone Number');
+            if (!checkin || checkin.length === 0) missingFields.push('Check-in Date');
+            if (!checkout || checkout.length === 0) missingFields.push('Check-out Date');
+            if (!adults || adults.length === 0) missingFields.push('Number of Adults');
+            if (!roomType || roomType.length === 0) missingFields.push('Room Type');
+            
+            if (missingFields.length > 0) {
+                console.log('Validation failed: Missing fields:', missingFields);
+                const errorMsg = 'Please fill in the following required fields: ' + missingFields.join(', ');
+                
+                // Show error in feedback container
+                if (feedbackContainer) {
+                    feedbackContainer.textContent = errorMsg;
+                    feedbackContainer.className = 'form-feedback error';
+                    feedbackContainer.style.display = 'block';
+                    
+                    // Scroll to feedback
+                    feedbackContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                } else {
+                    alert(errorMsg);
+                }
+                
+                return;
+            }
+            
+            // Validate email format
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                const errorMsg = 'Please enter a valid email address.';
+                
+                if (feedbackContainer) {
+                    feedbackContainer.textContent = errorMsg;
+                    feedbackContainer.className = 'form-feedback error';
+                    feedbackContainer.style.display = 'block';
+                    
+                    // Scroll to feedback
+                    feedbackContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                } else {
+                    alert(errorMsg);
+                }
+                
+                return;
+            }
+            
+            // Validate Ghana phone number format (+233 or 0 followed by 9 digits)
+            const phoneRegex = /^(?:\+233|0)(?:20|50|24|54|27|57|26|56|23|28|55|59)\d{7}$/;
+            if (!phoneRegex.test(phone)) {
+                const errorMsg = 'Please enter a valid Ghana phone number (e.g., +23324XXXXXXX or 024XXXXXXX).';
+                
+                if (feedbackContainer) {
+                    feedbackContainer.textContent = errorMsg;
+                    feedbackContainer.className = 'form-feedback error';
+                    feedbackContainer.style.display = 'block';
+                    
+                    // Scroll to feedback
+                    feedbackContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                } else {
+                    alert(errorMsg);
+                }
+                
+                return;
+            }
+            
+            // Validate dates
+            const checkinDate = new Date(checkin);
+            const checkoutDate = new Date(checkout);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            if (checkinDate < today) {
+                const errorMsg = 'Check-in date cannot be in the past.';
+                
+                if (feedbackContainer) {
+                    feedbackContainer.textContent = errorMsg;
+                    feedbackContainer.className = 'form-feedback error';
+                    feedbackContainer.style.display = 'block';
+                    
+                    // Scroll to feedback
+                    feedbackContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                } else {
+                    alert(errorMsg);
+                }
+                
+                return;
+            }
+            
+            if (checkoutDate <= checkinDate) {
+                const errorMsg = 'Check-out date must be after check-in date.';
+                
+                if (feedbackContainer) {
+                    feedbackContainer.textContent = errorMsg;
+                    feedbackContainer.className = 'form-feedback error';
+                    feedbackContainer.style.display = 'block';
+                    
+                    // Scroll to feedback
+                    feedbackContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                } else {
+                    alert(errorMsg);
+                }
+                
+                return;
+            }
+            
+            // Validate adults (must be between 1 and 10)
+            const adultsNum = parseInt(adults);
+            if (isNaN(adultsNum) || adultsNum < 1 || adultsNum > 10) {
+                const errorMsg = 'Number of adults must be between 1 and 10.';
+                
+                if (feedbackContainer) {
+                    feedbackContainer.textContent = errorMsg;
+                    feedbackContainer.className = 'form-feedback error';
+                    feedbackContainer.style.display = 'block';
+                    
+                    // Scroll to feedback
+                    feedbackContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                } else {
+                    alert(errorMsg);
+                }
+                
+                return;
+            }
+            
+            // Validate room type
+            const validRoomTypes = ['executive', 'regular', 'full-house'];
+            if (!validRoomTypes.includes(roomType)) {
+                const errorMsg = 'Please select a valid room type.';
+                
+                if (feedbackContainer) {
+                    feedbackContainer.textContent = errorMsg;
+                    feedbackContainer.className = 'form-feedback error';
+                    feedbackContainer.style.display = 'block';
+                    
+                    // Scroll to feedback
+                    feedbackContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                } else {
+                    alert(errorMsg);
+                }
+                
+                return;
+            }
+            
+            // Show loading feedback
+            if (feedbackContainer) {
+                feedbackContainer.textContent = 'Processing your booking request...';
+                feedbackContainer.className = 'form-feedback loading';
+                feedbackContainer.style.display = 'block';
+                
+                // Scroll to feedback
+                feedbackContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
 
         console.log('Client-side validation passed');
 
