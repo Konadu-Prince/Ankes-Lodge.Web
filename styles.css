@@ -1285,6 +1285,62 @@ footer {
         transform: scale(1.2);
     }
     
+    .search-share-section {
+        margin-top: 30px;
+        padding: 25px;
+        background-color: var(--accent-color);
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+    }
+    
+    .search-share-section h3 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: var(--secondary-color);
+    }
+    
+    .search-instructions,
+    .share-section {
+        margin-bottom: 25px;
+        text-align: center;
+    }
+    
+    .search-instructions p,
+    .share-section p {
+        margin-bottom: 15px;
+        font-size: 1.1rem;
+    }
+    
+    .link-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 10px;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    #share-link {
+        flex: 1;
+        min-width: 200px;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-family: var(--font-main);
+        font-size: 1rem;
+    }
+    
+    #copy-link-btn {
+        white-space: nowrap;
+    }
+    
+    .small-text {
+        font-size: 0.9rem;
+        color: #666;
+        font-style: italic;
+        margin: 0;
+    }
+    
     .testimonial-grid {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -1297,6 +1353,19 @@ footer {
 @media (max-width: 768px) {
     .menu-toggle {
         display: flex;
+    }
+    
+    .link-container {
+        flex-direction: column;
+    }
+    
+    #share-link {
+        min-width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    #copy-link-btn {
+        width: 100%;
     }
     
     nav ul {

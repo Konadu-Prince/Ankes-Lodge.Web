@@ -24,6 +24,39 @@ document.addEventListener('DOMContentLoaded', function() {
             menuToggle.classList.toggle('active');
         });
     }
+    
+    // Copy link functionality
+    const copyButton = document.getElementById('copy-link-btn');
+    const shareLinkInput = document.getElementById('share-link');
+    
+    if (copyButton && shareLinkInput) {
+        copyButton.addEventListener('click', function() {
+            shareLinkInput.select();
+            shareLinkInput.setSelectionRange(0, 99999); // For mobile devices
+            
+            navigator.clipboard.writeText(shareLinkInput.value).then(function() {
+                // Success
+                const originalText = copyButton.textContent;
+                copyButton.textContent = '✅ Copied!';
+                setTimeout(function() {
+                    copyButton.textContent = originalText;
+                }, 2000);
+            }).catch(function(error) {
+                // Fallback for older browsers
+                try {
+                    document.execCommand('copy');
+                    const originalText = copyButton.textContent;
+                    copyButton.textContent = '✅ Copied!';
+                    setTimeout(function() {
+                        copyButton.textContent = originalText;
+                    }, 2000);
+                } catch (err) {
+                    console.error('Failed to copy: ', error);
+                    alert('Failed to copy link. Please select and copy manually.');
+                }
+            });
+        });
+    }
 });
 
 // Set minimum check-in date to today
