@@ -621,6 +621,79 @@ function sendAdminNotification(booking) {
     });
 }
 
+// Email queue for asynchronous processing
+const emailQueue = [];
+const MAX_RETRY_ATTEMPTS = 3;
+const RETRY_DELAY = 5000; // 5 seconds
+
+// Function to process the email queue
+async function processEmailQueue() {
+    if (emailQueue.length === 0) return;
+    
+    const emailJob = emailQueue[0];
+    
+    try {
+        console.log(`Processing email job for ${emailJob.type} to ${emailJob.recipient}`);
+        
+        // Send the email based on type
+        if (emailJob.type === 'confirmation') {
+            await sendConfirmationEmail(emailJob.data);
+        } else if (emailJob.type === 'admin-notification') {
+            await sendAdminNotification(emailJob.data);
+        } else if (emailJob.type === 'contact-confirmation') {
+            await sendContactConfirmationEmail(emailJob.data);
+        } else if (emailJob.type === 'contact-admin') {
+            await sendContactAdminNotification(emailJob.data);
+        }
+        
+        // Remove the job from the queue if successful
+        emailQueue.shift();
+        console.log(`Email job completed successfully for ${emailJob.type}`);
+    } catch (error) {
+        console.log(`Email job failed for ${emailJob.type}:`, error.message);
+        emailJob.attempts += 1;
+        
+        if (emailJob.attempts < MAX_RETRY_ATTEMPTS) {
+            console.log(`Retrying email job (${emailJob.attempts}/${MAX_RETRY_ATTEMPTS}) in ${RETRY_DELAY}ms`);
+            setTimeout(() => processEmailQueue(), RETRY_DELAY);
+        } else {
+            console.log(`Max retry attempts reached for ${emailJob.type}. Moving to next job.`);
+            // Log the failed job for manual handling
+            console.log('=== FAILED EMAIL JOB ===');
+            console.log('Type:', emailJob.type);
+            console.log('Recipient:', emailJob.recipient);
+            console.log('Data:', emailJob.data);
+            console.log('=======================');
+            // Remove the failed job and continue with the next one
+            emailQueue.shift();
+        }
+    }
+    
+    // Process the next job if there are more in the queue
+    if (emailQueue.length > 0) {
+        setTimeout(() => processEmailQueue(), 1000); // Process next job after 1 second
+    }
+}
+
+// Function to add email jobs to the queue
+function queueEmail(type, recipient, data) {
+    const emailJob = {
+        type,
+        recipient,
+        data,
+        attempts: 0,
+        timestamp: new Date()
+    };
+    
+    emailQueue.push(emailJob);
+    console.log(`Email job queued: ${type} to ${recipient}`);
+    
+    // Start processing the queue if it was empty
+    if (emailQueue.length === 1) {
+        setTimeout(() => processEmailQueue(), 100);
+    }
+}
+
 // Helper function to get room type name
 function getRoomTypeName(roomType) {
     const roomTypes = {
@@ -775,24 +848,15 @@ app.post('/process-booking',
             // Save booking using database abstraction
             await bookingsDB.append(booking);
             
-            // Send confirmation email to customer and notification to admin
-            Promise.all([
-                sendConfirmationEmail(booking),
-                sendAdminNotification(booking)
-            ]).then(() => {
-                console.log('Booking form processed successfully - emails sent');
-                res.json({
-                    status: 'success',
-                    message: 'Booking request submitted successfully! A confirmation email has been sent to your email address. We will contact you shortly to confirm your reservation.',
-                    bookingId: booking.id
-                });
-            }).catch((error) => {
-                console.log('Error sending emails:', error);
-                res.json({
-                    status: 'success',
-                    message: 'Booking request submitted successfully! We will contact you shortly to confirm your reservation.',
-                    bookingId: booking.id
-                });
+            // Queue confirmation email to customer and notification to admin
+            queueEmail('confirmation', booking.email, booking);
+            queueEmail('admin-notification', 'ankeslodge@gmail.com', booking);
+            
+            console.log('Booking form processed successfully - emails queued');
+            res.json({
+                status: 'success',
+                message: 'Booking request submitted successfully! A confirmation email will be sent to your email address. We will contact you shortly to confirm your reservation.',
+                bookingId: booking.id
             });
         } catch (err) {
             console.error('Error processing booking form:', err);
@@ -898,22 +962,14 @@ app.post('/process-contact', async (req, res) => {
         
         // Send email notifications if transporter is configured
         if (transporter) {
-            // Send confirmation email to the customer and notification to admin
-            Promise.all([
-                sendContactConfirmationEmail(contact),
-                sendContactAdminNotification(contact)
-            ]).then(() => {
-                console.log('Contact form processed successfully - emails sent');
-                res.json({
-                    status: 'success',
-                    message: 'Thank you for your message! We will get back to you soon.'
-                });
-            }).catch((error) => {
-                console.log('Error sending contact emails:', error);
-                res.json({
-                    status: 'success',
-                    message: 'Thank you for your message! We will get back to you soon.'
-                });
+            // Queue confirmation email to the customer and notification to admin
+            queueEmail('contact-confirmation', contact.email, contact);
+            queueEmail('contact-admin', 'ankeslodge@gmail.com', contact);
+            
+            console.log('Contact form processed successfully - emails queued');
+            res.json({
+                status: 'success',
+                message: 'Thank you for your message! We will get back to you soon.'
             });
         } else {
             console.log('Email transporter not configured, skipping email notifications');
