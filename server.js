@@ -440,7 +440,7 @@ function sendConfirmationEmail(booking) {
         html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
                 <div style="text-align: center; padding: 20px 0; background-color: #fff; border-bottom: 3px solid #ffa500;">
-                    <img src="https://konadu-prince.github.io/Ankes-Lodge.Web/orangeLogo.png" alt="Ankes Lodge Logo" style="max-width: 100px; margin-bottom: 10px;">
+                    <img src="https://ankes-lodge.onrender.com/orangeLogo.png" alt="Ankes Lodge Logo" style="max-width: 100px; margin-bottom: 10px;">
                     <h1 style="color: #333; margin: 0;">Ankes Lodge</h1>
                     <p style="color: #666; margin: 5px 0;">Luxury Guest House in Abesim</p>
                 </div>
@@ -470,7 +470,7 @@ function sendConfirmationEmail(booking) {
                         <p><strong>Customer Phone:</strong> <a href="tel:${booking.phone}">${booking.phone}</a></p>
                         <p><strong>Customer Email:</strong> <a href="mailto:${booking.email}">${booking.email}</a></p>
                         <p><strong>Manager Contact:</strong> 0248293512</p>
-                        <p><strong>Website:</strong> <a href="https://konadu-prince.github.io/Ankes-Lodge.Web">View Our Website</a></p>
+                        <p><strong>Website:</strong> <a href="https://ankes-lodge.onrender.com">View Our Website</a></p>
                     </div>
                     
                     <p>Best regards,<br><strong>Ankes Lodge Team</strong></p>
@@ -543,7 +543,7 @@ function sendAdminNotification(booking) {
         html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
                 <div style="text-align: center; padding: 20px 0; background-color: #fff; border-bottom: 3px solid #ffa500;">
-                    <img src="https://konadu-prince.github.io/Ankes-Lodge.Web/orangeLogo.png" alt="Ankes Lodge Logo" style="max-width: 100px; margin-bottom: 10px;">
+                    <img src="https://ankes-lodge.onrender.com/orangeLogo.png" alt="Ankes Lodge Logo" style="max-width: 100px; margin-bottom: 10px;">
                     <h1 style="color: #333; margin: 0;">Ankes Lodge</h1>
                     <p style="color: #666; margin: 5px 0;">Luxury Guest House in Abesim</p>
                 </div>
@@ -569,7 +569,7 @@ function sendAdminNotification(booking) {
                     
                     <p>You can view more information about our services on our website:</p>
                     <div style="text-align: center; margin: 20px 0;">
-                        <a href="https://konadu-prince.github.io/Ankes-Lodge.Web" style="display: inline-block; background-color: #007bff; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Visit Our Website</a>
+                        <a href="https://ankes-lodge.onrender.com" style="display: inline-block; background-color: #007bff; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Visit Our Website</a>
                     </div>
                     
                     <p>Please follow up with the customer to confirm the booking.</p>
@@ -976,7 +976,7 @@ function sendContactConfirmationEmail(contact) {
         html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
                 <div style="text-align: center; padding: 20px 0; background-color: #fff; border-bottom: 3px solid #ffa500;">
-                    <img src="https://konadu-prince.github.io/Ankes-Lodge.Web/orangeLogo.png" alt="Ankes Lodge Logo" style="max-width: 100px; margin-bottom: 10px;">
+                    <img src="https://ankes-lodge.onrender.com/orangeLogo.png" alt="Ankes Lodge Logo" style="max-width: 100px; margin-bottom: 10px;">
                     <h1 style="color: #333; margin: 0;">Ankes Lodge</h1>
                     <p style="color: #666; margin: 5px 0;">Luxury Guest House in Abesim</p>
                 </div>
@@ -997,7 +997,7 @@ function sendContactConfirmationEmail(contact) {
                         <h3 style="color: #333; margin-top: 0;">Contact Information</h3>
                         <p>If you need immediate assistance, please contact our managers directly:</p>
                         <p><strong>Manager:</strong> 0248293512</p>
-                        <p><strong>Website:</strong> <a href="https://konadu-prince.github.io/Ankes-Lodge.Web">View Our Website</a></p>
+                        <p><strong>Website:</strong> <a href="https://ankes-lodge.onrender.com">View Our Website</a></p>
                     </div>
                     
                     <p>We typically respond within 24 hours. If you need immediate assistance, please call us at <strong>0544904547</strong> or <strong>0558647156</strong>.</p>
@@ -1059,7 +1059,7 @@ function sendContactAdminNotification(contact) {
         html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
                 <div style="text-align: center; padding: 20px 0; background-color: #fff; border-bottom: 3px solid #ffa500;">
-                    <img src="https://konadu-prince.github.io/Ankes-Lodge.Web/orangeLogo.png" alt="Ankes Lodge Logo" style="max-width: 100px; margin-bottom: 10px;">
+                    <img src="https://ankes-lodge.onrender.com/orangeLogo.png" alt="Ankes Lodge Logo" style="max-width: 100px; margin-bottom: 10px;">
                     <h1 style="color: #333; margin: 0;">Ankes Lodge</h1>
                     <p style="color: #666; margin: 5px 0;">Luxury Guest House in Abesim</p>
                 </div>
@@ -1080,7 +1080,7 @@ function sendContactAdminNotification(contact) {
                     <div style="background-color: #e8f4e8; padding: 20px; margin: 20px 0; border-left: 4px solid #28a745; border-radius: 3px;">
                         <h3 style="color: #333; margin-top: 0;">Contact Information</h3>
                         <p>Manager Contact: 0248293512</p>
-                        <p>Website: <a href="https://konadu-prince.github.io/Ankes-Lodge.Web">View Our Website</a></p>
+                        <p>Website: <a href="https://ankes-lodge.onrender.com">View Our Website</a></p>
                     </div>
                     
                     <p>Please follow up with the customer as soon as possible.</p>
@@ -1215,7 +1215,7 @@ function sendTestimonialAdminNotification(testimonial) {
         html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
                 <div style="text-align: center; padding: 20px 0; background-color: #fff; border-bottom: 3px solid #ffa500;">
-                    <img src="https://konadu-prince.github.io/Ankes-Lodge.Web/orangeLogo.png" alt="Ankes Lodge Logo" style="max-width: 100px; margin-bottom: 10px;">
+                    <img src="https://ankes-lodge.onrender.com/orangeLogo.png" alt="Ankes Lodge Logo" style="max-width: 100px; margin-bottom: 10px;">
                     <h1 style="color: #333; margin: 0;">Ankes Lodge</h1>
                     <p style="color: #666; margin: 5px 0;">Luxury Guest House in Abesim</p>
                 </div>

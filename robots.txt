@@ -1,6 +1,6 @@
 User-agent: *
 Allow: /
-Sitemap: https://konadu-prince.github.io/Ankes-Lodge.Web/sitemap.xml
+Sitemap: https://ankes-lodge.onrender.com/sitemap.xml
 
 User-agent: Googlebot
 Allow: /

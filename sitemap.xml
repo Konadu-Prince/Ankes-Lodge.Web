@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://konadu-prince.github.io/Ankes-Lodge.Web/</loc>
+    <loc>https://ankes-lodge.onrender.com/</loc>
     <lastmod>2025-12-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://konadu-prince.github.io/Ankes-Lodge.Web/index.html</loc>
+    <loc>https://ankes-lodge.onrender.com/index.html</loc>
     <lastmod>2025-12-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://konadu-prince.github.io/Ankes-Lodge.Web/booking-confirmation.html</loc>
+    <loc>https://ankes-lodge.onrender.com/booking-confirmation.html</loc>
     <lastmod>2025-12-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://konadu-prince.github.io/Ankes-Lodge.Web/admin.html</loc>
+    <loc>https://ankes-lodge.onrender.com/admin.html</loc>
     <lastmod>2025-12-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://konadu-prince.github.io/Ankes-Lodge.Web/login.html</loc>
+    <loc>https://ankes-lodge.onrender.com/login.html</loc>
     <lastmod>2025-12-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
