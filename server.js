@@ -5,6 +5,7 @@ const { v4: uuidv4 } = require('uuid');
 const nodemailer = require('nodemailer');
 const rateLimit = require('express-rate-limit');
 const { body, validationResult } = require('express-validator');
+const bcrypt = require('bcrypt');
 
 // Add MongoDB support
 let MongoClient;
@@ -85,6 +86,18 @@ function requireAuth(req, res, next) {
             // Redirect to login page
             return res.redirect('/login.html');
         }
+        
+        // Check if session has expired (24 hour expiration)
+        const session = adminSessions.get(sessionId);
+        const now = new Date();
+        const sessionAge = now - session.loginTime;
+        const maxSessionAge = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+        
+        if (sessionAge > maxSessionAge) {
+            // Session expired, remove it and redirect to login
+            adminSessions.delete(sessionId);
+            return res.redirect('/login.html');
+        }
     }
     
     // Allow public API endpoints without authentication
@@ -101,18 +114,62 @@ function requireAuth(req, res, next) {
 // Apply authentication middleware to all routes
 app.use(requireAuth);
 
-// Create a reusable transporter object using Gmail SMTP
+// Rate limiting for public API endpoints
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // limit each IP to 10 requests per windowMs
+  message: {
+    error: 'Too many requests',
+    message: 'Too many requests from this IP, please try again later.'
+  },
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+
+// Helper function to conditionally log based on environment
+// Only log verbose information in development/non-production environments
+const nodeEnv = process.env.NODE_ENV || 'development';
+const isDevelopment = nodeEnv !== 'production';
+
+function conditionalLog(...args) {
+  if (isDevelopment) {
+    console.log(...args);
+  }
+}
+
+function conditionalLogObject(obj) {
+  if (isDevelopment && obj) {
+    // For development, log the full object
+    console.log(JSON.stringify(obj, null, 2));
+  } else if (!isDevelopment && obj) {
+    // For production, log only non-sensitive keys
+    const safeKeys = {};
+    for (const key in obj) {
+      if (key.toLowerCase().includes('email') || key.toLowerCase().includes('phone') || 
+          key.toLowerCase().includes('message') || key.toLowerCase().includes('pass')) {
+        safeKeys[key] = '[REDACTED FOR PRIVACY]';
+      } else {
+        safeKeys[key] = obj[key];
+      }
+    }
+    console.log(JSON.stringify(safeKeys, null, 2));
+  }
+}
+
+// Create a reusable transporter object using Gmail SMTP or development email service
 // Note: In production, use environment variables for credentials
 let transporter;
 try {
     // Check if environment variables are set
     const emailUser = process.env.EMAIL_USER;
     const emailPass = process.env.EMAIL_PASS;
+    const nodeEnv = process.env.NODE_ENV || 'development';
     
     // Debug logging for environment variables
     console.log('=== EMAIL CONFIGURATION DEBUG ===');
     console.log('EMAIL_USER env var:', emailUser ? `${emailUser.substring(0, 5)}...` : 'NOT SET');
     console.log('EMAIL_PASS env var:', emailPass ? 'SET (hidden for security)' : 'NOT SET');
+    console.log('NODE_ENV:', nodeEnv);
     
     if (!emailUser || !emailPass) {
         console.log('EMAIL_USER and EMAIL_PASS environment variables are required for email functionality');
@@ -120,13 +177,40 @@ try {
         transporter = null;
     } else {
         console.log('Creating transporter with provided credentials...');
-        transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: emailUser,
-                pass: emailPass
-            }
-        });
+        
+        // Check if we're in development and using a testing service
+        if (nodeEnv === 'development' && emailUser.includes('ethereal')) {
+            // Ethereal.email testing service
+            transporter = nodemailer.createTransport({
+                host: 'smtp.ethereal.email',
+                port: 587,
+                secure: false, // true for 465, false for other ports
+                auth: {
+                    user: emailUser,
+                    pass: emailPass
+                }
+            });
+        } else if (nodeEnv === 'development' && emailUser.includes('mailtrap')) {
+            // Mailtrap testing service
+            transporter = nodemailer.createTransport({
+                host: 'smtp.mailtrap.io',
+                port: 2525,
+                secure: false, // true for 465, false for other ports
+                auth: {
+                    user: emailUser,
+                    pass: emailPass
+                }
+            });
+        } else {
+            // Production Gmail SMTP
+            transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: emailUser,
+                    pass: emailPass
+                }
+            });
+        }
     }
     console.log('=== END EMAIL CONFIGURATION DEBUG ===');
 } catch (error) {
@@ -464,29 +548,29 @@ if (transporter) {
 function sendConfirmationEmail(booking) {
     // If transporter is not configured, skip email sending
     if (!transporter) {
-        console.log('Email transporter not configured, logging booking confirmation to console');
-        console.log('=== BOOKING CONFIRMATION EMAIL ===');
-        console.log(`To: ${booking.email}`);
-        console.log(`Subject: Booking Confirmation - Ankes Lodge (Booking ID: ${booking.id})`);
-        console.log(`Body:`);
-        console.log(`Dear ${booking.name},`);
-        console.log(`Thank you for booking with Ankes Lodge. Your booking details are as follows:`);
-        console.log(`Booking ID: ${booking.id}`);
-        console.log(`Name: ${booking.name}`);
-        console.log(`Check-in Date: ${booking.checkin}`);
-        console.log(`Check-out Date: ${booking.checkout}`);
-        console.log(`Adults: ${booking.adults}`);
-        console.log(`Children: ${booking.children}`);
-        console.log(`Room Type: ${getRoomTypeName(booking.roomType)}`);
-        console.log(`Special Requests: ${booking.message || 'None'}`);
-        console.log(`We will contact you shortly to confirm your reservation and provide payment details.`);
-        console.log(`Best regards, Ankes Lodge Team`);
-        console.log('====================================');
+        conditionalLog('Email transporter not configured, logging booking confirmation to console');
+        conditionalLog('=== BOOKING CONFIRMATION EMAIL ===');
+        conditionalLog(`To: ${booking.email}`);
+        conditionalLog(`Subject: Booking Confirmation - Ankes Lodge (Booking ID: ${booking.id})`);
+        conditionalLog(`Body:`);
+        conditionalLog(`Dear ${booking.name},`);
+        conditionalLog(`Thank you for booking with Ankes Lodge. Your booking details are as follows:`);
+        conditionalLog(`Booking ID: ${booking.id}`);
+        conditionalLog(`Name: ${booking.name}`);
+        conditionalLog(`Check-in Date: ${booking.checkin}`);
+        conditionalLog(`Check-out Date: ${booking.checkout}`);
+        conditionalLog(`Adults: ${booking.adults}`);
+        conditionalLog(`Children: ${booking.children}`);
+        conditionalLog(`Room Type: ${getRoomTypeName(booking.roomType)}`);
+        conditionalLog(`Special Requests: ${booking.message || 'None'}`);
+        conditionalLog(`We will contact you shortly to confirm your reservation and provide payment details.`);
+        conditionalLog(`Best regards, Ankes Lodge Team`);
+        conditionalLog('====================================');
         return Promise.resolve(); // Return a resolved promise for consistency
     }
     
     const mailOptions = {
-        from: 'ankeslodge@gmail.com',
+        from: process.env.ADMIN_EMAIL || 'ankeslodge@gmail.com',
         to: booking.email,
         subject: `Booking Confirmation - Ankes Lodge (Booking ID: ${booking.id})`,
         html: `
@@ -574,31 +658,31 @@ function sendConfirmationEmail(booking) {
 function sendAdminNotification(booking) {
     // If transporter is not configured, skip email sending
     if (!transporter) {
-        console.log('Email transporter not configured, logging admin notification to console');
-        console.log('=== ADMIN NOTIFICATION EMAIL ===');
-        console.log(`To: ankeslodge@gmail.com`);
-        console.log(`Subject: New Booking Request - Ankes Lodge (Booking ID: ${booking.id})`);
-        console.log(`Body:`);
-        console.log(`A new booking request has been submitted. Details:`);
-        console.log(`Booking ID: ${booking.id}`);
-        console.log(`Timestamp: ${booking.timestamp}`);
-        console.log(`Name: ${booking.name}`);
-        console.log(`Email: ${booking.email}`);
-        console.log(`Phone: ${booking.phone}`);
-        console.log(`Check-in Date: ${booking.checkin}`);
-        console.log(`Check-out Date: ${booking.checkout}`);
-        console.log(`Adults: ${booking.adults}`);
-        console.log(`Children: ${booking.children}`);
-        console.log(`Room Type: ${getRoomTypeName(booking.roomType)}`);
-        console.log(`Special Requests: ${booking.message || 'None'}`);
-        console.log(`Please follow up with the customer to confirm the booking.`);
-        console.log('================================');
+        conditionalLog('Email transporter not configured, logging admin notification to console');
+        conditionalLog('=== ADMIN NOTIFICATION EMAIL ===');
+        conditionalLog(`To: ${process.env.ADMIN_EMAIL || 'ankeslodge@gmail.com'}`);
+        conditionalLog(`Subject: New Booking Request - Ankes Lodge (Booking ID: ${booking.id})`);
+        conditionalLog(`Body:`);
+        conditionalLog(`A new booking request has been submitted. Details:`);
+        conditionalLog(`Booking ID: ${booking.id}`);
+        conditionalLog(`Timestamp: ${booking.timestamp}`);
+        conditionalLog(`Name: ${booking.name}`);
+        conditionalLog(`Email: ${booking.email}`);
+        conditionalLog(`Phone: ${booking.phone}`);
+        conditionalLog(`Check-in Date: ${booking.checkin}`);
+        conditionalLog(`Check-out Date: ${booking.checkout}`);
+        conditionalLog(`Adults: ${booking.adults}`);
+        conditionalLog(`Children: ${booking.children}`);
+        conditionalLog(`Room Type: ${getRoomTypeName(booking.roomType)}`);
+        conditionalLog(`Special Requests: ${booking.message || 'None'}`);
+        conditionalLog(`Please follow up with the customer to confirm the booking.`);
+        conditionalLog('================================');
         return Promise.resolve(); // Return a resolved promise for consistency
     }
     
     const mailOptions = {
-        from: 'ankeslodge@gmail.com',
-        to: 'ankeslodge@gmail.com', // Admin email
+        from: process.env.ADMIN_EMAIL || 'ankeslodge@gmail.com',
+        to: process.env.ADMIN_EMAIL || 'ankeslodge@gmail.com', // Admin email
         subject: `New Booking Request - Ankes Lodge (Booking ID: ${booking.id})`,
         html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
@@ -661,12 +745,12 @@ function sendAdminNotification(booking) {
         const startTime = Date.now();
         
         // Always log email content to console for debugging purposes
-        console.log('=== ADMIN NOTIFICATION EMAIL CONTENT ===');
-        console.log(`To: ankeslodge@gmail.com`);
-        console.log(`Subject: New Booking Request - Ankes Lodge (Booking ID: ${booking.id})`);
-        console.log('Content:');
-        console.log(mailOptions.html);
-        console.log('=======================================');
+        conditionalLog('=== ADMIN NOTIFICATION EMAIL CONTENT ===');
+        conditionalLog(`To: ${process.env.ADMIN_EMAIL || 'ankeslodge@gmail.com'}`);
+        conditionalLog(`Subject: New Booking Request - Ankes Lodge (Booking ID: ${booking.id})`);
+        conditionalLog('Content:');
+        conditionalLog(mailOptions.html);
+        conditionalLog('=======================================');
         
         // If transporter is not configured, skip actual sending
         if (!transporter) {
@@ -765,8 +849,8 @@ function queueEmail(type, recipient, data) {
 // Helper function to get room type name
 function getRoomTypeName(roomType) {
     const roomTypes = {
-        'executive': 'Executive Room (₵299/night)',
-        'regular': 'Regular Bedroom (₵199/night)',
+        'executive': 'Executive Room (₵350/night)',
+        'regular': 'Regular Bedroom (₵250/night)',
         'full-house': 'Full House (Custom Pricing)'
     };
     return roomTypes[roomType] || roomType;
@@ -819,6 +903,7 @@ app.get('/login', (req, res) => {
 
 // Handle booking form submission
 app.post('/process-booking', 
+    apiLimiter,
     // Validation and sanitization middleware
     body('name').trim().escape().isLength({ min: 2, max: 50 }),
     body('email').trim().normalizeEmail().isEmail(),
@@ -918,7 +1003,7 @@ app.post('/process-booking',
             
             // Queue confirmation email to customer and notification to admin
             queueEmail('confirmation', booking.email, booking);
-            queueEmail('admin-notification', 'ankeslodge@gmail.com', booking);
+            queueEmail('admin-notification', process.env.ADMIN_EMAIL || 'ankeslodge@gmail.com', booking)
             
             console.log('Booking form processed successfully - emails queued');
             res.json({
@@ -936,31 +1021,31 @@ app.post('/process-booking',
     }
 );
 // Handle contact form submission
-app.post('/process-contact', async (req, res) => {
-    // Debug: Log request start
-    console.log('=== CONTACT FORM REQUEST START ===');
-    console.log('Request method:', req.method);
-    console.log('Request URL:', req.url);
-    console.log('Request headers:', req.headers);
+app.post('/process-contact', apiLimiter, async (req, res) => {
+    // Debug: Log request start (conditionally)
+    conditionalLog('=== CONTACT FORM REQUEST START ===');
+    conditionalLog('Request method:', req.method);
+    conditionalLog('Request URL:', req.url);
+    conditionalLog('Request headers:', req.headers);
     
-    // Debug: Log all incoming data
-    console.log('=== CONTACT FORM DEBUG ===');
-    console.log('Request body:', req.body);
-    console.log('Keys in body:', Object.keys(req.body));
+    // Debug: Log all incoming data (conditionally)
+    conditionalLog('=== CONTACT FORM DEBUG ===');
+    conditionalLogObject(req.body);
+    conditionalLog('Keys in body:', Object.keys(req.body));
     
-    // Debug: Check each field individually
-    console.log('Checking individual fields:');
-    console.log('contact-name in body:', 'contact-name' in req.body);
-    console.log('contact-email in body:', 'contact-email' in req.body);
-    console.log('subject in body:', 'subject' in req.body);
-    console.log('contact-message in body:', 'contact-message' in req.body);
+    // Debug: Check each field individually (conditionally)
+    conditionalLog('Checking individual fields:');
+    conditionalLog('contact-name in body:', 'contact-name' in req.body);
+    conditionalLog('contact-email in body:', 'contact-email' in req.body);
+    conditionalLog('subject in body:', 'subject' in req.body);
+    conditionalLog('contact-message in body:', 'contact-message' in req.body);
     
-    // Debug: Log raw values
-    console.log('Raw values:');
-    console.log('req.body[\'contact-name\']:', req.body['contact-name']);
-    console.log('req.body[\'contact-email\']:', req.body['contact-email']);
-    console.log('req.body[\'subject\']:', req.body['subject']);
-    console.log('req.body[\'contact-message\']:', req.body['contact-message']);
+    // Debug: Log raw values (conditionally)
+    conditionalLog('Raw values:');
+    conditionalLog('req.body[\'contact-name\']:', req.body['contact-name']);
+    conditionalLog('req.body[\'contact-email\']:', req.body['contact-email']);
+    conditionalLog('req.body[\'subject\']:', req.body['subject']);
+    conditionalLog('req.body[\'contact-message\']:', req.body['contact-message']);
     
     // Correctly extract form data
     const name = req.body['contact-name'];
@@ -1032,7 +1117,7 @@ app.post('/process-contact', async (req, res) => {
         if (transporter) {
             // Queue confirmation email to the customer and notification to admin
             queueEmail('contact-confirmation', contact.email, contact);
-            queueEmail('contact-admin', 'ankeslodge@gmail.com', contact);
+            queueEmail('contact-admin', process.env.ADMIN_EMAIL || 'ankeslodge@gmail.com', contact)
             
             console.log('Contact form processed successfully - emails queued');
             res.json({
@@ -1052,7 +1137,7 @@ app.post('/process-contact', async (req, res) => {
             console.log('====================================');
             
             console.log('=== ADMIN NOTIFICATION EMAIL ===');
-            console.log(`To: ankeslodge@gmail.com`);
+            console.log(`To: ${process.env.ADMIN_EMAIL || 'ankeslodge@gmail.com'}`);
             console.log(`Subject: New Contact Message - ${contact.subject}`);
             console.log(`Body:`);
             console.log(`A new contact message has been received. Details:`);
@@ -1080,21 +1165,21 @@ app.post('/process-contact', async (req, res) => {
 function sendContactConfirmationEmail(contact) {
     // If transporter is not configured, skip email sending
     if (!transporter) {
-        console.log('Email transporter not configured, logging contact confirmation to console');
-        console.log('=== CONTACT CONFIRMATION EMAIL ===');
-        console.log(`To: ${contact.email}`);
-        console.log(`Subject: Re: ${contact.subject}`);
-        console.log(`Body:`);
-        console.log(`Dear ${contact.name},`);
-        console.log(`Thank you for contacting Ankes Lodge. We have received your message and will get back to you soon.`);
-        console.log(`Your message: ${contact.message}`);
-        console.log(`Best regards, Ankes Lodge Team`);
-        console.log('====================================');
+        conditionalLog('Email transporter not configured, logging contact confirmation to console');
+        conditionalLog('=== CONTACT CONFIRMATION EMAIL ===');
+        conditionalLog(`To: ${contact.email}`);
+        conditionalLog(`Subject: Re: ${contact.subject}`);
+        conditionalLog(`Body:`);
+        conditionalLog(`Dear ${contact.name},`);
+        conditionalLog(`Thank you for contacting Ankes Lodge. We have received your message and will get back to you soon.`);
+        conditionalLog(`Your message: ${contact.message}`);
+        conditionalLog(`Best regards, Ankes Lodge Team`);
+        conditionalLog('====================================');
         return Promise.resolve(); // Return a resolved promise for consistency
     }
     
     const mailOptions = {
-        from: 'ankeslodge@gmail.com',
+        from: process.env.ADMIN_EMAIL || 'ankeslodge@gmail.com',
         to: contact.email,
         subject: `Re: ${contact.subject}`,
         html: `
@@ -1143,12 +1228,12 @@ function sendContactConfirmationEmail(contact) {
         const startTime = Date.now();
         
         // Always log email content to console for debugging purposes
-        console.log('=== CONTACT CONFIRMATION EMAIL CONTENT ===');
-        console.log(`To: ${contact.email}`);
-        console.log(`Subject: Re: ${contact.subject}`);
-        console.log('Content:');
-        console.log(mailOptions.html);
-        console.log('============================================');
+        conditionalLog('=== CONTACT CONFIRMATION EMAIL CONTENT ===');
+        conditionalLog(`To: ${contact.email}`);
+        conditionalLog(`Subject: Re: ${contact.subject}`);
+        conditionalLog('Content:');
+        conditionalLog(mailOptions.html);
+        conditionalLog('============================================');
         
         // If transporter is not configured, skip actual sending
         if (!transporter) {
@@ -1175,24 +1260,24 @@ function sendContactConfirmationEmail(contact) {
 function sendContactAdminNotification(contact) {
     // If transporter is not configured, skip email sending
     if (!transporter) {
-        console.log('Email transporter not configured, logging contact notification to console');
-        console.log('=== CONTACT NOTIFICATION EMAIL ===');
-        console.log(`To: ankeslodge@gmail.com`);
-        console.log(`Subject: New Contact Message - ${contact.subject}`);
-        console.log(`Body:`);
-        console.log(`A new contact message has been received. Details:`);
-        console.log(`Name: ${contact.name}`);
-        console.log(`Email: ${contact.email}`);
-        console.log(`Subject: ${contact.subject}`);
-        console.log(`Message: ${contact.message}`);
-        console.log(`Received: ${contact.timestamp}`);
-        console.log('==================================');
+        conditionalLog('Email transporter not configured, logging contact notification to console');
+        conditionalLog('=== CONTACT NOTIFICATION EMAIL ===');
+        conditionalLog(`To: ${process.env.ADMIN_EMAIL || 'ankeslodge@gmail.com'}`);
+        conditionalLog(`Subject: New Contact Message - ${contact.subject}`);
+        conditionalLog(`Body:`);
+        conditionalLog(`A new contact message has been received. Details:`);
+        conditionalLog(`Name: ${contact.name}`);
+        conditionalLog(`Email: ${contact.email}`);
+        conditionalLog(`Subject: ${contact.subject}`);
+        conditionalLog(`Message: ${contact.message}`);
+        conditionalLog(`Received: ${contact.timestamp}`);
+        conditionalLog('==================================');
         return Promise.resolve(); // Return a resolved promise for consistency
     }
     
     const mailOptions = {
-        from: 'ankeslodge@gmail.com',
-        to: 'ankeslodge@gmail.com', // Admin email
+        from: process.env.ADMIN_EMAIL || 'ankeslodge@gmail.com',
+        to: process.env.ADMIN_EMAIL || 'ankeslodge@gmail.com', // Admin email
         subject: `New Contact Message - ${contact.subject}`,
         html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
@@ -1237,16 +1322,16 @@ function sendContactAdminNotification(contact) {
 
     // Return a promise for better error handling
     return new Promise((resolve, reject) => {
-        console.log('Attempting to send contact admin notification email to: ankeslodge@gmail.com');
+        console.log('Attempting to send contact admin notification email to:', process.env.ADMIN_EMAIL || 'ankeslodge@gmail.com');
         const startTime = Date.now();
         
         // Always log email content to console for debugging purposes
-        console.log('=== CONTACT ADMIN NOTIFICATION EMAIL CONTENT ===');
-        console.log(`To: ankeslodge@gmail.com`);
-        console.log(`Subject: New Contact Message - ${contact.subject}`);
-        console.log('Content:');
-        console.log(mailOptions.html);
-        console.log('================================================');
+        conditionalLog('=== CONTACT ADMIN NOTIFICATION EMAIL CONTENT ===');
+        conditionalLog(`To: ${process.env.ADMIN_EMAIL || 'ankeslodge@gmail.com'}`);
+        conditionalLog(`Subject: New Contact Message - ${contact.subject}`);
+        conditionalLog('Content:');
+        conditionalLog(mailOptions.html);
+        conditionalLog('================================================');
         
         // If transporter is not configured, skip actual sending
         if (!transporter) {
@@ -1270,7 +1355,7 @@ function sendContactAdminNotification(contact) {
 }
 
 // Endpoint to add new testimonial
-app.post('/add-testimonial', async (req, res) => {
+app.post('/add-testimonial', apiLimiter, async (req, res) => {
     const { name, location, comment, rating } = req.body;
     
     // Validate required fields
@@ -1340,7 +1425,7 @@ function sendTestimonialAdminNotification(testimonial) {
     if (!transporter) {
         console.log('Email transporter not configured, logging testimonial admin notification to console');
         console.log('=== TESTIMONIAL ADMIN NOTIFICATION EMAIL ===');
-        console.log(`To: ankeslodge@gmail.com`);
+        console.log(`To: ${process.env.ADMIN_EMAIL || 'ankeslodge@gmail.com'}`);
         console.log(`Subject: New Testimonial Submitted - Ankes Lodge`);
         console.log(`Body:`);
         console.log(`A new testimonial has been submitted. Details:`);
@@ -1355,8 +1440,8 @@ function sendTestimonialAdminNotification(testimonial) {
     }
     
     const mailOptions = {
-        from: 'ankeslodge@gmail.com',
-        to: 'ankeslodge@gmail.com', // Admin email
+        from: process.env.ADMIN_EMAIL || 'ankeslodge@gmail.com',
+        to: process.env.ADMIN_EMAIL || 'ankeslodge@gmail.com', // Admin email
         subject: `New Testimonial Submitted - Ankes Lodge`,
         html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
@@ -1404,7 +1489,7 @@ function sendTestimonialAdminNotification(testimonial) {
 
     // Return a promise for better error handling
     return new Promise((resolve, reject) => {
-        console.log('Attempting to send testimonial admin notification email to: ankeslodge@gmail.com');
+        console.log('Attempting to send testimonial admin notification email to:', process.env.ADMIN_EMAIL || 'ankeslodge@gmail.com');
         const startTime = Date.now();
         
         transporter.sendMail(mailOptions, function(error, info) {
@@ -1415,7 +1500,7 @@ function sendTestimonialAdminNotification(testimonial) {
                 console.log('Testimonial admin notification error:', error.message);
                 // Log the email content as fallback
                 console.log('=== TESTIMONIAL ADMIN EMAIL FALLBACK LOG ===');
-                console.log(`To: ankeslodge@gmail.com`);
+                console.log(`To: ${process.env.ADMIN_EMAIL || 'ankeslodge@gmail.com'}`);
                 console.log(`Subject: New Testimonial Submitted - Ankes Lodge`);
                 console.log('Content:', mailOptions.html);
                 console.log('================================================');
@@ -1430,29 +1515,49 @@ function sendTestimonialAdminNotification(testimonial) {
 
 // Endpoint to get visitor count
 app.get('/visitor-count', async (req, res) => {
-    let counter = { count: 0 };
-    
-    // Read existing counter using database abstraction
     try {
-        const counters = await visitorCounterDB.read();
-        if (counters.length > 0) {
-            counter = counters[0];
+        // Use atomic increment operation to avoid race conditions
+        if (db) {
+            // MongoDB implementation with atomic increment
+            const visitorCounterCollection = db.collection('visitorCounter');
+            const result = await visitorCounterCollection.findOneAndUpdate(
+                { id: 'global' },
+                { $inc: { count: 1 } },
+                { upsert: true, returnDocument: 'after' }
+            );
+            
+            const count = result.value ? result.value.count : 1;
+            res.json({ count });
+        } else {
+            // Fallback to file-based implementation with locking
+            let counter = { count: 0 };
+            
+            // Read existing counter using database abstraction
+            try {
+                const counters = await visitorCounterDB.read();
+                if (counters.length > 0) {
+                    counter = counters[0];
+                }
+            } catch (err) {
+                counter = { count: 0 };
+            }
+            
+            // Increment counter
+            counter.count += 1;
+            
+            // Save updated counter using database abstraction
+            try {
+                await visitorCounterDB.write([counter]);
+            } catch (err) {
+                console.error('Error updating visitor counter:', err);
+            }
+            
+            res.json({ count: counter.count });
         }
-    } catch (err) {
-        counter = { count: 0 };
+    } catch (error) {
+        console.error('Error in visitor counter:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
-    
-    // Increment counter
-    counter.count += 1;
-    
-    // Save updated counter using database abstraction
-    try {
-        await visitorCounterDB.write([counter]);
-    } catch (err) {
-        console.error('Error updating visitor counter:', err);
-    }
-    
-    res.json({ count: counter.count });
 });// Endpoint to delete a testimonial
 app.delete('/delete-testimonial/:id', async (req, res) => {
     const id = parseInt(req.params.id);
@@ -1502,8 +1607,20 @@ app.delete('/delete-testimonial/:id', async (req, res) => {
             message: 'Failed to save testimonials. Please try again later.'
         });
     }
-});// Add login endpoint
-app.post('/admin/login', (req, res) => {
+});// Rate limiting for admin login to prevent brute force attacks
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // limit each IP to 5 login attempts per windowMs
+  message: {
+    error: 'Too many login attempts',
+    message: 'Too many login attempts from this IP, please try again later.'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Add login endpoint
+app.post('/admin/login', loginLimiter, (req, res) => {
     const { username, password } = req.body;
     
     // Read admin credentials
@@ -1517,8 +1634,8 @@ app.post('/admin/login', (req, res) => {
         console.error('Error reading admin credentials:', err);
     }
     
-    // Check credentials
-    if (username === adminCredentials.username && password === adminCredentials.password) {
+    // Check credentials using bcrypt for password comparison
+    if (username === adminCredentials.username && bcrypt.compareSync(password, adminCredentials.password)) {
         // Generate session ID
         const sessionId = uuidv4();
         
