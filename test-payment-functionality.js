@@ -7,13 +7,13 @@ async function testPaymentFunctionality() {
     
     // Test 1: Check if the initiate-payment endpoint is available
     try {
-        const testResponse = await axios.post('http://localhost:8080/initiate-payment', {
+        const testResponse = await axios.post('http://localhost:8000/initiate-payment', {
             booking_id: 'test123',
             email: 'test@example.com',
             customer_name: 'Test Customer',
             room_type: 'executive',
             amount: 350,  // GHS 350
-            callback_url: 'http://localhost:8080/payment-success'
+            callback_url: 'http://localhost:8000/payment-success'
         });
         
         console.log('✅ Payment initiation endpoint is working');
@@ -41,7 +41,7 @@ async function testPaymentFunctionality() {
     
     // Test 2: Verify webhook endpoint exists and is secured
     try {
-        const webhookResponse = await axios.post('http://localhost:8080/webhook/paystack', {}, {
+        const webhookResponse = await axios.post('http://localhost:8000/webhook/paystack', {}, {
             headers: { 'Content-Type': 'application/json' }
         });
         console.log('❌ Webhook should require signature - unexpected response:', webhookResponse.status);

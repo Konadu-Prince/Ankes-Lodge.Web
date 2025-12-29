@@ -887,25 +887,39 @@ function initTestimonialMarquee() {
             // Use default testimonials if fetch fails
             const defaultTestimonials = [
                 {
-                    name: "Samuel K.",
+                    name: "Ama K.",
                     location: "Kumasi, Ghana",
-                    comment: "Ankes Lodge provided the perfect retreat for our family vacation. The staff was incredibly welcoming and the facilities were spotless.",
+                    comment: "Ankes Lodge is absolutely magical! The semi-standard room was beautifully designed and the staff treated us like family. The best hospitality experience in Ghana - we're already planning our return trip!",
                     rating: 5,
-                    date: "2025-11-15"
+                    date: "2025-12-20"
                 },
                 {
-                    name: "Grace A.",
+                    name: "Kwame O.",
                     location: "Accra, Ghana",
-                    comment: "As a business traveler, I appreciate the quiet environment and reliable WiFi. The executive room exceeded my expectations.",
+                    comment: "This place is a hidden gem! The peaceful environment and breathtaking views made our weekend truly unforgettable. The executive room was pure luxury - every detail was perfect!",
                     rating: 5,
-                    date: "2025-10-22"
+                    date: "2025-12-15"
                 },
                 {
-                    name: "Michael T.",
-                    location: "Tech Solutions Ltd",
-                    comment: "The full house booking was perfect for our company retreat. The event hall and accommodation made our planning stress-free.",
+                    name: "Sarah T.",
+                    location: "London, UK",
+                    comment: "Visited family in Ghana and Ankes Lodge was our perfect home base! The full house was ideal for our extended family. Serene location, impeccable service - an absolute must-book!",
                     rating: 5,
-                    date: "2025-09-30"
+                    date: "2025-12-10"
+                },
+                {
+                    name: "Michael J.",
+                    location: "New York, USA",
+                    comment: "Ankes Lodge completely exceeded our expectations! The regular bedroom was spacious and spotless with all the amenities we needed. The staff were incredibly friendly and helpful. We'll definitely return!",
+                    rating: 5,
+                    date: "2025-12-05"
+                },
+                {
+                    name: "Esi A.",
+                    location: "Takoradi, Ghana",
+                    comment: "My family and I were blown away by the incredible experience at Ankes Lodge! The semi-standard room offered amazing value with top-notch amenities. Perfect location for exploring Abesim - we're already planning our next visit!",
+                    rating: 5,
+                    date: "2025-11-28"
                 }
             ];
             renderMarqueeTestimonials(defaultTestimonials);

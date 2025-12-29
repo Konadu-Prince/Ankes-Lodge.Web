@@ -736,15 +736,27 @@ function sendConfirmationEmail(booking) {
                         <p><strong>Special Requests:</strong> ${booking.message || 'None'}</p>
                     </div>
                     
-                    <p>We will contact you shortly to confirm your reservation and provide payment details.</p>
+                    <p>We will contact you shortly to confirm your reservation. Payment options are available below:</p>
+                    
+                    <div style="background-color: #e8f4e8; padding: 20px; margin: 20px 0; border-left: 4px solid #28a745; border-radius: 3px;">
+                        <h3 style="color: #333; margin-top: 0;">Payment Options</h3>
+                        <p>Required Amount: ₵${booking.required_amount || booking.amount}</p>
+                        <p>Pay now securely through our Paystack payment gateway:</p>
+                        <div style="text-align: center; margin: 20px 0;">
+                            <a href="https://ankes-lodge.onrender.com" style="display: inline-block; background-color: #FFA500; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Pay Now</a>
+                        </div>
+                        <p>Or pay on arrival at the lodge.</p>
+                    </div>
+                    
+                    <p>For any inquiries, please contact us.</p>
                     
                     <div style="background-color: #e8f4e8; padding: 20px; margin: 20px 0; border-left: 4px solid #28a745; border-radius: 3px;">
                         <h3 style="color: #333; margin-top: 0;">Contact Information</h3>
                         <p>To reach the customer directly:</p>
                         <p><strong>Customer Phone:</strong> <a href="tel:${booking.phone}">${booking.phone}</a></p>
                         <p><strong>Customer Email:</strong> <a href="mailto:${booking.email}">${booking.email}</a></p>
-                        <p><strong>General Manager:</strong> +233 24 753 3518</p>
-                        <p><strong>Managers:</strong> 0247533518 / 0206986461</p>
+                        <p><strong>General Manager:</strong> 0544904547, 0558647156</p>
+                        <p><strong>Managers:</strong> 0248293512</p>
                         <p><strong>Website:</strong> <a href="https://ankes-lodge.onrender.com">View Our Website</a></p>
                     </div>
                     
@@ -752,7 +764,7 @@ function sendConfirmationEmail(booking) {
                 </div>
                 
                 <div style="text-align: center; padding: 20px; color: #666; font-size: 14px;">
-                    <p>Contact: 0544904547, 0558647156, +233 24 753 3518, 0247533518, 0206986461</p>
+                    <p>Contact: 0544904547, 0558647156</p>
                     <p>&copy; 2025 Ankes Lodge. All rights reserved.</p>
                 </div>
             </div>
@@ -862,8 +874,8 @@ function sendAdminNotification(booking) {
                         <p>To reach the customer directly:</p>
                         <p><strong>Customer Phone:</strong> <a href="tel:${booking.phone}">${booking.phone}</a></p>
                         <p><strong>Customer Email:</strong> <a href="mailto:${booking.email}">${booking.email}</a></p>
-                        <p><strong>General Manager:</strong> +233 24 753 3518</p>
-                        <p><strong>Managers:</strong> 0247533518 / 0206986461</p>
+                        <p><strong>General Manager:</strong> 0544904547, 0558647156</p>
+                        <p><strong>Managers:</strong>0248293512</p>
                     </div>
                     
                     <div style="text-align: center; margin: 20px 0;">
@@ -1138,6 +1150,9 @@ app.post('/process-booking',
         // Calculate total amount
         const roomPriceForCalc = roomPricesForCalc[roomType] || 350;
         const totalAmount = roomPriceForCalc * nights;
+        
+        // Define the required amount for the booking
+        const requiredAmount = totalAmount;
 
         // Create booking record using database abstraction
         const booking = {
@@ -1155,6 +1170,7 @@ app.post('/process-booking',
             status: 'pending',
             payment_status: 'pending',
             amount: totalAmount,
+            required_amount: requiredAmount, // Store the required amount for payment verification
             nights: nights
         };
 
@@ -1400,18 +1416,18 @@ function sendContactConfirmationEmail(contact) {
                     <div style="background-color: #e8f4e8; padding: 20px; margin: 20px 0; border-left: 4px solid #28a745; border-radius: 3px;">
                         <h3 style="color: #333; margin-top: 0;">Contact Information</h3>
                         <p>If you need immediate assistance, please contact our managers directly:</p>
-                        <p><strong>General Manager:</strong> +233 24 753 3518</p>
-                        <p><strong>Managers:</strong> 0247533518 / 0206986461</p>
+                        <p><strong>General Manager:</strong> 0544904547, 0558647156</p>
+                        <p><strong>Managers:</strong> 0248293512</p>
                         <p><strong>Website:</strong> <a href="https://ankes-lodge.onrender.com">View Our Website</a></p>
                     </div>
                     
-                    <p>We typically respond within 24 hours. If you need immediate assistance, please call us at <strong>0544904547</strong>, <strong>0558647156</strong>, <strong>+233 24 753 3518</strong>, <strong>0247533518</strong>, or <strong>0206986461</strong>.</p>
+                    <p>We typically respond within 24 hours. If you need immediate assistance, please call us at <strong>0544904547</strong>, <strong>0558647156</strong></p>
                     
                     <p>Best regards,<br><strong>Ankes Lodge Team</strong></p>
                 </div>
                 
                 <div style="text-align: center; padding: 20px; color: #666; font-size: 14px;">
-                    <p>Contact: 0544904547, 0558647156, +233 24 753 3518, 0247533518, 0206986461</p>
+                    <p>Contact: 0544904547, 0558647156, 0248293512</p>
                     <p>&copy; 2025 Ankes Lodge. All rights reserved.</p>
                 </div>
             </div>
@@ -1498,8 +1514,8 @@ function sendContactAdminNotification(contact) {
                     
                     <div style="background-color: #e8f4e8; padding: 20px; margin: 20px 0; border-left: 4px solid #28a745; border-radius: 3px;">
                         <h3 style="color: #333; margin-top: 0;">Contact Information</h3>
-                        <p><strong>General Manager:</strong> +233 24 753 3518</p>
-                        <p><strong>Managers:</strong> 0247533518 / 0206986461</p>
+                        <p><strong>General Manager:</strong> 0248293512</p>
+                        <p><strong>Managers:</strong> 0544904547, 0558647156</p>
                         <p>Website: <a href="https://ankes-lodge.onrender.com">View Our Website</a></p>
                     </div>
                     
@@ -1677,7 +1693,7 @@ function sendTestimonialAdminNotification(testimonial) {
                 </div>
                 
                 <div style="text-align: center; padding: 20px; color: #666; font-size: 14px;">
-                    <p>Contact: 0544904547, 0558647156, +233 24 753 3518, 0247533518, 0206986461</p>
+                    <p>Contact: 0544904547, 0558647156</p>
                     <p>&copy; 2025 Ankes Lodge. All rights reserved.</p>
                 </div>
             </div>
@@ -1872,13 +1888,77 @@ app.post('/admin/logout', (req, res) => {
 
 // Paystack Payment Endpoints
 
+// Initialize donation payment
+app.post('/initiate-donation', async (req, res) => {
+    try {
+        const { email, customer_name, amount, callback_url, donation_purpose } = req.body;
+        
+        // Validate required fields
+        if (!customer_name || !amount) {
+            return res.status(400).json({
+                success: false,
+                message: 'Missing required fields: customer_name, amount'
+            });
+        }
+        
+        // Validate amount
+        const donationAmount = parseFloat(amount);
+        if (isNaN(donationAmount) || donationAmount <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid amount provided'
+            });
+        }
+        
+        // If email is not provided, try to use a default
+        let donationEmail = email;
+        if (!donationEmail) {
+            donationEmail = 'donation@ankes-lodge.onrender.com'; // Default email for donations
+        }
+        
+        // Generate a unique reference for this donation
+        const reference = `DONATION_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        
+        // Initialize donation with Paystack
+        const paymentResult = await initializePaystackPayment({
+            booking_id: reference, // Using reference as booking_id for donations
+            email: donationEmail,
+            customer_name,
+            room_type: 'donation',
+            amount: donationAmount,
+            reference,
+            callback_url: callback_url || `${req.protocol}://${req.get('host')}/payment-success`
+        });
+        
+        if (paymentResult.success) {
+            res.json({
+                success: true,
+                authorization_url: paymentResult.authorization_url,
+                reference: paymentResult.reference,
+                message: 'Donation payment initialized successfully'
+            });
+        } else {
+            res.status(500).json({
+                success: false,
+                message: paymentResult.error || 'Failed to initialize donation payment'
+            });
+        }
+    } catch (error) {
+        console.error('Error in /initiate-donation:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        });
+    }
+});
+
 // Initialize Paystack payment
 app.post('/initiate-payment', async (req, res) => {
     try {
         const { booking_id, email, customer_name, room_type, amount, callback_url } = req.body;
         
         // Validate required fields
-        if (!booking_id || !email || !customer_name || !room_type || !amount) {
+        if (!booking_id || !customer_name || !room_type || !amount) {
             return res.status(400).json({
                 success: false,
                 message: 'Missing required fields: booking_id, email, customer_name, room_type, amount'
@@ -1894,13 +1974,27 @@ app.post('/initiate-payment', async (req, res) => {
             });
         }
         
+        // If email is not provided, fetch it from the booking record
+        let bookingEmail = email;
+        if (!bookingEmail) {
+            const booking = await bookingsDB.findOne({ id: booking_id });
+            if (booking) {
+                bookingEmail = booking.email;
+            } else {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Booking not found'
+                });
+            }
+        }
+        
         // Generate a unique reference for this transaction
         const reference = `ANKES_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         
         // Initialize payment with Paystack
         const paymentResult = await initializePaystackPayment({
             booking_id,
-            email,
+            email: bookingEmail,
             customer_name,
             room_type,
             amount: paymentAmount,
@@ -2040,13 +2134,45 @@ app.post('/webhook/paystack', async (req, res) => {
                 // Update the booking status to confirmed
                 const booking = await bookingsDB.findOne({ id: data.metadata.booking_id });
                 if (booking) {
-                    await bookingsDB.update({ id: booking.id }, { ...booking, status: 'confirmed', payment_status: 'paid' });
+                    // Check payment amount against required amount
+                    const requiredAmount = booking.required_amount || booking.amount;
+                    const paidAmount = data.amount / 100; // Convert from kobo to GHS
+                    
+                    let payment_status = 'paid';
+                    let booking_status = 'confirmed';
+                    let payment_note = '';
+                    
+                    // Check if payment is less than required
+                    if (paidAmount < requiredAmount) {
+                        payment_status = 'underpaid';
+                        booking_status = 'pending_payment';
+                        payment_note = `Payment of ₵${paidAmount} is less than required amount of ₵${requiredAmount}.`;
+                        console.log(`Payment underpaid for booking ${booking.id}: Paid ₵${paidAmount}, Required ₵${requiredAmount}`);
+                    } 
+                    // Check if payment is more than required (donation)
+                    else if (paidAmount > requiredAmount) {
+                        payment_status = 'overpaid';
+                        payment_note = `Payment of ₵${paidAmount} is more than required amount of ₵${requiredAmount}. Extra amount (₵${(paidAmount - requiredAmount).toFixed(2)}) considered as donation.`;
+                        console.log(`Payment overpaid for booking ${booking.id}: Paid ₵${paidAmount}, Required ₵${requiredAmount}. Extra is donation.`);
+                    }
+                    
+                    // Update booking with payment validation results
+                    const updatedBooking = { 
+                        ...booking, 
+                        status: booking_status, 
+                        payment_status: payment_status,
+                        paid_amount: paidAmount,
+                        required_amount: requiredAmount,
+                        payment_note: payment_note
+                    };
+                    
+                    await bookingsDB.update({ id: booking.id }, updatedBooking);
                     
                     // Send confirmation email to customer
-                    queueEmail('confirmation', booking.email, { ...booking, status: 'confirmed' });
+                    queueEmail('confirmation', booking.email, updatedBooking);
                     
                     // Send notification to admin
-                    queueEmail('admin-notification', process.env.ADMIN_EMAIL || 'ankeslodge@gmail.com', { ...booking, status: 'confirmed' });
+                    queueEmail('admin-notification', process.env.ADMIN_EMAIL || 'ankeslodge@gmail.com', updatedBooking);
                 }
                 
                 break;
@@ -2177,6 +2303,283 @@ function startSelfPinger() {
         console.log('Self-pinger not started - not running on Render.com or not in production');
     }
 }
+
+// Payment success page route
+app.get('/payment-success', async (req, res) => {
+    // Get reference from query parameters if available
+    const reference = req.query.reference || req.query.ref;
+    
+    // Create a success page that shows payment was successful
+    // and provides links back to the site
+    let bookingDetails = null;
+    let paymentDetails = null;
+    
+    // If we have a reference, try to fetch booking details
+    if (reference) {
+        try {
+            // First, try to find payment details
+            paymentDetails = await paymentsDB.findOne({ id: reference });
+            
+            if (paymentDetails && paymentDetails.booking_id) {
+                // Find the associated booking
+                bookingDetails = await bookingsDB.findOne({ id: paymentDetails.booking_id });
+            }
+        } catch (error) {
+            console.log('Could not fetch booking details:', error.message);
+        }
+    }
+    
+    // Create a dynamic success page
+    res.send(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Payment Success - Ankes Lodge</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    background-color: #f4f4f4;
+                    margin: 0;
+                    padding: 0;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    min-height: 100vh;
+                }
+                .container {
+                    background-color: white;
+                    padding: 30px;
+                    border-radius: 10px;
+                    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+                    text-align: center;
+                    max-width: 600px;
+                    width: 90%;
+                }
+                .success-icon {
+                    font-size: 60px;
+                    color: #28a745;
+                    margin-bottom: 20px;
+                }
+                h1 {
+                    color: #28a745;
+                    margin-top: 0;
+                }
+                .payment-details {
+                    background-color: #f8f9fa;
+                    padding: 15px;
+                    border-radius: 5px;
+                    margin: 15px 0;
+                    text-align: left;
+                    font-size: 14px;
+                }
+                .payment-details p {
+                    margin: 5px 0;
+                }
+                .btn {
+                    display: inline-block;
+                    background-color: #FFA500;
+                    color: white;
+                    padding: 12px 25px;
+                    text-decoration: none;
+                    border-radius: 5px;
+                    margin: 8px;
+                    font-weight: bold;
+                    border: none;
+                    cursor: pointer;
+                }
+                .btn:hover {
+                    background-color: #e69500;
+                }
+                .btn-secondary {
+                    background-color: #6c757d;
+                }
+                .btn-secondary:hover {
+                    background-color: #5a6268;
+                }
+                .btn-donation {
+                    background-color: #28a745;
+                }
+                .btn-donation:hover {
+                    background-color: #218838;
+                }
+                .btn-container {
+                    display: flex;
+                    flex-wrap: wrap;
+                    justify-content: center;
+                    gap: 10px;
+                    margin-top: 20px;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="success-icon">✓</div>
+                <h1>Payment Successful!</h1>
+                <p>Thank you for your payment. Your transaction has been processed successfully.</p>
+                
+                ${bookingDetails ? `
+                <div class="payment-details">
+                    <h3>Booking Details</h3>
+                    <p><strong>Booking ID:</strong> ${bookingDetails.id}</p>
+                    <p><strong>Guest Name:</strong> ${bookingDetails.name}</p>
+                    <p><strong>Room Type:</strong> ${getRoomTypeName(bookingDetails.roomType)}</p>
+                    <p><strong>Check-in:</strong> ${bookingDetails.checkin}</p>
+                    <p><strong>Check-out:</strong> ${bookingDetails.checkout}</p>
+                    <p><strong>Required Amount:</strong> ₵${bookingDetails.required_amount || bookingDetails.amount}</p>
+                    <p><strong>Status:</strong> ${bookingDetails.status}</p>
+                    ${bookingDetails.payment_note ? `<p><strong>Note:</strong> ${bookingDetails.payment_note}</p>` : ''}
+                </div>
+                ` : ''}
+                
+                ${paymentDetails ? `
+                <div class="payment-details">
+                    <h3>Payment Details</h3>
+                    <p><strong>Reference:</strong> ${paymentDetails.id}</p>
+                    <p><strong>Amount Paid:</strong> ₵${paymentDetails.amount}</p>
+                    <p><strong>Payment Status:</strong> ${paymentDetails.status}</p>
+                    <p><strong>Paid At:</strong> ${paymentDetails.paid_at ? new Date(paymentDetails.paid_at).toLocaleString() : 'N/A'}</p>
+                </div>
+                ` : ''}
+                
+                <p>You will receive a confirmation email with your booking details shortly.</p>
+                
+                <div class="btn-container">
+                    <a href="/" class="btn">Return to Home</a>
+                    <a href="/booking-confirmation.html" class="btn">View Booking</a>
+                    <button class="btn btn-donation" onclick="initiateDonation()">Make a Donation</button>
+                    <a href="/" class="btn btn-secondary">Book Another Room</a>
+                </div>
+            </div>
+            
+            <script>
+                function initiateDonation() {
+                    // Create donation form
+                    const donationForm = document.createElement('form');
+                    donationForm.method = 'POST';
+                    donationForm.action = '/initiate-donation';
+                    donationForm.style.display = 'none';
+                    
+                    // Add form fields
+                    const emailField = document.createElement('input');
+                    emailField.type = 'hidden';
+                    emailField.name = 'email';
+                    emailField.value = '${bookingDetails && bookingDetails.email ? bookingDetails.email : 'donation@ankes-lodge.onrender.com'}';
+                    
+                    const nameField = document.createElement('input');
+                    nameField.type = 'hidden';
+                    nameField.name = 'customer_name';
+                    nameField.value = '${bookingDetails && bookingDetails.name ? bookingDetails.name : 'Ankes Lodge Supporter'}';
+                    
+                    const amountField = document.createElement('input');
+                    amountField.type = 'number';
+                    amountField.name = 'amount';
+                    amountField.placeholder = 'Donation amount';
+                    amountField.required = true;
+                    
+                    const purposeField = document.createElement('input');
+                    purposeField.type = 'hidden';
+                    purposeField.name = 'donation_purpose';
+                    purposeField.value = 'Support Ankes Lodge';
+                    
+                    // Add fields to form
+                    donationForm.appendChild(emailField);
+                    donationForm.appendChild(nameField);
+                    donationForm.appendChild(amountField);
+                    donationForm.appendChild(purposeField);
+                    
+                    document.body.appendChild(donationForm);
+                    
+                    // Ask for donation amount
+                    const amount = prompt('Enter donation amount (GHS):');
+                    if (amount && !isNaN(amount) && amount > 0) {
+                        amountField.value = amount;
+                        donationForm.submit();
+                    } else {
+                        alert('Please enter a valid donation amount');
+                    }
+                    
+                    // Remove form after submission
+                    setTimeout(() => {
+                        document.body.removeChild(donationForm);
+                    }, 1000);
+                }
+            </script>
+        </body>
+        </html>
+    `);
+});
+
+// Payment failure page route
+app.get('/payment-failed', (req, res) => {
+    // Create a failure page that shows payment failed
+    // and provides links back to the site
+    res.send(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Payment Failed - Ankes Lodge</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    background-color: #f4f4f4;
+                    margin: 0;
+                    padding: 0;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    min-height: 100vh;
+                }
+                .container {
+                    background-color: white;
+                    padding: 30px;
+                    border-radius: 10px;
+                    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+                    text-align: center;
+                    max-width: 500px;
+                    width: 90%;
+                }
+                .error-icon {
+                    font-size: 60px;
+                    color: #dc3545;
+                    margin-bottom: 20px;
+                }
+                h1 {
+                    color: #dc3545;
+                    margin-top: 0;
+                }
+                .btn {
+                    display: inline-block;
+                    background-color: #FFA500;
+                    color: white;
+                    padding: 12px 25px;
+                    text-decoration: none;
+                    border-radius: 5px;
+                    margin: 10px;
+                    font-weight: bold;
+                }
+                .btn:hover {
+                    background-color: #e69500;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <div class="error-icon">✕</div>
+                <h1>Payment Failed</h1>
+                <p>Your payment could not be processed. Please try again or contact our support team.</p>
+                <div>
+                    <a href="/" class="btn">Return to Home</a>
+                    <a href="javascript:history.back()" class="btn">Try Again</a>
+                </div>
+            </div>
+        </body>
+        </html>
+    `);
+});
 
 // For Vercel deployment, we need to export the app
 module.exports = app;

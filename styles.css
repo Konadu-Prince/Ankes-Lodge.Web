@@ -588,6 +588,43 @@ section h2::after {
     font-size: 1.1rem;
 }
 
+/* Testimonial Callout Section */
+.testimonial-callout {
+    text-align: center;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    padding: 40px 20px;
+    border-radius: 8px;
+    margin: 40px 0;
+    box-shadow: var(--shadow);
+}
+
+.testimonial-callout h3 {
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    color: white;
+}
+
+.testimonial-callout p {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.testimonial-callout .btn-primary {
+    background-color: white;
+    color: var(--primary-color);
+    padding: 12px 30px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.testimonial-callout .btn-primary:hover {
+    background-color: var(--light-color);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
 @media (max-width: 768px) {
     .testimonial-marquee-container {
         padding: 15px 0;
@@ -1164,6 +1201,61 @@ footer {
     width: 50px;
     height: 3px;
     background-color: var(--primary-color);
+}
+
+.testimonial-submission {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.testimonial-submission h4 {
+    margin-bottom: 20px;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.testimonial-submission h4::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 3px;
+    background-color: var(--primary-color);
+}
+
+.testimonial-submission .form-group {
+    margin-bottom: 15px;
+}
+
+.testimonial-submission input,
+.testimonial-submission select,
+.testimonial-submission textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #555;
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.2);
+    color: white;
+    font-size: 1rem;
+}
+
+.testimonial-submission input::placeholder,
+.testimonial-submission textarea::placeholder {
+    color: #aaa;
+}
+
+.testimonial-submission input:focus,
+.testimonial-submission select:focus,
+.testimonial-submission textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+.testimonial-submission textarea {
+    resize: vertical;
+    min-height: 100px;
 }
 
 .footer-links ul {

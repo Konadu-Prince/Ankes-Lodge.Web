@@ -115,7 +115,16 @@
                 
                 <div class="confirmation-message">
                     <p>A confirmation email has been sent to your email address with these details.</p>
-                    <p>Our team will contact you shortly to confirm your reservation and provide payment instructions.</p>
+                    <p>Your reservation is pending payment. Please complete your payment to confirm your booking.</p>
+                </div>
+                
+                <div class="payment-options">
+                    <h3>Payment Options</h3>
+                    <p>Required Amount: ₵<span id="required-amount">0.00</span></p>
+                    <div class="payment-buttons">
+                        <button class="btn-primary" onclick="initiatePayment()">Pay Now Securely</button>
+                        <button class="btn-secondary" onclick="initiateDonation()">Make a Donation</button>
+                    </div>
                 </div>
                 
                 <div class="confirmation-actions">
@@ -198,7 +207,107 @@
                 };
                 document.getElementById('room-type').textContent = roomTypes[roomType] || roomType;
             }
+            
+            // Calculate required amount based on room type and duration
+            if (checkin && checkout) {
+                const checkinDate = new Date(checkin);
+                const checkoutDate = new Date(checkout);
+                const timeDiff = checkoutDate.getTime() - checkinDate.getTime();
+                const nights = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                
+                let roomPrice = 0;
+                if (roomType === 'executive') roomPrice = 299;
+                else if (roomType === 'regular') roomPrice = 199;
+                else if (roomType === 'full-house') roomPrice = 800; // Default for full house
+                else roomPrice = 250; // Default
+                
+                const requiredAmount = roomPrice * nights;
+                document.getElementById('required-amount').textContent = requiredAmount.toFixed(2);
+            }
         });
+        
+        // Function to initiate payment
+        async function initiatePayment() {
+            const bookingId = new URLSearchParams(window.location.search).get('id');
+            const name = new URLSearchParams(window.location.search).get('name');
+            const roomType = new URLSearchParams(window.location.search).get('room');
+            const requiredAmount = document.getElementById('required-amount').textContent;
+            
+            if (!bookingId || !name || !roomType) {
+                alert('Booking information is incomplete. Please contact support.');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/initiate-payment', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        booking_id: bookingId,
+                        email: '', // Will be retrieved from booking record
+                        customer_name: name,
+                        room_type: roomType,
+                        amount: parseFloat(requiredAmount)
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Redirect to Paystack payment page
+                    window.location.href = result.authorization_url;
+                } else {
+                    alert('Error initiating payment: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error initiating payment:', error);
+                alert('Error initiating payment. Please try again.');
+            }
+        }
+        
+        // Function to initiate donation
+        async function initiateDonation() {
+            const donationAmount = prompt('Enter donation amount (GHS):');
+            
+            if (!donationAmount) {
+                return; // User cancelled
+            }
+            
+            const donationFloat = parseFloat(donationAmount);
+            
+            if (isNaN(donationFloat) || donationFloat <= 0) {
+                alert('Please enter a valid donation amount.');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/initiate-donation', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: '', // Will be retrieved from user input or booking
+                        customer_name: new URLSearchParams(window.location.search).get('name') || 'Anonymous Donor',
+                        amount: donationFloat
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Redirect to Paystack donation page
+                    window.location.href = result.authorization_url;
+                } else {
+                    alert('Error initiating donation: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error initiating donation:', error);
+                alert('Error initiating donation. Please try again.');
+            }
+        }
     </script>
 </body>
 </html>
