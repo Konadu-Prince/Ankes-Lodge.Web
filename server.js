@@ -119,6 +119,9 @@ function requireAuth(req, res, next) {
 // Apply authentication middleware to all routes
 app.use(requireAuth);
 
+// Set trust proxy for Render.com deployment
+app.set('trust proxy', 1);
+
 // Rate limiting for public API endpoints
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -129,6 +132,7 @@ const apiLimiter = rateLimit({
   },
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  trustProxy: true, // Enable trust proxy for Render.com
 });
 
 // Helper function to conditionally log based on environment
@@ -207,13 +211,23 @@ try {
                 }
             });
         } else {
-            // Production Gmail SMTP
+            // Production Gmail SMTP with timeout settings for Render.com
             transporter = nodemailer.createTransport({
                 service: 'gmail',
                 auth: {
                     user: emailUser,
                     pass: emailPass
-                }
+                },
+                // Add timeout and connection settings to prevent timeout issues on Render.com
+                timeout: 30000, // 30 seconds
+                connectionTimeout: 30000, // 30 seconds
+                greetingTimeout: 30000, // 30 seconds
+                // Add secure options
+                secure: true,
+                // Add pool settings to reuse connections
+                pool: true,
+                maxConnections: 5,
+                maxMessages: 100
             });
         }
     }
@@ -1911,6 +1925,7 @@ const loginLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  trustProxy: true, // Enable trust proxy for Render.com
 });
 
 // Add login endpoint
@@ -2170,6 +2185,7 @@ app.post('/webhook/paystack', async (req, res) => {
         }
         
         // Verify the signature to ensure the request is from Paystack
+        // Paystack uses SHA512-HMAC and sends the signature as hex
         const expectedSignature = crypto
             .createHmac('sha512', PAYSTACK_WEBHOOK_SECRET)
             .update(JSON.stringify(req.body))
@@ -2177,6 +2193,8 @@ app.post('/webhook/paystack', async (req, res) => {
         
         if (signature !== expectedSignature) {
             console.log('Invalid Paystack webhook signature');
+            console.log('Expected:', expectedSignature);
+            console.log('Received:', signature);
             return res.status(400).send('Invalid signature');
         }
         
