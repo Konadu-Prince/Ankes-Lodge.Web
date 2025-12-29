@@ -22,6 +22,9 @@ const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch
 // Add path module for file operations
 const path = require('path');
 
+// Add crypto module for webhook signature verification
+const crypto = require('crypto');
+
 // Load environment variables from .env file
 require('dotenv').config();
 const app = express();
@@ -104,7 +107,9 @@ function requireAuth(req, res, next) {
     if (req.path === '/process-contact' || req.path === '/process-booking' || 
         req.path === '/add-testimonial' || req.path === '/visitor-count' ||
         req.path === '/testimonials.json' || req.path === '/bookings.json' ||
-        req.path === '/contacts.json') {
+        req.path === '/contacts.json' ||
+        req.path === '/initiate-payment' || req.path === '/webhook/paystack' ||
+        req.path.startsWith('/verify-payment/') || req.path.startsWith('/payment-status/')) {
         return next();
     }
     
@@ -498,6 +503,139 @@ class FileDatabase {
     }
 }
 
+// Paystack Configuration and Initialization
+const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY;
+const PAYSTACK_PUBLIC_KEY = process.env.PAYSTACK_PUBLIC_KEY;
+const PAYSTACK_WEBHOOK_SECRET = process.env.PAYSTACK_WEBHOOK_SECRET;
+
+// Initialize payments database
+let paymentsDB;
+
+// Initialize payments database
+try {
+    paymentsDB = new MongoDatabase('payments');
+    console.log('Payments database initialized');
+} catch (error) {
+    console.error('Failed to initialize payments database:', error);
+    paymentsDB = new FileDatabase('data/payments.json');
+    console.log('Payments database initialized with file fallback');
+}
+
+// Function to initialize Paystack transaction
+async function initializePaystackPayment(paymentData) {
+    try {
+        const response = await fetch('https://api.paystack.co/transaction/initialize', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${PAYSTACK_SECRET_KEY}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: paymentData.email,
+                amount: paymentData.amount * 100, // Paystack expects amount in kobo
+                reference: paymentData.reference,
+                callback_url: paymentData.callback_url,
+                metadata: {
+                    booking_id: paymentData.booking_id,
+                    customer_name: paymentData.customer_name,
+                    room_type: paymentData.room_type
+                }
+            })
+        });
+
+        const result = await response.json();
+        
+        if (result.status) {
+            // Save payment record
+            const paymentRecord = {
+                id: paymentData.reference,
+                booking_id: paymentData.booking_id,
+                customer_email: paymentData.email,
+                customer_name: paymentData.customer_name,
+                amount: paymentData.amount,
+                currency: 'GHS',
+                status: 'pending',
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+                paystack_reference: result.data.reference,
+                authorization_url: result.data.authorization_url
+            };
+            
+            await paymentsDB.append(paymentRecord);
+            
+            return {
+                success: true,
+                authorization_url: result.data.authorization_url,
+                reference: result.data.reference
+            };
+        } else {
+            throw new Error(result.message || 'Failed to initialize payment');
+        }
+    } catch (error) {
+        console.error('Error initializing Paystack payment:', error);
+        return {
+            success: false,
+            error: error.message
+        };
+    }
+}
+
+// Function to verify Paystack transaction
+async function verifyPaystackPayment(reference) {
+    try {
+        const response = await fetch(`https://api.paystack.co/transaction/verify/${reference}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${PAYSTACK_SECRET_KEY}`
+            }
+        });
+
+        const result = await response.json();
+        
+        if (result.status) {
+            const data = result.data;
+            
+            // Update payment record
+            const paymentRecord = {
+                id: data.reference,
+                booking_id: data.metadata.booking_id,
+                customer_email: data.customer.email,
+                customer_name: data.metadata.customer_name,
+                amount: data.amount / 100, // Convert from kobo to GHS
+                currency: data.currency,
+                status: data.status,
+                gateway_response: data.gateway_response,
+                paid_at: data.paid_at,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+                paystack_reference: data.reference,
+                authorization: data.authorization
+            };
+            
+            // Update the payment record in the database
+            const existingPayment = await paymentsDB.findOne({ id: data.reference });
+            if (existingPayment) {
+                await paymentsDB.update({ id: data.reference }, paymentRecord);
+            } else {
+                await paymentsDB.append(paymentRecord);
+            }
+            
+            return {
+                success: true,
+                data: paymentRecord
+            };
+        } else {
+            throw new Error(result.message || 'Failed to verify payment');
+        }
+    } catch (error) {
+        console.error('Error verifying Paystack payment:', error);
+        return {
+            success: false,
+            error: error.message
+        };
+    }
+}
+
 // Database instances
 let bookingsDB;
 let contactsDB;
@@ -605,7 +743,8 @@ function sendConfirmationEmail(booking) {
                         <p>To reach the customer directly:</p>
                         <p><strong>Customer Phone:</strong> <a href="tel:${booking.phone}">${booking.phone}</a></p>
                         <p><strong>Customer Email:</strong> <a href="mailto:${booking.email}">${booking.email}</a></p>
-                        <p><strong>Manager Contact:</strong> 0248293512</p>
+                        <p><strong>General Manager:</strong> +233 24 753 3518</p>
+                        <p><strong>Managers:</strong> 0247533518 / 0206986461</p>
                         <p><strong>Website:</strong> <a href="https://ankes-lodge.onrender.com">View Our Website</a></p>
                     </div>
                     
@@ -613,7 +752,7 @@ function sendConfirmationEmail(booking) {
                 </div>
                 
                 <div style="text-align: center; padding: 20px; color: #666; font-size: 14px;">
-                    <p>Contact: 0544904547, 0558647156, 0248293512</p>
+                    <p>Contact: 0544904547, 0558647156, +233 24 753 3518, 0247533518, 0206986461</p>
                     <p>&copy; 2025 Ankes Lodge. All rights reserved.</p>
                 </div>
             </div>
@@ -723,7 +862,8 @@ function sendAdminNotification(booking) {
                         <p>To reach the customer directly:</p>
                         <p><strong>Customer Phone:</strong> <a href="tel:${booking.phone}">${booking.phone}</a></p>
                         <p><strong>Customer Email:</strong> <a href="mailto:${booking.email}">${booking.email}</a></p>
-                        <p><strong>Manager Contact:</strong> 0248293512</p>
+                        <p><strong>General Manager:</strong> +233 24 753 3518</p>
+                        <p><strong>Managers:</strong> 0247533518 / 0206986461</p>
                     </div>
                     
                     <div style="text-align: center; margin: 20px 0;">
@@ -851,6 +991,7 @@ function getRoomTypeName(roomType) {
     const roomTypes = {
         'executive': 'Executive Room (₵350/night)',
         'regular': 'Regular Bedroom (₵250/night)',
+        'semi-standard': 'Semi Standard Room (₵300/night)',
         'full-house': 'Full House (Custom Pricing)'
     };
     return roomTypes[roomType] || roomType;
@@ -940,7 +1081,8 @@ app.post('/process-booking',
             adults,
             children,
             'room-type': roomType,
-            message
+            message,
+            payment_method
         } = req.body;
 
         // Validate required fields
@@ -953,7 +1095,7 @@ app.post('/process-booking',
         }
 
         // Validate room type
-        const validRoomTypes = ['executive', 'regular', 'full-house'];
+        const validRoomTypes = ['executive', 'regular', 'semi-standard', 'full-house'];
         if (!validRoomTypes.includes(roomType)) {
             return res.status(400).json({
                 status: 'error',
@@ -981,6 +1123,22 @@ app.post('/process-booking',
             });
         }
 
+        // Calculate number of nights
+        const timeDiff = checkoutDate.getTime() - checkinDate.getTime();
+        const nights = Math.ceil(timeDiff / (1000 * 3600 * 24));
+        
+        // Define room prices
+        const roomPricesForCalc = {
+            'executive': 350,
+            'regular': 250,
+            'semi-standard': 300, // Semi standard room price
+            'full-house': 1000 // Default price for full house
+        };
+        
+        // Calculate total amount
+        const roomPriceForCalc = roomPricesForCalc[roomType] || 350;
+        const totalAmount = roomPriceForCalc * nights;
+
         // Create booking record using database abstraction
         const booking = {
             id: uuidv4().substring(0, 8),
@@ -994,23 +1152,60 @@ app.post('/process-booking',
             children: children || '0',
             roomType,
             message: message || '',
-            status: 'pending'
+            status: 'pending',
+            payment_status: 'pending',
+            amount: totalAmount,
+            nights: nights
         };
 
         try {
             // Save booking using database abstraction
             await bookingsDB.append(booking);
             
-            // Queue confirmation email to customer and notification to admin
-            queueEmail('confirmation', booking.email, booking);
-            queueEmail('admin-notification', process.env.ADMIN_EMAIL || 'ankeslodge@gmail.com', booking)
-            
-            console.log('Booking form processed successfully - emails queued');
-            res.json({
-                status: 'success',
-                message: 'Booking request submitted successfully! A confirmation email will be sent to your email address. We will contact you shortly to confirm your reservation.',
-                bookingId: booking.id
-            });
+            // Check if payment is required
+            if (payment_method === 'paystack') {
+                // Initialize Paystack payment
+                const paymentResult = await initializePaystackPayment({
+                    booking_id: booking.id,
+                    email: booking.email,
+                    customer_name: booking.name,
+                    room_type: booking.roomType,
+                    amount: booking.amount,
+                    reference: `ANKES_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                    callback_url: `${req.protocol}://${req.get('host')}/payment-success`
+                });
+                
+                if (paymentResult.success) {
+                    // Return payment URL for frontend to redirect
+                    res.json({
+                        status: 'success',
+                        message: 'Booking created successfully. Redirecting to payment page...',
+                        bookingId: booking.id,
+                        payment_url: paymentResult.authorization_url,
+                        amount: booking.amount
+                    });
+                } else {
+                    // If payment initialization failed, still save the booking but return error
+                    res.status(500).json({
+                        status: 'error',
+                        message: 'Booking created but payment initialization failed. Please contact support.',
+                        bookingId: booking.id
+                    });
+                }
+            } else {
+                // No payment required, proceed with normal flow
+                // Queue confirmation email to customer and notification to admin
+                queueEmail('confirmation', booking.email, booking);
+                queueEmail('admin-notification', process.env.ADMIN_EMAIL || 'ankeslodge@gmail.com', booking)
+                
+                console.log('Booking form processed successfully - emails queued');
+                res.json({
+                    status: 'success',
+                    message: 'Booking request submitted successfully! A confirmation email will be sent to your email address. We will contact you shortly to confirm your reservation.',
+                    bookingId: booking.id,
+                    amount: totalAmount
+                });
+            }
         } catch (err) {
             console.error('Error processing booking form:', err);
             res.status(500).json({
@@ -1205,17 +1400,18 @@ function sendContactConfirmationEmail(contact) {
                     <div style="background-color: #e8f4e8; padding: 20px; margin: 20px 0; border-left: 4px solid #28a745; border-radius: 3px;">
                         <h3 style="color: #333; margin-top: 0;">Contact Information</h3>
                         <p>If you need immediate assistance, please contact our managers directly:</p>
-                        <p><strong>Manager:</strong> 0248293512</p>
+                        <p><strong>General Manager:</strong> +233 24 753 3518</p>
+                        <p><strong>Managers:</strong> 0247533518 / 0206986461</p>
                         <p><strong>Website:</strong> <a href="https://ankes-lodge.onrender.com">View Our Website</a></p>
                     </div>
                     
-                    <p>We typically respond within 24 hours. If you need immediate assistance, please call us at <strong>0544904547</strong> or <strong>0558647156</strong>.</p>
+                    <p>We typically respond within 24 hours. If you need immediate assistance, please call us at <strong>0544904547</strong>, <strong>0558647156</strong>, <strong>+233 24 753 3518</strong>, <strong>0247533518</strong>, or <strong>0206986461</strong>.</p>
                     
                     <p>Best regards,<br><strong>Ankes Lodge Team</strong></p>
                 </div>
                 
                 <div style="text-align: center; padding: 20px; color: #666; font-size: 14px;">
-                    <p>Contact: 0544904547, 0558647156</p>
+                    <p>Contact: 0544904547, 0558647156, +233 24 753 3518, 0247533518, 0206986461</p>
                     <p>&copy; 2025 Ankes Lodge. All rights reserved.</p>
                 </div>
             </div>
@@ -1302,7 +1498,8 @@ function sendContactAdminNotification(contact) {
                     
                     <div style="background-color: #e8f4e8; padding: 20px; margin: 20px 0; border-left: 4px solid #28a745; border-radius: 3px;">
                         <h3 style="color: #333; margin-top: 0;">Contact Information</h3>
-                        <p>Manager Contact: 0248293512</p>
+                        <p><strong>General Manager:</strong> +233 24 753 3518</p>
+                        <p><strong>Managers:</strong> 0247533518 / 0206986461</p>
                         <p>Website: <a href="https://ankes-lodge.onrender.com">View Our Website</a></p>
                     </div>
                     
@@ -1480,7 +1677,7 @@ function sendTestimonialAdminNotification(testimonial) {
                 </div>
                 
                 <div style="text-align: center; padding: 20px; color: #666; font-size: 14px;">
-                    <p>Contact: 0544904547, 0558647156, 0248293512</p>
+                    <p>Contact: 0544904547, 0558647156, +233 24 753 3518, 0247533518, 0206986461</p>
                     <p>&copy; 2025 Ankes Lodge. All rights reserved.</p>
                 </div>
             </div>
@@ -1671,6 +1868,260 @@ app.post('/admin/logout', (req, res) => {
         success: true,
         message: 'Logged out successfully'
     });
+});
+
+// Paystack Payment Endpoints
+
+// Initialize Paystack payment
+app.post('/initiate-payment', async (req, res) => {
+    try {
+        const { booking_id, email, customer_name, room_type, amount, callback_url } = req.body;
+        
+        // Validate required fields
+        if (!booking_id || !email || !customer_name || !room_type || !amount) {
+            return res.status(400).json({
+                success: false,
+                message: 'Missing required fields: booking_id, email, customer_name, room_type, amount'
+            });
+        }
+        
+        // Validate amount
+        const paymentAmount = parseFloat(amount);
+        if (isNaN(paymentAmount) || paymentAmount <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid amount provided'
+            });
+        }
+        
+        // Generate a unique reference for this transaction
+        const reference = `ANKES_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        
+        // Initialize payment with Paystack
+        const paymentResult = await initializePaystackPayment({
+            booking_id,
+            email,
+            customer_name,
+            room_type,
+            amount: paymentAmount,
+            reference,
+            callback_url: callback_url || `${req.protocol}://${req.get('host')}/payment-success`
+        });
+        
+        if (paymentResult.success) {
+            res.json({
+                success: true,
+                authorization_url: paymentResult.authorization_url,
+                reference: paymentResult.reference,
+                message: 'Payment initialized successfully'
+            });
+        } else {
+            res.status(500).json({
+                success: false,
+                message: paymentResult.error || 'Failed to initialize payment'
+            });
+        }
+    } catch (error) {
+        console.error('Error in /initiate-payment:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        });
+    }
+});
+
+// Verify Paystack payment
+app.post('/verify-payment/:reference', async (req, res) => {
+    try {
+        const { reference } = req.params;
+        
+        if (!reference) {
+            return res.status(400).json({
+                success: false,
+                message: 'Payment reference is required'
+            });
+        }
+        
+        const verificationResult = await verifyPaystackPayment(reference);
+        
+        if (verificationResult.success) {
+            // Update the booking status if payment is successful
+            if (verificationResult.data.status === 'success') {
+                // Find the booking by the payment reference and update its status
+                const booking = await bookingsDB.findOne({ id: verificationResult.data.booking_id });
+                if (booking) {
+                    // Update booking status to confirmed
+                    await bookingsDB.update({ id: booking.id }, { ...booking, status: 'confirmed', payment_status: 'paid' });
+                    
+                    // Send confirmation email to customer
+                    queueEmail('confirmation', booking.email, { ...booking, status: 'confirmed' });
+                    
+                    // Send notification to admin
+                    queueEmail('admin-notification', process.env.ADMIN_EMAIL || 'ankeslodge@gmail.com', { ...booking, status: 'confirmed' });
+                }
+            }
+            
+            res.json({
+                success: true,
+                data: verificationResult.data,
+                message: 'Payment verified successfully'
+            });
+        } else {
+            res.status(500).json({
+                success: false,
+                message: verificationResult.error || 'Failed to verify payment'
+            });
+        }
+    } catch (error) {
+        console.error('Error in /verify-payment:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        });
+    }
+});
+
+// Paystack Webhook Endpoint
+app.post('/webhook/paystack', async (req, res) => {
+    try {
+        // Get the event payload
+        const event = req.body;
+        
+        // Verify webhook signature
+        const signature = req.headers['x-paystack-signature'];
+        
+        if (!signature) {
+            return res.status(400).send('No signature provided');
+        }
+        
+        // Verify the signature to ensure the request is from Paystack
+        const expectedSignature = crypto
+            .createHmac('sha512', PAYSTACK_WEBHOOK_SECRET)
+            .update(JSON.stringify(req.body))
+            .digest('hex');
+        
+        if (signature !== expectedSignature) {
+            console.log('Invalid Paystack webhook signature');
+            return res.status(400).send('Invalid signature');
+        }
+        
+        const eventType = event.event;
+        const data = event.data;
+        
+        console.log(`Paystack webhook received: ${eventType}`);
+        
+        switch (eventType) {
+            case 'charge.success':
+                // Update payment status in database
+                const paymentRecord = {
+                    id: data.reference,
+                    booking_id: data.metadata.booking_id,
+                    customer_email: data.customer.email,
+                    customer_name: data.metadata.customer_name,
+                    amount: data.amount / 100, // Convert from kobo to GHS
+                    currency: data.currency,
+                    status: 'success',
+                    gateway_response: data.gateway_response,
+                    paid_at: data.paid_at,
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString(),
+                    paystack_reference: data.reference,
+                    authorization: data.authorization
+                };
+                
+                // Update the payment record in the database
+                const existingPayment = await paymentsDB.findOne({ id: data.reference });
+                if (existingPayment) {
+                    await paymentsDB.update({ id: data.reference }, paymentRecord);
+                } else {
+                    await paymentsDB.append(paymentRecord);
+                }
+                
+                // Update the booking status to confirmed
+                const booking = await bookingsDB.findOne({ id: data.metadata.booking_id });
+                if (booking) {
+                    await bookingsDB.update({ id: booking.id }, { ...booking, status: 'confirmed', payment_status: 'paid' });
+                    
+                    // Send confirmation email to customer
+                    queueEmail('confirmation', booking.email, { ...booking, status: 'confirmed' });
+                    
+                    // Send notification to admin
+                    queueEmail('admin-notification', process.env.ADMIN_EMAIL || 'ankeslodge@gmail.com', { ...booking, status: 'confirmed' });
+                }
+                
+                break;
+            
+            case 'payment.failed':
+                // Update payment status to failed
+                const failedPaymentRecord = {
+                    id: data.reference,
+                    booking_id: data.metadata.booking_id,
+                    customer_email: data.customer.email,
+                    customer_name: data.metadata.customer_name,
+                    amount: data.amount / 100, // Convert from kobo to GHS
+                    currency: data.currency,
+                    status: 'failed',
+                    gateway_response: data.gateway_response,
+                    paid_at: data.paid_at,
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString(),
+                    paystack_reference: data.reference
+                };
+                
+                await paymentsDB.update({ id: data.reference }, failedPaymentRecord);
+                
+                // Update the booking status to failed
+                const failedBooking = await bookingsDB.findOne({ id: data.metadata.booking_id });
+                if (failedBooking) {
+                    await bookingsDB.update({ id: failedBooking.id }, { ...failedBooking, status: 'failed', payment_status: 'failed' });
+                }
+                
+                break;
+            
+            default:
+                console.log(`Unhandled Paystack event: ${eventType}`);
+        }
+        
+        // Respond with 200 OK to acknowledge receipt
+        res.status(200).json({ received: true });
+    } catch (error) {
+        console.error('Error processing Paystack webhook:', error);
+        res.status(500).json({ error: 'Webhook processing failed' });
+    }
+});
+
+// Get payment status
+app.get('/payment-status/:reference', async (req, res) => {
+    try {
+        const { reference } = req.params;
+        
+        if (!reference) {
+            return res.status(400).json({
+                success: false,
+                message: 'Payment reference is required'
+            });
+        }
+        
+        const payment = await paymentsDB.findOne({ id: reference });
+        
+        if (!payment) {
+            return res.status(404).json({
+                success: false,
+                message: 'Payment not found'
+            });
+        }
+        
+        res.json({
+            success: true,
+            data: payment
+        });
+    } catch (error) {
+        console.error('Error getting payment status:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error'
+        });
+    }
 });
 
 // Add error handling middleware

@@ -126,6 +126,7 @@ function getRoomTypeName(roomType) {
     const roomTypes = {
         'executive': 'Executive Room',
         'regular': 'Regular Bedroom',
+        'semi-standard': 'Semi Standard Room',
         'full-house': 'Full House'
     };
     return roomTypes[roomType] || 'Room';
@@ -637,7 +638,7 @@ function handleFormSubmit(formId, successMessage) {
             }
             
             // Validate room type
-            const validRoomTypes = ['executive', 'regular', 'full-house'];
+            const validRoomTypes = ['executive', 'regular', 'semi-standard', 'full-house'];
             if (!validRoomTypes.includes(roomType)) {
                 const errorMsg = 'Please select a valid room type.';
                 
