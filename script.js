@@ -818,8 +818,8 @@ function initFlyerPreview() {
 
 // Old testimonial slider functionality removed
 
-// Initialize visitor counter
-function initVisitorCounter() {
+// Initialize views counter
+function initViewsCounter() {
     // Determine the correct base URL (Render.com when on GitHub Pages)
     let baseUrl = window.location.origin;
     
@@ -829,17 +829,47 @@ function initVisitorCounter() {
         baseUrl = 'https://ankes-lodge.onrender.com'; // Replace with your actual Render.com URL
     }
     
-    fetch(`${baseUrl}/visitor-count`)
+    fetch(`${baseUrl}/views`)
         .then(response => response.json())
         .then(data => {
             const counterElement = document.getElementById('visitor-count');
             if (counterElement) {
-                counterElement.textContent = data.count.toLocaleString();
+                counterElement.textContent = data.views.toLocaleString();
             }
         })
         .catch(error => {
-            console.error('Error fetching visitor count:', error);
+            console.error('Error fetching views count:', error);
         });
+}
+
+// Increment views count when page loads
+function incrementViewsCount() {
+    // Determine the correct base URL (Render.com when on GitHub Pages)
+    let baseUrl = window.location.origin;
+    
+    // Check if we're on GitHub Pages and use Render.com server instead
+    if (window.location.hostname.includes('github.io')) {
+        // Use your Render.com server URL for form submissions when hosted on GitHub Pages
+        baseUrl = 'https://ankes-lodge.onrender.com'; // Replace with your actual Render.com URL
+    }
+    
+    fetch(`${baseUrl}/increment-views`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Update the counter display with the new count
+        const counterElement = document.getElementById('visitor-count');
+        if (counterElement) {
+            counterElement.textContent = data.views.toLocaleString();
+        }
+    })
+    .catch(error => {
+        console.error('Error incrementing views count:', error);
+    });
 }
 
 // Testimonial marquee functionality
@@ -993,8 +1023,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize testimonial marquee
     initTestimonialMarquee();
     
-    // Initialize visitor counter
-    initVisitorCounter();
+    // Initialize views counter
+    initViewsCounter();
+    
+    // Increment views count for this visit
+    incrementViewsCount();
     
     // Initialize testimonial form
     initTestimonialForm();
@@ -1117,8 +1150,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize testimonial marquee
     initTestimonialMarquee();
     
-    // Initialize visitor counter
-    initVisitorCounter();
+    // Initialize views counter
+    initViewsCounter();
+    
+    // Increment views count for this visit
+    incrementViewsCount();
     
     // Initialize testimonial form
     initTestimonialForm();

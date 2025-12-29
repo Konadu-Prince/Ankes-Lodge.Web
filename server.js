@@ -1771,6 +1771,87 @@ app.get('/visitor-count', async (req, res) => {
         console.error('Error in visitor counter:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
+});
+
+// Endpoint to get views count (same as visitor count)
+app.get('/views', async (req, res) => {
+    try {
+        if (db) {
+            // MongoDB implementation
+            const visitorCounterCollection = db.collection('visitorCounter');
+            const result = await visitorCounterCollection.findOne({ id: 'global' });
+            
+            const count = result ? result.count : 0;
+            res.json({ views: count });
+        } else {
+            // Fallback to database abstraction
+            let counter = { count: 0 };
+            
+            try {
+                const counters = await visitorCounterDB.read();
+                if (counters.length > 0) {
+                    counter = counters[0];
+                }
+            } catch (err) {
+                counter = { count: 0 };
+            }
+            
+            const views = counter.count || 0;
+            res.json({ views });
+        }
+    } catch (error) {
+        console.error('Error getting views count:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Endpoint to increment views count
+app.post('/increment-views', async (req, res) => {
+    try {
+        if (db) {
+            // MongoDB implementation with atomic increment
+            const visitorCounterCollection = db.collection('visitorCounter');
+            const result = await visitorCounterCollection.findOneAndUpdate(
+                { id: 'global' },
+                { $inc: { count: 1 } },
+                { upsert: true, returnDocument: 'after' }
+            );
+            
+            const count = result.value ? result.value.count : 1;
+            res.json({ views: count });
+        } else {
+            // Fallback to database abstraction
+            let counter = { count: 0 };
+            
+            try {
+                const counters = await visitorCounterDB.read();
+                if (counters.length > 0) {
+                    counter = counters[0];
+                }
+            } catch (err) {
+                counter = { count: 0 };
+            }
+            
+            counter.count += 1;
+            
+            try {
+                // Update or create the counter record
+                const existingCounter = await visitorCounterDB.findOne({ id: 'global' });
+                if (existingCounter) {
+                    await visitorCounterDB.update({ id: 'global' }, { count: counter.count, id: 'global' });
+                } else {
+                    await visitorCounterDB.append({ count: counter.count, id: 'global' });
+                }
+            } catch (err) {
+                console.error('Error updating views counter:', err);
+            }
+            
+            res.json({ views: counter.count });
+        }
+    } catch (error) {
+        console.error('Error incrementing views count:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
 });// Endpoint to delete a testimonial
 app.delete('/delete-testimonial/:id', async (req, res) => {
     const id = parseInt(req.params.id);
