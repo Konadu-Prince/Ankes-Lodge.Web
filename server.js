@@ -1932,41 +1932,42 @@ const loginLimiter = rateLimit({
 app.post('/admin/login', loginLimiter, async (req, res) => {
     const { username, password } = req.body;
     
-    // Read admin credentials
+    // Read admin credentials - prioritize MongoDB as main storage
     let adminCredentials = null;
     
-    // Try to read from file first
-    try {
-        if (fs.existsSync('admin-credentials.json')) {
-            const data = fs.readFileSync('admin-credentials.json', 'utf8');
-            adminCredentials = JSON.parse(data);
-        }
-    } catch (err) {
-        console.error('Error reading admin credentials from file:', err);
-    }
-    
-    // If not found in file, try MongoDB
-    if (!adminCredentials || !adminCredentials.username || !adminCredentials.password) {
+    // Try to read from MongoDB first (main storage)
+    if (db) {
         try {
-            if (db) {
-                const adminCredentialsCollection = db.collection('admin_credentials');
-                const mongoCredentials = await adminCredentialsCollection.findOne({ type: 'admin' });
-                if (mongoCredentials) {
-                    adminCredentials = {
-                        username: mongoCredentials.username,
-                        password: mongoCredentials.password
-                    };
-                    console.log('Using admin credentials from MongoDB');
-                }
+            const adminCredentialsCollection = db.collection('admin_credentials');
+            const mongoCredentials = await adminCredentialsCollection.findOne({ type: 'admin' });
+            if (mongoCredentials) {
+                adminCredentials = {
+                    username: mongoCredentials.username,
+                    password: mongoCredentials.password
+                };
+                console.log('Using admin credentials from MongoDB (primary storage)');
             }
         } catch (err) {
             console.error('Error reading admin credentials from MongoDB:', err);
         }
     }
     
-    // Use default credentials if not found in file or MongoDB
+    // If not found in MongoDB, try file as backup
     if (!adminCredentials || !adminCredentials.username || !adminCredentials.password) {
-        console.log('Using default admin credentials - please update admin-credentials.json for security');
+        try {
+            if (fs.existsSync('admin-credentials.json')) {
+                const data = fs.readFileSync('admin-credentials.json', 'utf8');
+                adminCredentials = JSON.parse(data);
+                console.log('Using admin credentials from file (backup storage)');
+            }
+        } catch (err) {
+            console.error('Error reading admin credentials from file:', err);
+        }
+    }
+    
+    // Use default credentials if not found in MongoDB, file, or as fallback
+    if (!adminCredentials || !adminCredentials.username || !adminCredentials.password) {
+        console.log('Using default admin credentials - please update MongoDB or admin-credentials.json for security');
         adminCredentials = { 
             username: 'admin', 
             password: '$2b$10$2TyiZf7fnhatV3/ejXdoMerPU2imRQ346t66ADYAmPxJ2cDBFViCS' // bcrypt hash of 'ankeslodge2025'
@@ -2010,6 +2011,116 @@ app.post('/admin/logout', (req, res) => {
         success: true,
         message: 'Logged out successfully'
     });
+});
+
+// Endpoint to update admin credentials (only accessible when logged in)
+app.post('/admin/update-credentials', requireAuth, async (req, res) => {
+    const { currentPassword, newPassword, confirmNewPassword } = req.body;
+    
+    if (!newPassword || !confirmNewPassword) {
+        return res.status(400).json({
+            success: false,
+            message: 'New password and confirmation are required'
+        });
+    }
+    
+    if (newPassword !== confirmNewPassword) {
+        return res.status(400).json({
+            success: false,
+            message: 'New password and confirmation do not match'
+        });
+    }
+    
+    if (newPassword.length < 8) {
+        return res.status(400).json({
+            success: false,
+            message: 'New password must be at least 8 characters long'
+        });
+    }
+    
+    try {
+        // Read current credentials - prioritize MongoDB as main storage
+        let adminCredentials = null;
+        
+        // Try to read from MongoDB first (main storage)
+        if (db) {
+            try {
+                const adminCredentialsCollection = db.collection('admin_credentials');
+                const mongoCredentials = await adminCredentialsCollection.findOne({ type: 'admin' });
+                if (mongoCredentials) {
+                    adminCredentials = {
+                        username: mongoCredentials.username,
+                        password: mongoCredentials.password
+                    };
+                }
+            } catch (err) {
+                console.error('Error reading admin credentials from MongoDB:', err);
+            }
+        }
+        
+        // If not found in MongoDB, try file as backup
+        if (!adminCredentials) {
+            try {
+                if (fs.existsSync('admin-credentials.json')) {
+                    const data = fs.readFileSync('admin-credentials.json', 'utf8');
+                    adminCredentials = JSON.parse(data);
+                }
+            } catch (err) {
+                console.error('Error reading admin credentials from file:', err);
+            }
+        }
+        
+        // Use default if not found anywhere
+        if (!adminCredentials) {
+            adminCredentials = { 
+                username: 'admin', 
+                password: '$2b$10$2TyiZf7fnhatV3/ejXdoMerPU2imRQ346t66ADYAmPxJ2cDBFViCS' // bcrypt hash of 'ankeslodge2025'
+            };
+        }
+        
+        // Verify current password
+        const validCurrentPassword = bcrypt.compareSync(currentPassword, adminCredentials.password);
+        if (!validCurrentPassword) {
+            return res.status(401).json({
+                success: false,
+                message: 'Current password is incorrect'
+            });
+        }
+        
+        // Hash the new password
+        const hashedNewPassword = bcrypt.hashSync(newPassword, 10);
+        
+        // Update credentials
+        const updatedCredentials = {
+            username: adminCredentials.username,
+            password: hashedNewPassword
+        };
+        
+        // Save to file
+        fs.writeFileSync('admin-credentials.json', JSON.stringify(updatedCredentials, null, 2));
+        
+        // Update in MongoDB (primary storage)
+        if (db) {
+            const adminCredentialsCollection = db.collection('admin_credentials');
+            await adminCredentialsCollection.updateOne(
+                { type: 'admin' },
+                { $set: updatedCredentials },
+                { upsert: true }
+            );
+        }
+        
+        res.json({
+            success: true,
+            message: 'Admin credentials updated successfully'
+        });
+        
+    } catch (error) {
+        console.error('Error updating admin credentials:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to update credentials'
+        });
+    }
 });
 
 // Paystack Payment Endpoints
