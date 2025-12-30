@@ -1929,18 +1929,48 @@ const loginLimiter = rateLimit({
 });
 
 // Add login endpoint
-app.post('/admin/login', loginLimiter, (req, res) => {
+app.post('/admin/login', loginLimiter, async (req, res) => {
     const { username, password } = req.body;
     
     // Read admin credentials
-    let adminCredentials = { username: 'admin', password: 'ankeslodge2025' };
+    let adminCredentials = null;
+    
+    // Try to read from file first
     try {
         if (fs.existsSync('admin-credentials.json')) {
             const data = fs.readFileSync('admin-credentials.json', 'utf8');
             adminCredentials = JSON.parse(data);
         }
     } catch (err) {
-        console.error('Error reading admin credentials:', err);
+        console.error('Error reading admin credentials from file:', err);
+    }
+    
+    // If not found in file, try MongoDB
+    if (!adminCredentials || !adminCredentials.username || !adminCredentials.password) {
+        try {
+            if (db) {
+                const adminCredentialsCollection = db.collection('admin_credentials');
+                const mongoCredentials = await adminCredentialsCollection.findOne({ type: 'admin' });
+                if (mongoCredentials) {
+                    adminCredentials = {
+                        username: mongoCredentials.username,
+                        password: mongoCredentials.password
+                    };
+                    console.log('Using admin credentials from MongoDB');
+                }
+            }
+        } catch (err) {
+            console.error('Error reading admin credentials from MongoDB:', err);
+        }
+    }
+    
+    // Use default credentials if not found in file or MongoDB
+    if (!adminCredentials || !adminCredentials.username || !adminCredentials.password) {
+        console.log('Using default admin credentials - please update admin-credentials.json for security');
+        adminCredentials = { 
+            username: 'admin', 
+            password: '$2b$10$2TyiZf7fnhatV3/ejXdoMerPU2imRQ346t66ADYAmPxJ2cDBFViCS' // bcrypt hash of 'ankeslodge2025'
+        };
     }
     
     // Check credentials using bcrypt for password comparison
