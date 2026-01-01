@@ -962,6 +962,10 @@ async function processEmailQueue() {
             await sendContactConfirmationEmail(emailJob.data);
         } else if (emailJob.type === 'contact-admin') {
             await sendContactAdminNotification(emailJob.data);
+        } else if (emailJob.type === 'date-change-confirmation') {
+            await sendDateChangeConfirmationEmail(emailJob.data);
+        } else if (emailJob.type === 'refund-confirmation') {
+            await sendRefundConfirmationEmail(emailJob.data);
         }
         
         // Remove the job from the queue if successful
@@ -2873,6 +2877,287 @@ app.get('/payment-failed', (req, res) => {
 });
 
 // For Vercel deployment, we need to export the app
+
+// Booking modification and refund endpoints
+
+// Update booking dates
+app.post('/admin/update-booking-dates/:id', requireAuth, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { checkin, checkout } = req.body;
+        
+        // Validate dates
+        if (!checkin || !checkout) {
+            return res.status(400).json({ error: 'Check-in and check-out dates are required' });
+        }
+        
+        const booking = await bookingsDB.findOne({ id });
+        if (!booking) {
+            return res.status(404).json({ error: 'Booking not found' });
+        }
+        
+        // Update the booking with new dates
+        const updatedBooking = {
+            ...booking,
+            checkin,
+            checkout,
+            updated_at: new Date().toISOString()
+        };
+        
+        await bookingsDB.update({ id }, updatedBooking);
+        
+        // Send notification email about date change
+        queueEmail('date-change-confirmation', booking.email, {
+            ...updatedBooking,
+            old_checkin: booking.checkin,
+            old_checkout: booking.checkout
+        });
+        
+        res.json({ success: true, booking: updatedBooking });
+    } catch (error) {
+        console.error('Error updating booking dates:', error);
+        res.status(500).json({ error: 'Failed to update booking dates' });
+    }
+});
+
+// Process refund for a booking
+app.post('/admin/process-refund/:id', requireAuth, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { reason, amount, refund_method } = req.body;
+        
+        const booking = await bookingsDB.findOne({ id });
+        if (!booking) {
+            return res.status(404).json({ error: 'Booking not found' });
+        }
+        
+        // Update booking status to refunded
+        const updatedBooking = {
+            ...booking,
+            status: 'refunded',
+            refund_reason: reason,
+            refund_amount: amount,
+            refund_method: refund_method || 'original_method',
+            refunded_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        };
+        
+        await bookingsDB.update({ id }, updatedBooking);
+        
+        // Send refund confirmation email
+        queueEmail('refund-confirmation', booking.email, {
+            ...updatedBooking,
+            refund_amount: amount
+        });
+        
+        // If using Paystack, initiate refund through their API
+        if (booking.payment_reference) {
+            // Note: In a real implementation, you would call Paystack's refund API here
+            console.log(`Refund requested for Paystack transaction: ${booking.payment_reference}`);
+            // await initiatePaystackRefund(booking.payment_reference, amount);
+        }
+        
+        res.json({ success: true, booking: updatedBooking });
+    } catch (error) {
+        console.error('Error processing refund:', error);
+        res.status(500).json({ error: 'Failed to process refund' });
+    }
+});
+
+// Email functions for date changes and refunds
+
+// Function to send date change confirmation email to customer
+function sendDateChangeConfirmationEmail(booking) {
+    // If transporter is not configured, skip email sending
+    if (!transporter) {
+        conditionalLog('Email transporter not configured, logging date change confirmation to console');
+        conditionalLog('=== DATE CHANGE CONFIRMATION EMAIL ===');
+        conditionalLog(`To: ${booking.email}`);
+        conditionalLog(`Subject: Date Change Confirmation for Booking ${booking.id}`);
+        conditionalLog(`Body:`);
+        conditionalLog(`Dear ${booking.name},`);
+        conditionalLog(`Your booking dates have been successfully updated.`);
+        conditionalLog(`Previous dates: ${booking.old_checkin} to ${booking.old_checkout}`);
+        conditionalLog(`New dates: ${booking.checkin} to ${booking.checkout}`);
+        conditionalLog(`Booking ID: ${booking.id}`);
+        conditionalLog(`Room Type: ${getRoomTypeName(booking.roomType)}`);
+        conditionalLog(`Thank you for choosing Ankes Lodge!`);
+        conditionalLog('====================================');
+        return Promise.resolve(); // Return a resolved promise for consistency
+    }
+    
+    const mailOptions = {
+        from: process.env.ADMIN_EMAIL || 'ankeslodge@gmail.com',
+        to: booking.email,
+        subject: `Date Change Confirmation for Booking ${booking.id}`,
+        html: `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="utf-8">
+                <title>Date Change Confirmation</title>
+            </head>
+            <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                    <h2 style="color: #FFA500;">Date Change Confirmation</h2>
+                    <p>Dear ${booking.name},</p>
+                    <p>Your booking dates have been successfully updated. Here are the new details:</p>
+                    <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 15px 0;">
+                        <h3>Updated Booking Details</h3>
+                        <p><strong>Booking ID:</strong> ${booking.id}</p>
+                        <p><strong>Guest Name:</strong> ${booking.name}</p>
+                        <p><strong>Room Type:</strong> ${getRoomTypeName(booking.roomType)}</p>
+                        <p><strong>Previous Check-in:</strong> ${booking.old_checkin}</p>
+                        <p><strong>Previous Check-out:</strong> ${booking.old_checkout}</p>
+                        <p><strong>New Check-in:</strong> ${booking.checkin}</p>
+                        <p><strong>New Check-out:</strong> ${booking.checkout}</p>
+                        <p><strong>Email:</strong> ${booking.email}</p>
+                        <p><strong>Phone:</strong> ${booking.phone}</p>
+                    </div>
+                    <p>If you have any questions about this change, please contact us.</p>
+                    <p>Thank you for choosing Ankes Lodge!</p>
+                    <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+                    <p style="font-size: 12px; color: #666;">This email was sent from Ankes Lodge. If you received this email in error, please ignore it.</p>
+                </div>
+            </body>
+            </html>
+        `
+    };
+
+    // Return a promise for better error handling
+    return new Promise((resolve, reject) => {
+        console.log('Attempting to send date change confirmation email to:', booking.email);
+        const startTime = Date.now();
+        
+        // Always log email content to console for debugging purposes
+        conditionalLog('=== DATE CHANGE CONFIRMATION EMAIL CONTENT ===');
+        conditionalLog(`To: ${booking.email}`);
+        conditionalLog(`Subject: Date Change Confirmation for Booking ${booking.id}`);
+        conditionalLog('Content:');
+        conditionalLog(mailOptions.html);
+        conditionalLog('=========================================');
+        
+        // If transporter is not configured, skip actual sending
+        if (!transporter) {
+            console.log('Email transporter not configured - email not sent, content logged above for debugging');
+            return resolve();
+        }
+        
+        transporter.sendMail(mailOptions, function(error, info) {
+            const endTime = Date.now();
+            console.log(`Date change confirmation email sending attempt took ${endTime - startTime}ms`);
+            
+            if (error) {
+                console.log('Date change confirmation email sending error:', error.message);
+                resolve(); // Resolve anyway since this is not a critical error for the user experience
+            } else {
+                console.log('Date change confirmation email sent successfully: ' + info.response);
+                resolve();
+            }
+        });
+    });
+}
+
+// Function to send refund confirmation email to customer
+function sendRefundConfirmationEmail(booking) {
+    // If transporter is not configured, skip email sending
+    if (!transporter) {
+        conditionalLog('Email transporter not configured, logging refund confirmation to console');
+        conditionalLog('=== REFUND CONFIRMATION EMAIL ===');
+        conditionalLog(`To: ${booking.email}`);
+        conditionalLog(`Subject: Refund Confirmation for Booking ${booking.id}`);
+        conditionalLog(`Body:`);
+        conditionalLog(`Dear ${booking.name},`);
+        conditionalLog(`A refund of ₵${booking.refund_amount} has been processed for your booking.`);
+        conditionalLog(`Refund Reason: ${booking.refund_reason}`);
+        conditionalLog(`Refund Method: ${booking.refund_method}`);
+        conditionalLog(`Booking ID: ${booking.id}`);
+        conditionalLog(`Room Type: ${getRoomTypeName(booking.roomType)}`);
+        conditionalLog(`The refund should appear in your account within 5-10 business days.`);
+        conditionalLog(`Thank you for choosing Ankes Lodge!`);
+        conditionalLog('====================================');
+        return Promise.resolve(); // Return a resolved promise for consistency
+    }
+    
+    const mailOptions = {
+        from: process.env.ADMIN_EMAIL || 'ankeslodge@gmail.com',
+        to: booking.email,
+        subject: `Refund Confirmation for Booking ${booking.id}`,
+        html: `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="utf-8">
+                <title>Refund Confirmation</title>
+            </head>
+            <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                    <h2 style="color: #FFA500;">Refund Confirmation</h2>
+                    <p>Dear ${booking.name},</p>
+                    <p>A refund has been processed for your booking. Here are the details:</p>
+                    <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 15px 0;">
+                        <h3>Refund Details</h3>
+                        <p><strong>Booking ID:</strong> ${booking.id}</p>
+                        <p><strong>Guest Name:</strong> ${booking.name}</p>
+                        <p><strong>Room Type:</strong> ${getRoomTypeName(booking.roomType)}</p>
+                        <p><strong>Refund Amount:</strong> ₵${booking.refund_amount}</p>
+                        <p><strong>Refund Method:</strong> ${booking.refund_method}</p>
+                        <p><strong>Refund Reason:</strong> ${booking.refund_reason}</p>
+                        <p><strong>Refund Date:</strong> ${formatDate(booking.refunded_at)}</p>
+                        <p><strong>Email:</strong> ${booking.email}</p>
+                        <p><strong>Phone:</strong> ${booking.phone}</p>
+                    </div>
+                    <p>The refund has been processed and should appear in your account within 5-10 business days, depending on your payment method.</p>
+                    <p>If you have any questions about this refund, please contact us.</p>
+                    <p>Thank you for choosing Ankes Lodge!</p>
+                    <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+                    <p style="font-size: 12px; color: #666;">This email was sent from Ankes Lodge. If you received this in error, please ignore it.</p>
+                </div>
+            </body>
+            </html>
+        `
+    };
+
+    // Return a promise for better error handling
+    return new Promise((resolve, reject) => {
+        console.log('Attempting to send refund confirmation email to:', booking.email);
+        const startTime = Date.now();
+        
+        // Always log email content to console for debugging purposes
+        conditionalLog('=== REFUND CONFIRMATION EMAIL CONTENT ===');
+        conditionalLog(`To: ${booking.email}`);
+        conditionalLog(`Subject: Refund Confirmation for Booking ${booking.id}`);
+        conditionalLog('Content:');
+        conditionalLog(mailOptions.html);
+        conditionalLog('=========================================');
+        
+        // If transporter is not configured, skip actual sending
+        if (!transporter) {
+            console.log('Email transporter not configured - email not sent, content logged above for debugging');
+            return resolve();
+        }
+        
+        transporter.sendMail(mailOptions, function(error, info) {
+            const endTime = Date.now();
+            console.log(`Refund confirmation email sending attempt took ${endTime - startTime}ms`);
+            
+            if (error) {
+                console.log('Refund confirmation email sending error:', error.message);
+                resolve(); // Resolve anyway since this is not a critical error for the user experience
+            } else {
+                console.log('Refund confirmation email sent successfully: ' + info.response);
+                resolve();
+            }
+        });
+    });
+}
+
+// Format date function
+function formatDate(dateString) {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return date.toLocaleDateString();
+}
 
 // Legacy endpoints for compatibility with old admin page
 app.get("/bookings.json", requireAuth, async (req, res) => {

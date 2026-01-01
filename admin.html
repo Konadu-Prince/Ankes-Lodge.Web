@@ -1,3 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Ankes Lodge</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .admin-header {
+            background-color: #FFA500;
+            color: white;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-header h1 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+
+        .logout-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .logout-btn:hover {
+            background-color: #c82333;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            background-color: white;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            background-color: #e9ecef;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .tab.active {
+            background-color: #FFA500;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .no-bookings {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .action-btn {
+            padding: 5px 10px;
+            margin: 0 2px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .edit-btn {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .refund-btn {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .refresh-btn {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+
+        .refresh-btn:hover {
+            background-color: #5a6268;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 5px;
+            width: 80%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: black;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .modal-buttons {
+            text-align: right;
+            margin-top: 20px;
+        }
+
+        .modal-buttons button {
+            margin-left: 10px;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-save {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-cancel {
+            background-color: #6c757d;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1>Admin Panel - Ankes Lodge</h1>
+            <a href="#" id="logoutLink" class="logout-btn">Logout</a>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="bookings">Bookings</div>
+            <div class="tab" data-tab="contacts">Contacts</div>
+            <div class="tab" data-tab="testimonials">Testimonials</div>
+        </div>
+
+        <!-- Bookings Tab -->
+        <div id="bookings-tab" class="tab-content active">
+            <button id="refreshBtn" class="refresh-btn">Refresh Bookings</button>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Date</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Check-in</th>
+                        <th>Check-out</th>
+                        <th>Guests</th>
+                        <th>Room Type</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="bookingsBody">
+                    <tr><td colspan="11" class="no-bookings">Loading bookings...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Contacts Tab -->
+        <div id="contacts-tab" class="tab-content">
+            <button id="refreshContactsBtn" class="refresh-btn">Refresh Contacts</button>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Date</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Subject</th>
+                        <th>Message</th>
+                    </tr>
+                </thead>
+                <tbody id="contactsBody">
+                    <tr><td colspan="6" class="no-bookings">Loading contacts...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Testimonials Tab -->
+        <div id="testimonials-tab" class="tab-content">
+            <button id="refreshTestimonialsBtn" class="refresh-btn">Refresh Testimonials</button>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Date</th>
+                        <th>Name</th>
+                        <th>Location</th>
+                        <th>Rating</th>
+                        <th>Comment</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="testimonialsBody">
+                    <tr><td colspan="7" class="no-bookings">Loading testimonials...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Edit Booking Modal -->
+    <div id="editBookingModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Edit Booking</h2>
+            <div class="form-group">
+                <label for="editBookingId">Booking ID:</label>
+                <input type="text" id="editBookingId" readonly>
+            </div>
+            <div class="form-group">
+                <label for="editCheckin">Check-in Date:</label>
+                <input type="date" id="editCheckin">
+            </div>
+            <div class="form-group">
+                <label for="editCheckout">Check-out Date:</label>
+                <input type="date" id="editCheckout">
+            </div>
+            <div class="form-group">
+                <label for="editReason">Reason for Change:</label>
+                <textarea id="editReason" placeholder="Enter reason for date change"></textarea>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-cancel" id="cancelEdit">Cancel</button>
+                <button class="btn-save" id="saveEdit">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Refund Booking Modal -->
+    <div id="refundModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Process Refund</h2>
+            <div class="form-group">
+                <label for="refundBookingId">Booking ID:</label>
+                <input type="text" id="refundBookingId" readonly>
+            </div>
+            <div class="form-group">
+                <label for="refundAmount">Refund Amount (GHS):</label>
+                <input type="number" id="refundAmount" step="0.01" min="0" placeholder="Enter refund amount">
+            </div>
+            <div class="form-group">
+                <label for="refundReason">Refund Reason:</label>
+                <textarea id="refundReason" placeholder="Enter reason for refund"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="refundMethod">Refund Method:</label>
+                <select id="refundMethod">
+                    <option value="original_method">Original Payment Method</option>
+                    <option value="bank_transfer">Bank Transfer</option>
+                    <option value="cash">Cash</option>
+                </select>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn-cancel" id="cancelRefund">Cancel</button>
+                <button class="btn-save" id="processRefund">Process Refund</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Function to format date
         function formatDate(dateString) {
@@ -77,7 +448,7 @@
                     const tbody = document.getElementById('bookingsBody');
                     
                     if (bookings.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="9" class="no-bookings">No bookings found</td></tr>';
+                        tbody.innerHTML = '<tr><td colspan="11" class="no-bookings">No bookings found</td></tr>';
                         return;
                     }
                     
@@ -97,6 +468,11 @@
                             <td>${booking.checkout || 'N/A'}</td>
                             <td>${booking.adults || 0} adults, ${booking.children || 0} children</td>
                             <td>${booking['room-type'] || booking.roomType || 'N/A'}</td>
+                            <td>${booking.status || 'N/A'}</td>
+                            <td>
+                                <button class="action-btn edit-btn" onclick="editBooking('${booking.id}')" title="Edit Booking">✏️</button>
+                                <button class="action-btn refund-btn" onclick="processRefund('${booking.id}')" title="Process Refund">💰</button>
+                            </td>
                         `;
                         tbody.appendChild(row);
                     });
@@ -112,7 +488,7 @@
                         
                         const tbody = document.getElementById('bookingsBody');
                         if (bookings.length === 0) {
-                            tbody.innerHTML = '<tr><td colspan="9" class="no-bookings">No bookings found (offline mode)</td></tr>';
+                            tbody.innerHTML = '<tr><td colspan="11" class="no-bookings">No bookings found (offline mode)</td></tr>';
                             return;
                         }
                         
@@ -132,11 +508,16 @@
                                 <td>${booking.checkout || 'N/A'}</td>
                                 <td>${booking.adults || 0} adults, ${booking.children || 0} children</td>
                                 <td>${booking['room-type'] || booking.roomType || 'N/A'}</td>
+                                <td>${booking.status || 'N/A'}</td>
+                                <td>
+                                    <button class="action-btn edit-btn" onclick="editBooking('${booking.id}')" title="Edit Booking">✏️</button>
+                                    <button class="action-btn refund-btn" onclick="processRefund('${booking.id}')" title="Process Refund">💰</button>
+                                </td>
                             `;
                             tbody.appendChild(row);
                         });
                     } catch (storageError) {
-                        document.getElementById('bookingsBody').innerHTML = '<tr><td colspan="9" class="no-bookings">Error loading bookings (offline mode unavailable)</td></tr>';
+                        document.getElementById('bookingsBody').innerHTML = '<tr><td colspan="11" class="no-bookings">Error loading bookings (offline mode unavailable)</td></tr>';
                     }
                 });
         }
@@ -337,6 +718,35 @@
             });
         }
         
+        // Function to edit a booking (open modal)
+        function editBooking(bookingId) {
+            // Get booking details from the displayed table row
+            const row = event.target.closest('tr');
+            const cells = row.cells;
+            
+            // Set modal values
+            document.getElementById('editBookingId').value = bookingId;
+            document.getElementById('editCheckin').value = cells[5].textContent; // Check-in date
+            document.getElementById('editCheckout').value = cells[6].textContent; // Check-out date
+            
+            // Show modal
+            document.getElementById('editBookingModal').style.display = 'block';
+        }
+        
+        // Function to process a refund (open modal)
+        function processRefund(bookingId) {
+            // Get booking details from the displayed table row
+            const row = event.target.closest('tr');
+            const cells = row.cells;
+            const amount = cells[8].textContent; // Room type (for reference)
+            
+            // Set modal values
+            document.getElementById('refundBookingId').value = bookingId;
+            
+            // Show modal
+            document.getElementById('refundModal').style.display = 'block';
+        }
+        
         // Load data when page loads
         document.addEventListener('DOMContentLoaded', function() {
             loadOfflineData();
@@ -348,6 +758,9 @@
         // Refresh button events
         document.getElementById('refreshBtn').addEventListener('click', function() {
             loadBookings();
+        });
+        
+        document.getElementById('refreshContactsBtn').addEventListener('click', function() {
             loadContacts();
         });
         
@@ -394,6 +807,119 @@
             .catch(error => {
                 console.error('Logout error:', error);
                 alert('Error logging out. Please try again.');
+            });
+        });
+        
+        // Modal functionality
+        const modals = document.querySelectorAll('.modal');
+        const closeButtons = document.querySelectorAll('.close');
+        
+        // Close modals when clicking on close button
+        closeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                this.closest('.modal').style.display = 'none';
+            });
+        });
+        
+        // Close modals when clicking outside the content
+        window.addEventListener('click', function(event) {
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+        
+        // Cancel edit button
+        document.getElementById('cancelEdit').addEventListener('click', function() {
+            document.getElementById('editBookingModal').style.display = 'none';
+        });
+        
+        // Save edit button
+        document.getElementById('saveEdit').addEventListener('click', function() {
+            const bookingId = document.getElementById('editBookingId').value;
+            const checkin = document.getElementById('editCheckin').value;
+            const checkout = document.getElementById('editCheckout').value;
+            const reason = document.getElementById('editReason').value;
+            
+            if (!checkin || !checkout) {
+                alert('Please enter both check-in and check-out dates.');
+                return;
+            }
+            
+            fetch(`/admin/update-booking-dates/${bookingId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    checkin: checkin,
+                    checkout: checkout,
+                    reason: reason
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Booking dates updated successfully!');
+                    loadBookings(); // Refresh the bookings list
+                    document.getElementById('editBookingModal').style.display = 'none';
+                } else {
+                    alert('Error updating booking: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error updating booking:', error);
+                alert('Failed to update booking. Please try again later.');
+            });
+        });
+        
+        // Cancel refund button
+        document.getElementById('cancelRefund').addEventListener('click', function() {
+            document.getElementById('refundModal').style.display = 'none';
+        });
+        
+        // Process refund button
+        document.getElementById('processRefund').addEventListener('click', function() {
+            const bookingId = document.getElementById('refundBookingId').value;
+            const amount = document.getElementById('refundAmount').value;
+            const reason = document.getElementById('refundReason').value;
+            const method = document.getElementById('refundMethod').value;
+            
+            if (!amount || isNaN(amount) || amount <= 0) {
+                alert('Please enter a valid refund amount.');
+                return;
+            }
+            
+            if (!reason) {
+                alert('Please provide a reason for the refund.');
+                return;
+            }
+            
+            fetch(`/admin/process-refund/${bookingId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    amount: parseFloat(amount),
+                    reason: reason,
+                    refund_method: method
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Refund processed successfully!');
+                    loadBookings(); // Refresh the bookings list
+                    document.getElementById('refundModal').style.display = 'none';
+                } else {
+                    alert('Error processing refund: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error processing refund:', error);
+                alert('Failed to process refund. Please try again later.');
             });
         });
     </script>
