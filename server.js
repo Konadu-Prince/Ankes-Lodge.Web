@@ -2123,6 +2123,57 @@ app.post('/admin/update-credentials', requireAuth, async (req, res) => {
     }
 });
 
+// Admin API Endpoints
+
+// Get all bookings from MongoDB
+app.get('/admin/bookings', requireAuth, async (req, res) => {
+    try {
+        const bookings = await bookingsDB.find({});
+        res.json(bookings);
+    } catch (error) {
+        console.error('Error fetching bookings:', error);
+        res.status(500).json({ error: 'Failed to fetch bookings' });
+    }
+});
+
+// Get all contacts from MongoDB
+app.get('/admin/contacts', requireAuth, async (req, res) => {
+    try {
+        const contacts = await contactsDB.find({});
+        res.json(contacts);
+    } catch (error) {
+        console.error('Error fetching contacts:', error);
+        res.status(500).json({ error: 'Failed to fetch contacts' });
+    }
+});
+
+// Get all testimonials from MongoDB
+app.get('/admin/testimonials', requireAuth, async (req, res) => {
+    try {
+        const testimonials = await testimonialsDB.find({});
+        res.json(testimonials);
+    } catch (error) {
+        console.error('Error fetching testimonials:', error);
+        res.status(500).json({ error: 'Failed to fetch testimonials' });
+    }
+});
+
+// Delete testimonial
+app.delete('/admin/testimonials/:id', requireAuth, async (req, res) => {
+    try {
+        const id = parseInt(req.params.id);
+        if (isNaN(id)) {
+            return res.status(400).json({ error: 'Invalid testimonial ID' });
+        }
+        
+        await testimonialsDB.delete({ id: id });
+        res.json({ status: 'success', message: 'Testimonial deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting testimonial:', error);
+        res.status(500).json({ error: 'Failed to delete testimonial' });
+    }
+});
+
 // Paystack Payment Endpoints
 
 // Initialize donation payment
@@ -2822,6 +2873,52 @@ app.get('/payment-failed', (req, res) => {
 });
 
 // For Vercel deployment, we need to export the app
+
+// Legacy endpoints for compatibility with old admin page
+app.get("/bookings.json", requireAuth, async (req, res) => {
+    try {
+        const bookings = await bookingsDB.find({});
+        res.json(bookings);
+    } catch (error) {
+        console.error("Error fetching bookings:", error);
+        res.status(500).json({ error: "Failed to fetch bookings" });
+    }
+});
+
+app.get("/contacts.json", requireAuth, async (req, res) => {
+    try {
+        const contacts = await contactsDB.find({});
+        res.json(contacts);
+    } catch (error) {
+        console.error("Error fetching contacts:", error);
+        res.status(500).json({ error: "Failed to fetch contacts" });
+    }
+});
+
+app.get("/testimonials.json", requireAuth, async (req, res) => {
+    try {
+        const testimonials = await testimonialsDB.find({});
+        res.json(testimonials);
+    } catch (error) {
+        console.error("Error fetching testimonials:", error);
+        res.status(500).json({ error: "Failed to fetch testimonials" });
+    }
+});
+
+app.delete("/delete-testimonial/:id", requireAuth, async (req, res) => {
+    try {
+        const id = parseInt(req.params.id);
+        if (isNaN(id)) {
+            return res.status(400).json({ error: "Invalid testimonial ID" });
+        }
+        
+        await testimonialsDB.delete({ id: id });
+        res.json({ status: "success", message: "Testimonial deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting testimonial:", error);
+        res.status(500).json({ error: "Failed to delete testimonial" });
+    }
+});
 module.exports = app;
 
 // Only start the server if this file is run directly (not imported)
