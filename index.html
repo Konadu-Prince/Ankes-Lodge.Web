@@ -12,21 +12,21 @@
     <meta property="og:url" content="https://ankes-lodge.onrender.com/">
     <meta property="og:title" content="Ankes Lodge - Luxury Guest House in Abesim, Sunyani">
     <meta property="og:description" content="Book comfortable accommodations at Ankes Lodge in Abesim, Sunyani. Modern amenities, excellent service, and convenient location for business and leisure travel.">
-    <meta property="og:image" content="https://ankes-lodge.onrender.com/main-flyer.jpg">
+    <meta property="og:image" content="https://ankes-lodge.onrender.com/main-flyer.jpeg">
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://ankes-lodge.onrender.com/">
     <meta property="twitter:title" content="Ankes Lodge - Luxury Guest House in Abesim, Sunyani">
     <meta property="twitter:description" content="Book comfortable accommodations at Ankes Lodge in Abesim, Sunyani. Modern amenities, excellent service, and convenient location for business and leisure travel.">
-    <meta property="twitter:image" content="https://ankes-lodge.onrender.com/main-flyer.jpg">
+    <meta property="twitter:image" content="https://ankes-lodge.onrender.com/main-flyer.jpeg">
     
     <!-- Canonical URL -->
     <link rel="canonical" href="https://ankes-lodge.onrender.com/">
     
     <title>Ankes Lodge - Luxury Guest House in Abesim, Sunyani</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="icon" href="orangeLogo.png" type="image/png">
+    <link rel="icon" href="AnkesImages/AnkesLodgeLogo.jpeg" type="image/jpeg">
 </head>
 <body>
     <!-- Schema.org structured data -->
@@ -67,7 +67,7 @@
     <header>
         <div class="container">
             <div class="logo">
-                <img src="orangeLogo.png" alt="Ankes Lodge Logo">
+                <img src="AnkesImages/AnkesLodgeLogo.jpeg" alt="Ankes Lodge Logo">
                 <h1>Ankes Lodge</h1>
             </div>
             <div class="menu-toggle">
@@ -325,7 +325,7 @@
             <h2>Gallery</h2>
             <div class="gallery-grid">
                 <div class="gallery-item">
-                    <img src="main-flyer.jpg" alt="Ankes Lodge Flyer">
+                    <img src="main-flyer.jpeg" alt="Ankes Lodge Flyer">
                     <button class="expand-btn" aria-label="Expand image">⤢</button>
                 </div>
                 <div class="gallery-item video-container">
@@ -456,88 +456,175 @@
                 <h3>Direct Booking with Ankes Lodge</h3>
                 <p>Book directly with us for a personalized experience. Fill out the form below and we'll contact you shortly to confirm your reservation.</p>
                 
+                <!-- Multi-step Progress Indicator -->
+                <div class="booking-progress">
+                    <div class="progress-steps">
+                        <div class="step active" data-step="1">
+                            <div class="step-number">1</div>
+                            <div class="step-label">Personal Info</div>
+                        </div>
+                        <div class="step" data-step="2">
+                            <div class="step-number">2</div>
+                            <div class="step-label">Dates & Guests</div>
+                        </div>
+                        <div class="step" data-step="3">
+                            <div class="step-number">3</div>
+                            <div class="step-label">Room Details</div>
+                        </div>
+                        <div class="step" data-step="4">
+                            <div class="step-number">4</div>
+                            <div class="step-label">Review & Submit</div>
+                        </div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 25%"></div>
+                    </div>
+                </div>
+                
                 <form id="booking-form" aria-labelledby="booking-form-title">
-                    <div class="form-group">
-                        <label for="name">Full Name <span aria-label="required">*</span></label>
-                        <input type="text" id="name" name="name" required aria-required="true" placeholder="Enter your full name">
+                    <!-- Step 1: Personal Information -->
+                    <div class="booking-step active" data-step="1">
+                        <h3>Personal Information</h3>
+                        <div class="form-group">
+                            <label for="name">Full Name <span aria-label="required">*</span></label>
+                            <input type="text" id="name" name="name" required aria-required="true" placeholder="Enter your full name">
+                        </div>
+                    
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="email">Email <span aria-label="required">*</span></label>
+                                <input type="email" id="email" name="email" required aria-required="true" placeholder="your.email@example.com">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="phone">Phone Number <span aria-label="required">*</span></label>
+                                <input type="tel" id="phone" name="phone" required aria-required="true" placeholder="+233XXXXXXXXX">
+                                <small class="form-help">Please include country code (+233 for Ghana)</small>
+                            </div>
+                        </div>
+                        <div class="step-navigation">
+                            <button type="button" class="btn-secondary next-step" data-next="2">Next: Dates & Guests</button>
+                        </div>
                     </div>
                     
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="email">Email <span aria-label="required">*</span></label>
-                            <input type="email" id="email" name="email" required aria-required="true" placeholder="your.email@example.com">
+                    <!-- Step 2: Dates & Guests -->
+                    <div class="booking-step" data-step="2">
+                        <h3>Dates & Guests</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="checkin">Check-in Date <span aria-label="required">*</span></label>
+                                <input type="date" id="checkin" name="checkin" required aria-required="true">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="checkout">Check-out Date <span aria-label="required">*</span></label>
+                                <input type="date" id="checkout" name="checkout" required aria-required="true">
+                            </div>
                         </div>
                         
-                        <div class="form-group">
-                            <label for="phone">Phone Number <span aria-label="required">*</span></label>
-                            <input type="tel" id="phone" name="phone" required aria-required="true" placeholder="+233XXXXXXXXX">
-                            <small class="form-help">Please include country code (+233 for Ghana)</small>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="adults">Adults <span aria-label="required">*</span></label>
+                                <select id="adults" name="adults" required aria-required="true">
+                                    <option value="">Select Number of Adults</option>
+                                    <option value="1">1 Adult</option>
+                                    <option value="2">2 Adults</option>
+                                    <option value="3">3 Adults</option>
+                                    <option value="4">4 Adults</option>
+                                    <option value="5">5 Adults</option>
+                                    <option value="6">6 Adults</option>
+                                    <option value="7">7 Adults</option>
+                                    <option value="8">8 Adults</option>
+                                    <option value="9">9 Adults</option>
+                                    <option value="10">10 Adults</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="children">Children</label>
+                                <select id="children" name="children">
+                                    <option value="0" selected>0 Children</option>
+                                    <option value="1">1 Child</option>
+                                    <option value="2">2 Children</option>
+                                    <option value="3">3 Children</option>
+                                    <option value="4">4 Children</option>
+                                    <option value="5">5 Children</option>
+                                    <option value="6">6 Children</option>
+                                    <option value="7">7 Children</option>
+                                    <option value="8">8 Children</option>
+                                    <option value="9">9 Children</option>
+                                    <option value="10">10 Children</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="step-navigation">
+                            <button type="button" class="btn-secondary prev-step" data-prev="1">Previous</button>
+                            <button type="button" class="btn-secondary next-step" data-next="3">Next: Room Details</button>
                         </div>
                     </div>
                     
-                    <div class="form-row">
+                    <!-- Step 3: Room Details -->
+                    <div class="booking-step" data-step="3">
+                        <h3>Room Details</h3>
                         <div class="form-group">
-                            <label for="checkin">Check-in Date <span aria-label="required">*</span></label>
-                            <input type="date" id="checkin" name="checkin" required aria-required="true">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="checkout">Check-out Date <span aria-label="required">*</span></label>
-                            <input type="date" id="checkout" name="checkout" required aria-required="true">
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="adults">Adults <span aria-label="required">*</span></label>
-                            <select id="adults" name="adults" required aria-required="true">
-                                <option value="">Select Number of Adults</option>
-                                <option value="1">1 Adult</option>
-                                <option value="2">2 Adults</option>
-                                <option value="3">3 Adults</option>
-                                <option value="4">4 Adults</option>
-                                <option value="5">5 Adults</option>
-                                <option value="6">6 Adults</option>
-                                <option value="7">7 Adults</option>
-                                <option value="8">8 Adults</option>
-                                <option value="9">9 Adults</option>
-                                <option value="10">10 Adults</option>
+                            <label for="room-type">Room Type <span aria-label="required">*</span></label>
+                            <select id="room-type" name="room-type" required aria-required="true">
+                                <option value="">Select Room Type</option>
+                                <option value="executive">Executive Room (₵299/night)</option>
+                                <option value="regular">Regular Bedroom (₵199/night)</option>
+                                <option value="full-house">Full House (Custom Pricing)</option>
                             </select>
                         </div>
-                        
+                    
                         <div class="form-group">
-                            <label for="children">Children</label>
-                            <select id="children" name="children">
-                                <option value="0" selected>0 Children</option>
-                                <option value="1">1 Child</option>
-                                <option value="2">2 Children</option>
-                                <option value="3">3 Children</option>
-                                <option value="4">4 Children</option>
-                                <option value="5">5 Children</option>
-                                <option value="6">6 Children</option>
-                                <option value="7">7 Children</option>
-                                <option value="8">8 Children</option>
-                                <option value="9">9 Children</option>
-                                <option value="10">10 Children</option>
-                            </select>
+                            <label for="message">Special Requests</label>
+                            <textarea id="message" name="message" rows="4" placeholder="Any special requests or requirements..."></textarea>
+                            <small class="form-help">Please include any dietary requirements, accessibility needs, or other special requests</small>
+                        </div>
+                        <div class="step-navigation">
+                            <button type="button" class="btn-secondary prev-step" data-prev="2">Previous</button>
+                            <button type="button" class="btn-secondary next-step" data-next="4">Next: Review Booking</button>
                         </div>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="room-type">Room Type <span aria-label="required">*</span></label>
-                        <select id="room-type" name="room-type" required aria-required="true">
-                            <option value="">Select Room Type</option>
-                            <option value="executive">Executive Room (₵299/night)</option>
-                            <option value="regular">Regular Bedroom (₵199/night)</option>
-                            <option value="full-house">Full House (Custom Pricing)</option>
-                        </select>
+                    <!-- Step 4: Review & Submit -->
+                    <div class="booking-step" data-step="4">
+                        <h3>Review Your Booking</h3>
+                        <div class="review-summary">
+                            <div class="review-section">
+                                <h4>Guest Information</h4>
+                                <p><strong>Name:</strong> <span id="review-name">-</span></p>
+                                <p><strong>Email:</strong> <span id="review-email">-</span></p>
+                                <p><strong>Phone:</strong> <span id="review-phone">-</span></p>
+                            </div>
+                            
+                            <div class="review-section">
+                                <h4>Stay Details</h4>
+                                <p><strong>Check-in:</strong> <span id="review-checkin">-</span></p>
+                                <p><strong>Check-out:</strong> <span id="review-checkout">-</span></p>
+                                <p><strong>Adults:</strong> <span id="review-adults">-</span></p>
+                                <p><strong>Children:</strong> <span id="review-children">-</span></p>
+                            </div>
+                            
+                            <div class="review-section">
+                                <h4>Room Selection</h4>
+                                <p><strong>Room Type:</strong> <span id="review-room">-</span></p>
+                                <p><strong>Total Nights:</strong> <span id="review-nights">-</span></p>
+                                <p><strong>Estimated Cost:</strong> <span id="review-cost">-</span></p>
+                            </div>
+                            
+                            <div class="review-section" id="review-special-requests" style="display: none;">
+                                <h4>Special Requests</h4>
+                                <p id="review-message">-</p>
+                            </div>
+                        </div>
+                        
+                        <div class="step-navigation">
+                            <button type="button" class="btn-secondary prev-step" data-prev="3">Previous</button>
+                            <button type="submit" class="btn-primary">Confirm Booking</button>
+                        </div>
                     </div>
-                    
-                    <div class="form-group">
-                        <label for="message">Special Requests</label>
-                        <textarea id="message" name="message" rows="4" placeholder="Any special requests or requirements..."></textarea>
-                        <small class="form-help">Please include any dietary requirements, accessibility needs, or other special requests</small>
-                    </div>
+
                     
                     <div class="form-group">
                         <button type="submit" class="btn-primary">Submit Booking Request</button>
@@ -637,9 +724,40 @@
     <footer>
         <div class="container">
             <div class="footer-content">
-                <div class="footer-logo">
-                    <img src="orangeLogo.png" alt="Ankes Lodge Logo">
-                    <h3>Ankes Lodge</h3>
+                <div class="footer-main">
+                    <div class="footer-logo">
+                        <img src="AnkesImages/AnkesLodgeLogo.jpeg" alt="Ankes Lodge Logo">
+                        <h3>Ankes Lodge</h3>
+                    </div>
+                    
+                    <div class="social-media">
+                        <h4>Follow Us</h4>
+                        <div class="social-links">
+                            <p><a href="https://www.tiktok.com/@ankes.like" target="_blank" rel="noopener">TikTok: @ankes.lodge</a></p>
+                            <p><a href="https://www.facebook.com/profile.php?id=61585622975473" target="_blank" rel="noopener">Facebook: Ankes Lodge</a></p>
+                            <p><a href="https://www.instagram.com/ankeslodge.2025?igsh=ODF5MnV6cG01aWd2" target="_blank" rel="noopener">Instagram: @ankeslodge.2025</a></p>
+                            <p><a href="https://x.com/CouQuincy" target="_blank" rel="noopener">Twitter: @CouQuincy</a></p>
+                            <p><a href="https://whatsapp.com/channel/0029Vb7dl4j5kg7AhA6B411q" target="_blank" rel="noopener">WhatsApp: Ankes Lodge Channel</a></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="affiliate-section">
+                    <div class="affiliate-company">
+                        <div class="affiliate-logo" onclick="openAffiliateModal()">
+                            <img src="AnkesImages/Conadux-Prime-EnterpriseLogo.jpeg" alt="Conadux Prime Enterprise Logo">
+                            <p>Affordable Quality Laptops & Data Bundles</p>
+                        </div>
+                        <div class="affiliate-social">
+                            <h4>Follow Conadux</h4>
+                            <div class="social-links">
+                                <p><a href="#" target="_blank" rel="noopener">TikTok: @conadux_prime</a></p>
+                                <p><a href="#" target="_blank" rel="noopener">Facebook: Conadux Prime Enterprise</a></p>
+                                <p><a href="#" target="_blank" rel="noopener">Instagram: @conadux.prime</a></p>
+                                <p><a href="https://whatsapp.com/channel/0029Vb735aEC1Fu4s9zF9231" target="_blank" rel="noopener">WhatsApp: Conadux Prime Enterprise</a></p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 
                 <div class="footer-links">
@@ -653,26 +771,32 @@
                         <li><a href="/login.html">Admin Login</a></li>
                     </ul>
                 </div>
-                
-        
-                <div class="social-media">
-                    <h4>Follow Us</h4>
-                    <div class="social-links">
-                        <p><a href="https://www.tiktok.com/@ankes.lodge?_r=1&_t=ZN-92ZQkB26Rq2" target="_blank" rel="noopener">TikTok: @ankes.lodge</a></p>
-                        <p><a href="https://www.facebook.com/profile.php?id=61585622975473" target="_blank" rel="noopener">Facebook: Ankes Lodge</a></p>
-                        <p><a href="https://www.instagram.com/ankeslodge.2025?igsh=ODF5MnV6cG01aWd2" target="_blank" rel="noopener">Instagram: @ankeslodge.2025</a></p>
-                        <p><a href="https://x.com/CouQuincy" target="_blank" rel="noopener">Twitter: @CouQuincy</a></p>
-                    </div>
-                </div>
             </div>
             
            
             
             <div class="copyright">
-                <p>&copy; 2025 Ankes Lodge. All rights reserved.</p>
+                <p>&copy; 2025 Ankes Lodge. All rights reserved | <a href="https://github.com/Konadu-Prince" target="_blank" rel="noopener">conadux</a></p>
             </div>
         </div>
     </footer>
+
+    <!-- Affiliate Company Modal -->
+    <div id="affiliateModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAffiliateModal()">&times;</span>
+            <div class="modal-header">
+                <img src="AnkesImages/Conadux-Prime-EnterpriseLogo.jpeg" alt="Conadux Prime Enterprise Logo" class="modal-logo">
+                <h2>Conadux Prime Enterprise</h2>
+            </div>
+            <div class="modal-body">
+                <p>We specialize in providing affordable and quality laptops and data bundles. Your trusted partner for all your tech needs at competitive prices.</p>
+                <div class="modal-links">
+                    <a href="https://whatsapp.com/channel/0029Vb735aEC1Fu4s9zF9231" target="_blank" rel="noopener" class="btn-primary">Follow Our WhatsApp Channel</a>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Scroll to Top Button -->
     <button id="scrollToTop" class="scroll-to-top">

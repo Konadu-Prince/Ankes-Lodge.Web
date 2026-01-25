@@ -67,6 +67,8 @@ To deploy this application to Render.com:
 4. Set the following environment variables in Render.com dashboard:
    - `EMAIL_USER` - Your Gmail address for sending emails
    - `EMAIL_PASS` - Your Gmail App Password (not regular password)
+   - `ADMIN_EMAIL` - Admin contact email
+   - `MONGODB_URI` - Your MongoDB connection string
 5. Set Build Command to: `npm install`
 6. Set Start Command to: `node server.js`
 7. Add the following environment variable in Render.com:
@@ -74,10 +76,22 @@ To deploy this application to Render.com:
    - Value: `production`
 8. Deploy the application
 
-Note: For email functionality to work, you must:
+Note: For email functionality to work on Render.com, you must:
 - Enable 2-factor authentication on your Gmail account
 - Generate an App Password at https://myaccount.google.com/apppasswords
 - Use the App Password (not your regular Gmail password) as the `EMAIL_PASS` value
+- For Gmail on Render.com specifically:
+  * Use App Passwords, not regular passwords
+  * Ensure your account has 2FA enabled
+  * Check that your IP is not blocked by Google
+  * If Gmail doesn't work, consider using alternative SMTP services like SendGrid or Mailgun
+  * Monitor the server logs for email configuration errors
+  * The application includes fallback logging when email fails
+
+If Gmail SMTP continues to fail on Render.com:
+- Consider using alternative email services like SendGrid, Mailgun, or AWS SES
+- These services are often more reliable on cloud platforms
+- They offer better deliverability and less restriction than Gmail for application use
 
 ### Keeping the Server Awake on Render.com Free Tier
 

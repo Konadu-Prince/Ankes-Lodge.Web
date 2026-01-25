@@ -1171,10 +1171,186 @@ footer {
 
 .footer-content {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 30px;
     margin-bottom: 30px;
 }
+
+.footer-main {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.affiliate-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.affiliate-company {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.affiliate-social {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #444;
+    width: 100%;
+}
+
+.affiliate-social h4 {
+    margin-bottom: 15px;
+    position: relative;
+    padding-bottom: 8px;
+    color: #ccc;
+}
+
+.affiliate-social h4::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 40px;
+    height: 2px;
+    background-color: var(--primary-color);
+}
+
+.affiliate-social .social-links p {
+    margin-bottom: 8px;
+}
+
+.affiliate-social .social-links a {
+    color: #aaa;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.affiliate-social .social-links a:hover {
+    color: var(--primary-color);
+    text-decoration: underline;
+}
+
+.affiliate-logo {
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    text-align: center;
+}
+
+.affiliate-logo:hover {
+    transform: scale(1.05);
+}
+
+.affiliate-logo img {
+    height: 60px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.affiliate-logo p {
+    color: #ccc;
+    font-size: 0.9rem;
+    margin: 0;
+    text-align: center;
+}
+
+/* Affiliate Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background-color: #2c2c2c;
+    margin: 10% auto;
+    padding: 30px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    border: 1px solid #444;
+}
+
+.modal-header {
+    text-align: center;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #444;
+}
+
+.modal-logo {
+    height: 80px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+}
+
+.modal-header h2 {
+    color: var(--primary-color);
+    margin: 0;
+    font-size: 1.8rem;
+}
+
+.modal-body {
+    text-align: center;
+}
+
+.modal-body p {
+    color: #ccc;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
+
+.modal-links {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.modal-links a {
+    display: inline-block;
+    padding: 12px 25px;
+    background-color: var(--primary-color);
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.modal-links a:hover {
+    background-color: #e69500;
+    transform: translateY(-2px);
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    transition: color 0.3s ease;
+}
+
+.close:hover,
+.close:focus {
+    color: var(--primary-color);
+}
+
+.footer-content {
 
 .footer-logo {
     display: flex;
@@ -1298,6 +1474,18 @@ footer {
     padding-top: 20px;
     border-top: 1px solid #444;
     color: #aaa;
+    font-size: 0.9rem;
+}
+
+.copyright a {
+    color: #aaa;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.copyright a:hover {
+    color: var(--primary-color);
+    text-decoration: underline;
 }
 
 /* Scroll to Top Button */
@@ -1481,6 +1669,65 @@ footer {
         display: flex;
     }
     
+    /* Enhanced touch targets for tablets */
+    input, select, textarea, button {
+        min-height: 42px;
+        padding: 11px 14px;
+    }
+    
+    /* Better form spacing */
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    /* Enhanced buttons */
+    .btn-primary, .btn-secondary {
+        min-height: 44px;
+        padding: 11px 20px;
+        font-size: 0.9rem;
+        -webkit-tap-highlight-color: rgba(255, 165, 0, 0.2);
+        tap-highlight-color: rgba(255, 165, 0, 0.2);
+    }
+    
+    /* Improved navigation */
+    nav ul li a {
+        padding: 10px 0;
+        min-height: 44px;
+    }
+    
+    /* Better gallery layout */
+    .gallery-grid {
+        gap: 16px;
+    }
+    
+    .gallery-item {
+        height: 230px;
+    }
+    
+    /* Enhanced testimonial display */
+    .testimonial-card {
+        padding: 20px;
+        margin: 0 14px;
+    }
+    
+    /* Better footer spacing */
+    .footer-content {
+        gap: 25px;
+    }
+    
+    /* Improved touch scrolling */
+    body {
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Better mobile menu animation */
+    nav ul {
+        -webkit-transition: left 0.3s ease-out;
+        -moz-transition: left 0.3s ease-out;
+        -o-transition: left 0.3s ease-out;
+        transition: left 0.3s ease-out;
+    }
+    
     .link-container {
         flex-direction: column;
     }
@@ -1565,6 +1812,52 @@ footer {
         height: 80vh;
     }
     
+    /* Enhanced touch interactions */
+    input, select, textarea, button {
+        min-height: 44px;
+        padding: 12px 15px;
+    }
+    
+    /* Better form spacing */
+    .form-group {
+        margin-bottom: 22px;
+    }
+    
+    /* Enhanced buttons */
+    .btn-primary, .btn-secondary {
+        min-height: 46px;
+        padding: 12px 22px;
+        font-size: 0.95rem;
+        -webkit-tap-highlight-color: rgba(255, 165, 0, 0.3);
+        tap-highlight-color: rgba(255, 165, 0, 0.3);
+    }
+    
+    /* Improved navigation */
+    nav ul li a {
+        padding: 12px 0;
+        min-height: 46px;
+    }
+    
+    /* Better gallery layout */
+    .gallery-grid {
+        gap: 18px;
+    }
+    
+    .gallery-item {
+        height: 220px;
+    }
+    
+    /* Enhanced testimonial display */
+    .testimonial-card {
+        padding: 22px;
+        margin: 0 12px;
+    }
+    
+    /* Better footer spacing */
+    .footer-content {
+        gap: 28px;
+    }
+    
     .hero h1 {
         font-size: 1.8rem;
     }
@@ -1622,6 +1915,65 @@ footer {
 /* Extra small devices (phones, 480px and down) */
 @media (max-width: 480px) {
     .container {
+        padding: 0 10px;
+    }
+    
+    /* Enhanced touch targets for better mobile UX */
+    input, select, textarea, button {
+        min-height: 44px; /* Minimum touch target size */
+        padding: 12px 15px;
+    }
+    
+    /* Better spacing for mobile forms */
+    .form-group {
+        margin-bottom: 25px;
+    }
+    
+    /* Enhanced button touch areas */
+    .btn-primary, .btn-secondary {
+        min-height: 48px;
+        padding: 14px 25px;
+        font-size: 1rem;
+        /* Add visual feedback for touch */
+        -webkit-tap-highlight-color: rgba(255, 165, 0, 0.3);
+        tap-highlight-color: rgba(255, 165, 0, 0.3);
+    }
+    
+    /* Improved navigation touch targets */
+    nav ul li a {
+        padding: 15px 0;
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* Better spacing for mobile gallery */
+    .gallery-grid {
+        gap: 15px;
+    }
+    
+    .gallery-item {
+        height: 200px;
+    }
+    
+    /* Enhanced testimonial cards for mobile */
+    .testimonial-card {
+        padding: 25px;
+        margin: 0 10px;
+    }
+    
+    /* Better mobile footer layout */
+    .footer-content {
+        gap: 25px;
+    }
+    
+    /* Improved mobile hero section */
+    .hero {
+        padding: 20px 0;
+    }
+    
+    .hero-content {
         padding: 0 10px;
     }
     
@@ -1926,4 +2278,242 @@ footer {
 
 .flyer-preview img:hover {
     transform: scale(1.02);
+}
+
+/* Multi-step Booking Form Styles */
+.booking-progress {
+    margin-bottom: 30px;
+    padding: 20px;
+    background-color: var(--accent-color);
+    border-radius: 8px;
+}
+
+.progress-steps {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.progress-steps::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: #ddd;
+    z-index: 1;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+    flex: 1;
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #ddd;
+    color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+}
+
+.step-label {
+    font-size: 0.85rem;
+    color: #666;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.step.active .step-number {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.step.active .step-label {
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.step.completed .step-number {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.step.completed .step-label {
+    color: #4CAF50;
+}
+
+.progress-bar {
+    height: 6px;
+    background-color: #ddd;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background-color: var(--primary-color);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.booking-step {
+    display: none;
+}
+
+.booking-step.active {
+    display: block;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.step-navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+}
+
+.review-summary {
+    background-color: var(--accent-color);
+    padding: 25px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+}
+
+.review-section {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.review-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.review-section h4 {
+    color: var(--secondary-color);
+    margin-bottom: 12px;
+    font-size: 1.1rem;
+}
+
+.review-section p {
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+.review-section strong {
+    color: var(--secondary-color);
+}
+
+/* Mobile responsiveness for multi-step form */
+@media (max-width: 768px) {
+    .booking-progress {
+        padding: 15px;
+        margin-bottom: 25px;
+    }
+    
+    .progress-steps {
+        margin-bottom: 15px;
+    }
+    
+    .step-label {
+        font-size: 0.75rem;
+    }
+    
+    .step-number {
+        width: 35px;
+        height: 35px;
+        font-size: 0.9rem;
+    }
+    
+    .step-navigation {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .step-navigation button {
+        width: 100%;
+        margin: 0;
+    }
+    
+    .review-summary {
+        padding: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .booking-progress {
+        padding: 12px;
+    }
+    
+    .step-label {
+        font-size: 0.7rem;
+    }
+    
+    .step-number {
+        width: 30px;
+        height: 30px;
+        font-size: 0.8rem;
+    }
+    
+    .review-section h4 {
+        font-size: 1rem;
+    }
+    
+    .review-section p {
+        font-size: 0.9rem;
+    }
+}
+
+/* Responsive Footer Adjustments */
+@media (max-width: 768px) {
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .footer-main {
+        gap: 20px;
+    }
+    
+    .affiliate-section {
+        order: 2;
+    }
+    
+    .footer-links {
+        order: 3;
+    }
+}
+
+@media (max-width: 480px) {
+    .footer-content {
+        gap: 15px;
+    }
+    
+    .affiliate-social h4::after {
+        width: 30px;
+    }
+    
+    .footer-main {
+        gap: 15px;
+    }
 }

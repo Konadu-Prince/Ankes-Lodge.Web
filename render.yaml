@@ -7,5 +7,13 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+      - key: EMAIL_USER
+        sync: false
+      - key: EMAIL_PASS
+        sync: false
+      - key: MONGODB_URI
+        sync: false
+      - key: ADMIN_EMAIL
+        value: konaduprince26@gmail.com
     healthCheckPath: /health
     autoDeploy: true

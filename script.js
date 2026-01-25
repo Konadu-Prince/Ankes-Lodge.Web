@@ -1164,4 +1164,308 @@ document.addEventListener('DOMContentLoaded', function() {
 document.addEventListener('DOMContentLoaded', function() {
     handleFormSubmit('booking-form', 'Thank you for your booking request! We will contact you shortly to confirm your reservation.');
     handleFormSubmit('contact-form', 'Thank you for your message! We will get back to you soon.');
+    
+    // Initialize multi-step booking functionality
+    initMultiStepBooking();
+});
+
+// Multi-step booking functionality
+function initMultiStepBooking() {
+    const form = document.getElementById('booking-form');
+    if (!form) return;
+    
+    const steps = document.querySelectorAll('.booking-step');
+    const stepIndicators = document.querySelectorAll('.step');
+    const progressFill = document.querySelector('.progress-fill');
+    const nextButtons = document.querySelectorAll('.next-step');
+    const prevButtons = document.querySelectorAll('.prev-step');
+    
+    let currentStep = 1;
+    const totalSteps = steps.length;
+    
+    // Initialize form
+    showStep(currentStep);
+    
+    // Next button event listeners
+    nextButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const nextStep = parseInt(this.dataset.next);
+            if (validateStep(currentStep)) {
+                currentStep = nextStep;
+                showStep(currentStep);
+                updateProgress();
+            }
+        });
+    });
+    
+    // Previous button event listeners
+    prevButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const prevStep = parseInt(this.dataset.prev);
+            currentStep = prevStep;
+            showStep(currentStep);
+            updateProgress();
+        });
+    });
+    
+    // Form input event listeners for real-time validation
+    const inputs = form.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            validateField(this);
+        });
+        
+        input.addEventListener('input', function() {
+            // Clear error state on input
+            this.classList.remove('error');
+            const errorElement = this.parentNode.querySelector('.field-error');
+            if (errorElement) {
+                errorElement.remove();
+            }
+        });
+    });
+    
+    // Update review section when fields change
+    form.addEventListener('input', updateReviewSection);
+    form.addEventListener('change', updateReviewSection);
+    
+    function showStep(stepNumber) {
+        // Hide all steps
+        steps.forEach(step => {
+            step.classList.remove('active');
+        });
+        
+        // Show current step
+        const currentStepElement = document.querySelector(`.booking-step[data-step="${stepNumber}"]`);
+        if (currentStepElement) {
+            currentStepElement.classList.add('active');
+        }
+        
+        // Update step indicators
+        stepIndicators.forEach((indicator, index) => {
+            indicator.classList.remove('active', 'completed');
+            const indicatorStep = index + 1;
+            
+            if (indicatorStep < stepNumber) {
+                indicator.classList.add('completed');
+            } else if (indicatorStep === stepNumber) {
+                indicator.classList.add('active');
+            }
+        });
+        
+        // Scroll to top of form
+        form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    
+    function updateProgress() {
+        const percentage = ((currentStep - 1) / (totalSteps - 1)) * 100;
+        if (progressFill) {
+            progressFill.style.width = `${percentage}%`;
+        }
+    }
+    
+    function validateStep(stepNumber) {
+        const stepElement = document.querySelector(`.booking-step[data-step="${stepNumber}"]`);
+        const fields = stepElement.querySelectorAll('input[required], select[required], textarea[required]');
+        
+        let isValid = true;
+        
+        fields.forEach(field => {
+            if (!validateField(field)) {
+                isValid = false;
+            }
+        });
+        
+        return isValid;
+    }
+    
+    function validateField(field) {
+        const value = field.value.trim();
+        const fieldName = field.name || field.id;
+        
+        // Clear previous errors
+        field.classList.remove('error');
+        const existingError = field.parentNode.querySelector('.field-error');
+        if (existingError) {
+            existingError.remove();
+        }
+        
+        // Required field validation
+        if (field.hasAttribute('required') && !value) {
+            showError(field, 'This field is required');
+            return false;
+        }
+        
+        // Email validation
+        if (fieldName === 'email' && value) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(value)) {
+                showError(field, 'Please enter a valid email address');
+                return false;
+            }
+        }
+        
+        // Phone validation
+        if (fieldName === 'phone' && value) {
+            const phoneRegex = /^(?:\+233|0)(?:20|50|24|54|27|57|26|56|23|28|55|59)\d{7}$/;
+            if (!phoneRegex.test(value)) {
+                showError(field, 'Please enter a valid Ghanaian phone number (+233 or 0 followed by 9 digits)');
+                return false;
+            }
+        }
+        
+        // Date validation
+        if ((fieldName === 'checkin' || fieldName === 'checkout') && value) {
+            const selectedDate = new Date(value);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            if (selectedDate < today) {
+                showError(field, 'Date cannot be in the past');
+                return false;
+            }
+        }
+        
+        // Date range validation
+        if (fieldName === 'checkout' && value) {
+            const checkinValue = document.getElementById('checkin').value;
+            if (checkinValue) {
+                const checkinDate = new Date(checkinValue);
+                const checkoutDate = new Date(value);
+                
+                if (checkoutDate <= checkinDate) {
+                    showError(field, 'Check-out date must be after check-in date');
+                    return false;
+                }
+            }
+        }
+        
+        return true;
+    }
+    
+    function showError(field, message) {
+        field.classList.add('error');
+        
+        const errorElement = document.createElement('div');
+        errorElement.className = 'field-error';
+        errorElement.style.color = '#dc3545';
+        errorElement.style.fontSize = '0.85rem';
+        errorElement.style.marginTop = '5px';
+        errorElement.textContent = message;
+        
+        field.parentNode.appendChild(errorElement);
+    }
+    
+    function updateReviewSection() {
+        // Update personal info
+        document.getElementById('review-name').textContent = document.getElementById('name').value || '-';
+        document.getElementById('review-email').textContent = document.getElementById('email').value || '-';
+        document.getElementById('review-phone').textContent = document.getElementById('phone').value || '-';
+        
+        // Update dates and guests
+        const checkinDate = document.getElementById('checkin').value;
+        const checkoutDate = document.getElementById('checkout').value;
+        
+        document.getElementById('review-checkin').textContent = checkinDate ? formatDate(checkinDate) : '-';
+        document.getElementById('review-checkout').textContent = checkoutDate ? formatDate(checkoutDate) : '-';
+        
+        const adults = document.getElementById('adults').value;
+        const children = document.getElementById('children').value;
+        
+        document.getElementById('review-adults').textContent = adults ? `${adults} Adult${parseInt(adults) > 1 ? 's' : ''}` : '-';
+        document.getElementById('review-children').textContent = children && parseInt(children) > 0 ? 
+            `${children} Child${parseInt(children) > 1 ? 'ren' : ''}` : 'None';
+        
+        // Update room details
+        const roomType = document.getElementById('room-type').value;
+        const roomNames = {
+            'executive': 'Executive Room',
+            'regular': 'Regular Bedroom',
+            'full-house': 'Full House'
+        };
+        
+        document.getElementById('review-room').textContent = roomNames[roomType] || '-';
+        
+        // Calculate nights and cost
+        if (checkinDate && checkoutDate) {
+            const nights = calculateNights(checkinDate, checkoutDate);
+            document.getElementById('review-nights').textContent = `${nights} night${nights > 1 ? 's' : ''}`;
+            
+            const cost = calculateCost(roomType, nights);
+            document.getElementById('review-cost').textContent = cost ? `₵${cost}` : 'Custom Pricing';
+        } else {
+            document.getElementById('review-nights').textContent = '-';
+            document.getElementById('review-cost').textContent = '-';
+        }
+        
+        // Update special requests
+        const message = document.getElementById('message').value;
+        const messageElement = document.getElementById('review-message');
+        const specialRequestsSection = document.getElementById('review-special-requests');
+        
+        if (message) {
+            messageElement.textContent = message;
+            specialRequestsSection.style.display = 'block';
+        } else {
+            specialRequestsSection.style.display = 'none';
+        }
+    }
+    
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+    }
+    
+    function calculateNights(checkin, checkout) {
+        const checkinDate = new Date(checkin);
+        const checkoutDate = new Date(checkout);
+        const timeDiff = checkoutDate.getTime() - checkinDate.getTime();
+        return Math.ceil(timeDiff / (1000 * 3600 * 24));
+    }
+    
+    function calculateCost(roomType, nights) {
+        const prices = {
+            'executive': 299,
+            'regular': 199,
+            'full-house': 0 // Custom pricing
+        };
+        
+        const pricePerNight = prices[roomType];
+        if (pricePerNight === 0) return null;
+        
+        return pricePerNight * nights;
+    }
+}
+
+// Affiliate Company Modal Functions
+function openAffiliateModal() {
+    const modal = document.getElementById('affiliateModal');
+    if (modal) {
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    }
+}
+
+function closeAffiliateModal() {
+    const modal = document.getElementById('affiliateModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = ''; // Restore scrolling
+    }
+}
+
+// Close modal when clicking outside of it
+document.addEventListener('DOMContentLoaded', function() {
+    const modal = document.getElementById('affiliateModal');
+    if (modal) {
+        modal.addEventListener('click', function(event) {
+            if (event.target === modal) {
+                closeAffiliateModal();
+            }
+        });
+    }
 });

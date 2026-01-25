@@ -7,6 +7,8 @@ const rateLimit = require('express-rate-limit');
 const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcrypt');
 
+// EmailJS Cloud Service
+const emailjs = require('@emailjs/browser');
 // Add MongoDB support
 let MongoClient;
 try {
@@ -173,16 +175,18 @@ try {
     const emailUser = process.env.EMAIL_USER;
     const emailPass = process.env.EMAIL_PASS;
     const nodeEnv = process.env.NODE_ENV || 'development';
-    
+                
     // Debug logging for environment variables
     console.log('=== EMAIL CONFIGURATION DEBUG ===');
     console.log('EMAIL_USER env var:', emailUser ? `${emailUser.substring(0, 5)}...` : 'NOT SET');
     console.log('EMAIL_PASS env var:', emailPass ? 'SET (hidden for security)' : 'NOT SET');
     console.log('NODE_ENV:', nodeEnv);
-    
+                
     if (!emailUser || !emailPass) {
         console.log('EMAIL_USER and EMAIL_PASS environment variables are required for email functionality');
         console.log('Please set these environment variables in your deployment platform');
+        console.log('For Gmail, use App Passwords, not regular passwords');
+        console.log('Generate App Password at: https://myaccount.google.com/apppasswords');
         transporter = null;
     } else {
         console.log('Creating transporter with provided credentials...');
@@ -211,24 +215,63 @@ try {
                 }
             });
         } else {
-            // Production Gmail SMTP with timeout settings for Render.com
-            transporter = nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: emailUser,
-                    pass: emailPass
-                },
-                // Add timeout and connection settings to prevent timeout issues on Render.com
-                timeout: 30000, // 30 seconds
-                connectionTimeout: 30000, // 30 seconds
-                greetingTimeout: 30000, // 30 seconds
-                // Add secure options
-                secure: true,
-                // Add pool settings to reuse connections
-                pool: true,
-                maxConnections: 5,
-                maxMessages: 100
-            });
+            // Check if we're on Render.com specifically
+            const isRender = process.env.RENDER !== undefined;
+            
+            if (isRender) {
+                // For Render.com, use alternative configuration that works better with their environment
+                transporter = nodemailer.createTransport({
+                    host: 'smtp.gmail.com',
+                    port: 587,
+                    secure: false,
+                    auth: {
+                        user: emailUser,
+                        pass: emailPass
+                    },
+                    // Render.com specific settings
+                    connectionTimeout: 60000,
+                    greetingTimeout: 45000,
+                    socketTimeout: 60000,
+                    tls: {
+                        rejectUnauthorized: false,
+                        minVersion: 'TLSv1.2',
+                        ciphers: 'HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!SRP:!CAMELLIA'
+                    },
+                    // Reduce connection pool for Render.com
+                    pool: true,
+                    maxConnections: 1,
+                    maxMessages: 10
+                });
+            } else {
+                // Production Gmail SMTP with enhanced settings for Render.com
+                transporter = nodemailer.createTransport({
+                    host: 'smtp.gmail.com',
+                    port: 587,
+                    secure: false, // true for 465, false for other ports
+                    auth: {
+                        user: emailUser,
+                        pass: emailPass
+                    },
+                    // Enhanced timeout and connection settings for Render.com
+                    timeout: 60000, // 60 seconds
+                    connectionTimeout: 60000, // 60 seconds
+                    greetingTimeout: 60000, // 60 seconds
+                    // Additional security and connection settings
+                    requireTLS: true,
+                    tls: {
+                        rejectUnauthorized: false,
+                        ciphers: 'SSLv3',
+                        minVersion: 'TLSv1.2'
+                    },
+                    // Pool settings for better performance
+                    pool: true,
+                    maxConnections: 2,
+                    maxMessages: 50,
+                    // Keepalive settings
+                    socketTimeout: 60000,
+                    debug: true
+                });
+            }
         }
     }
     console.log('=== END EMAIL CONFIGURATION DEBUG ===');
@@ -1989,12 +2032,18 @@ app.post('/admin/login', loginLimiter, async (req, res) => {
             loginTime: new Date()
         });
         
+        // Log successful login
+        logAuditAction(username, 'login', { sessionId: sessionId.substring(0, 8) + '...' }, req.ip, req.get('User-Agent'));
+        
         // Send success response with session ID
         res.json({
             success: true,
             sessionId: sessionId
         });
     } else {
+        // Log failed login attempt
+        logAuditAction('unknown', 'failed-login', { username, reason: 'invalid-credentials' }, req.ip, req.get('User-Agent'));
+        
         // Send failure response
         res.status(401).json({
             success: false,
@@ -2008,6 +2057,8 @@ app.post('/admin/logout', (req, res) => {
     const sessionId = req.headers.authorization || req.query.session;
     
     if (sessionId && adminSessions.has(sessionId)) {
+        const session = adminSessions.get(sessionId);
+        logAuditAction(session.username, 'logout', { sessionId: sessionId.substring(0, 8) + '...' }, req.ip, req.get('User-Agent'));
         adminSessions.delete(sessionId);
     }
     
@@ -2906,6 +2957,16 @@ app.post('/admin/update-booking-dates/:id', requireAuth, async (req, res) => {
         
         await bookingsDB.update({ id }, updatedBooking);
         
+        // Log the date change action
+        logAuditAction(req.user?.username || 'admin', 'update-booking-dates', { 
+            bookingId: id, 
+            oldCheckin: booking.checkin, 
+            oldCheckout: booking.checkout,
+            newCheckin: checkin,
+            newCheckout: checkout,
+            reason: req.body.reason
+        }, req.ip, req.get('User-Agent'));
+        
         // Send notification email about date change
         queueEmail('date-change-confirmation', booking.email, {
             ...updatedBooking,
@@ -2943,6 +3004,14 @@ app.post('/admin/process-refund/:id', requireAuth, async (req, res) => {
         };
         
         await bookingsDB.update({ id }, updatedBooking);
+        
+        // Log the refund action
+        logAuditAction(req.user?.username || 'admin', 'process-refund', { 
+            bookingId: id, 
+            amount: amount,
+            reason: reason,
+            method: refund_method
+        }, req.ip, req.get('User-Agent'));
         
         // Send refund confirmation email
         queueEmail('refund-confirmation', booking.email, {
@@ -3159,6 +3228,92 @@ function formatDate(dateString) {
     return date.toLocaleDateString();
 }
 
+// Audit logging system
+const auditLogs = [];
+
+function logAuditAction(userId, action, details, ip, userAgent) {
+    const logEntry = {
+        id: Date.now() + Math.random().toString(36).substr(2, 9),
+        timestamp: new Date().toISOString(),
+        userId: userId || 'anonymous',
+        action: action,
+        details: details,
+        ip: ip || 'unknown',
+        userAgent: userAgent || 'unknown',
+        severity: getActionSeverity(action)
+    };
+    
+    auditLogs.push(logEntry);
+    
+    // Keep only last 1000 logs to prevent memory issues
+    if (auditLogs.length > 1000) {
+        auditLogs.shift();
+    }
+    
+    console.log(`AUDIT: ${action} by ${userId || 'anonymous'} - ${JSON.stringify(details)}`);
+    
+    // Also save to MongoDB if available
+    if (db) {
+        try {
+            const auditCollection = db.collection('audit_logs');
+            auditCollection.insertOne(logEntry);
+        } catch (error) {
+            console.error('Failed to save audit log to MongoDB:', error);
+        }
+    }
+}
+
+function getActionSeverity(action) {
+    const highSeverity = ['login', 'logout', 'delete', 'refund', 'update-booking-dates'];
+    const mediumSeverity = ['view', 'search', 'filter'];
+    
+    if (highSeverity.includes(action)) return 'high';
+    if (mediumSeverity.includes(action)) return 'medium';
+    return 'low';
+}
+
+// Monitoring dashboard endpoint
+app.get('/admin/monitoring', requireAuth, async (req, res) => {
+    try {
+        // Get system metrics
+        const metrics = {
+            uptime: process.uptime(),
+            memoryUsage: process.memoryUsage(),
+            cpuUsage: process.cpuUsage ? process.cpuUsage() : null,
+            nodeVersion: process.version,
+            platform: process.platform
+        };
+        
+        // Get recent audit logs (last 50)
+        const recentLogs = auditLogs.slice(-50).reverse();
+        
+        // Get booking statistics
+        const bookings = await bookingsDB.find({});
+        const contacts = await contactsDB.find({});
+        const testimonials = await testimonialsDB.find({});
+        
+        const stats = {
+            totalBookings: bookings.length,
+            pendingBookings: bookings.filter(b => b.status === 'pending').length,
+            confirmedBookings: bookings.filter(b => b.status === 'confirmed').length,
+            refundedBookings: bookings.filter(b => b.status === 'refunded').length,
+            totalContacts: contacts.length,
+            totalTestimonials: testimonials.length,
+            recentActivity: recentLogs.slice(0, 10)
+        };
+        
+        res.json({
+            success: true,
+            metrics: metrics,
+            stats: stats,
+            auditLogs: recentLogs
+        });
+    } catch (error) {
+        console.error('Error fetching monitoring data:', error);
+        res.status(500).json({ error: 'Failed to fetch monitoring data' });
+    }
+});
+
 // Legacy endpoints for compatibility with old admin page
 app.get("/bookings.json", requireAuth, async (req, res) => {
     try {
@@ -3237,6 +3392,10 @@ if (require.main === module) {
                         console.log('Error code:', error.code);
                         console.log('This is likely due to Render.com SMTP restrictions');
                         console.log('Emails will be logged to console instead of sent.');
+                        console.log('For Render.com deployment, ensure EMAIL_USER and EMAIL_PASS are set as environment variables');
+                        console.log('If using Gmail, make sure you are using App Passwords, not regular passwords');
+                        console.log('Visit: https://myaccount.google.com/apppasswords to generate an App Password');
+                        console.log('Also check that your IP is not blocked and that 2FA is enabled on your Gmail account');
                     } else {
                         console.log('Email configuration test PASSED - emails will be sent.');
                     }
