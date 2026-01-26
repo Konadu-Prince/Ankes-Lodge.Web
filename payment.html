@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Secure payment page for Ankes Lodge booking. Complete your reservation with our trusted payment gateway.">
+    <meta name="keywords" content="Ankes Lodge, payment, secure payment, booking payment, Ghana accommodation">
+    <meta name="author" content="Ankes Lodge">
+    <meta name="robots" content="noindex, follow">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:url" content="https://ankes-lodge.onrender.com/payment.html">
+    <meta property="og:title" content="Complete Your Payment - Ankes Lodge">
+    <meta property="og:description" content="Securely complete your payment for Ankes Lodge reservation. Trusted payment gateway with multiple options.">
+    <meta property="og:image" content="https://ankes-lodge.onrender.com/orangeLogo.png">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary">
+    <meta property="twitter:url" content="https://ankes-lodge.onrender.com/payment.html">
+    <meta property="twitter:title" content="Complete Your Payment - Ankes Lodge">
+    <meta property="twitter:description" content="Securely complete your payment for Ankes Lodge reservation. Trusted payment gateway with multiple options.">
+    <meta property="twitter:image" content="https://ankes-lodge.onrender.com/orangeLogo.png">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://ankes-lodge.onrender.com/payment.html">
+    
+    <title>Complete Your Payment - Ankes Lodge</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="AnkesImages/AnkesLodgeLogo.jpeg" type="image/jpeg">
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <img src="orangeLogo.png" alt="Ankes Lodge Logo">
+                <h1>Ankes Lodge</h1>
+            </div>
+            <div class="menu-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/rooms.html">Rooms</a></li>
+                    <li><a href="/about.html">About</a></li>
+                    <li><a href="/contact.html">Contact</a></li>
+                    <li><a href="/booking.html" class="btn-primary">Book/Know About Us</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Payment Section -->
+    <section class="payment-section">
+        <div class="container">
+            <div class="payment-wrapper">
+                <!-- Progress Steps -->
+                <div class="progress-steps">
+                    <div class="step completed">
+                        <span class="step-number">1</span>
+                        <span class="step-label">Booking</span>
+                    </div>
+                    <div class="step active">
+                        <span class="step-number">2</span>
+                        <span class="step-label">Payment</span>
+                    </div>
+                    <div class="step">
+                        <span class="step-number">3</span>
+                        <span class="step-label">Confirmation</span>
+                    </div>
+                </div>
+
+                <div class="payment-content">
+                    <div class="payment-header">
+                        <h2>Complete Your Payment</h2>
+                        <p>Securely finish your reservation with our trusted payment gateway</p>
+                    </div>
+
+                    <div class="payment-grid">
+                        <!-- Booking Summary -->
+                        <div class="payment-summary">
+                            <h3>Booking Summary</h3>
+                            <div class="summary-item">
+                                <span class="label">Booking ID:</span>
+                                <span id="payment-booking-id">-</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="label">Guest Name:</span>
+                                <span id="payment-customer-name">-</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="label">Email:</span>
+                                <span id="payment-customer-email">-</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="label">Room Type:</span>
+                                <span id="payment-room-type">-</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="label">Check-in:</span>
+                                <span id="payment-checkin">-</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="label">Check-out:</span>
+                                <span id="payment-checkout">-</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="label">Total Nights:</span>
+                                <span id="payment-nights">-</span>
+                            </div>
+                            <div class="summary-total">
+                                <span class="label">Total Amount:</span>
+                                <span class="amount" id="payment-amount">₵0.00</span>
+                            </div>
+                        </div>
+
+                        <!-- Payment Options -->
+                        <div class="payment-options">
+                            <h3>Payment Methods</h3>
+                            
+                            <!-- Paystack Payment Option -->
+                            <div class="payment-option active" data-method="paystack">
+                                <div class="option-header">
+                                    <input type="radio" id="paystack" name="payment-method" value="paystack" checked>
+                                    <label for="paystack">
+                                        <div class="option-icon">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z" fill="#00A651"/>
+                                                <path d="M8.5 16L10.5 8L15.5 16H8.5Z" fill="white"/>
+                                                <path d="M15.5 8H17.5L19.5 12L17.5 16H15.5L13.5 12L15.5 8Z" fill="white"/>
+                                            </svg>
+                                        </div>
+                                        <div class="option-info">
+                                            <h4>Paystack</h4>
+                                            <p>Secure online payment with Visa, Mastercard, or mobile money</p>
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="option-details">
+                                    <div class="security-badge">
+                                        <span class="secure-icon">🔒</span>
+                                        <span class="secure-text">256-bit SSL encryption</span>
+                                    </div>
+                                    <div class="accepted-cards">
+                                        <span>Visa</span>
+                                        <span>Mastercard</span>
+                                        <span>Mobile Money</span>
+                                        <span>Verve</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Bank Transfer Option -->
+                            <div class="payment-option" data-method="bank-transfer">
+                                <div class="option-header">
+                                    <input type="radio" id="bank-transfer" name="payment-method" value="bank-transfer">
+                                    <label for="bank-transfer">
+                                        <div class="option-icon">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M4 10H20V14H4V10ZM4 16H20V20H4V16ZM4 4H20V8H4V4Z" fill="#1976D2"/>
+                                                <path d="M2 2H22V6H2V2Z" fill="#1565C0"/>
+                                            </svg>
+                                        </div>
+                                        <div class="option-info">
+                                            <h4>Bank Transfer</h4>
+                                            <p>Transfer funds directly to our bank account</p>
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="option-details">
+                                    <div class="bank-details">
+                                        <p><strong>Bank:</strong> Access Bank Ghana</p>
+                                        <p><strong>Account Name:</strong> Ankes Lodge Services</p>
+                                        <p><strong>Account Number:</strong> 1234567890</p>
+                                        <p><strong>Reference:</strong> <span id="payment-reference">-</span></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Cash on Arrival Option -->
+                            <div class="payment-option" data-method="cash-on-arrival">
+                                <div class="option-header">
+                                    <input type="radio" id="cash-on-arrival" name="payment-method" value="cash-on-arrival">
+                                    <label for="cash-on-arrival">
+                                        <div class="option-icon">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z" fill="#FF9800"/>
+                                                <path d="M12 17C14.7614 17 17 14.7614 17 12C17 9.23858 14.7614 7 12 7C9.23858 7 7 9.23858 7 12C7 14.7614 9.23858 17 12 17Z" fill="white"/>
+                                                <path d="M12 14C13.1046 14 14 13.1046 14 12C14 10.8954 13.1046 10 12 10C10.8954 10 10 10.8954 10 12C10 13.1046 10.8954 14 12 14Z" fill="#FF9800"/>
+                                            </svg>
+                                        </div>
+                                        <div class="option-info">
+                                            <h4>Cash on Arrival</h4>
+                                            <p>Pay directly when you arrive at the lodge</p>
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="option-details">
+                                    <div class="warning-message">
+                                        <p><strong>Note:</strong> Reservation will be held for 24 hours after scheduled arrival time. Payment must be made in Ghana Cedis (GHS).</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Actions -->
+                        <div class="payment-actions">
+                            <div class="payment-security">
+                                <div class="security-feature">
+                                    <span class="feature-icon">🛡️</span>
+                                    <div class="feature-info">
+                                        <h4>Secure Payment</h4>
+                                        <p>All transactions are encrypted and secure</p>
+                                    </div>
+                                </div>
+                                <div class="security-feature">
+                                    <span class="feature-icon">🔒</span>
+                                    <div class="feature-info">
+                                        <h4>PCI DSS Compliant</h4>
+                                        <p>We meet industry security standards</p>
+                                    </div>
+                                </div>
+                                <div class="security-feature">
+                                    <span class="feature-icon">🛡️</span>
+                                    <div class="feature-info">
+                                        <h4>Money Back Guarantee</h4>
+                                        <p>Cancellation policy applies</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="payment-buttons">
+                                <button class="btn-secondary" onclick="goBackToBooking()">
+                                    <span class="btn-icon">←</span>
+                                    Back to Booking
+                                </button>
+                                <button class="btn-primary" onclick="processPayment()">
+                                    <span class="btn-icon">💳</span>
+                                    <span id="payment-button-text">Process Payment</span>
+                                </button>
+                            </div>
+
+                            <div class="payment-help">
+                                <p>Need help? Contact our support team:</p>
+                                <p class="contact-info">📧 ankeslodge@gmail.com | 📞 +233 248293512</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Loading overlay -->
+                    <div id="payment-loading" class="loading-overlay" style="display: none;">
+                        <div class="loading-content">
+                            <div class="spinner"></div>
+                            <h3>Processing Payment</h3>
+                            <p>Please wait while we process your payment...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="orangeLogo.png" alt="Ankes Lodge Logo">
+                    <h3>Ankes Lodge</h3>
+                </div>
+                
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html#home">Home</a></li>
+                        <li><a href="index.html#rooms">Rooms</a></li>
+                        <li><a href="index.html#facilities">Facilities</a></li>
+                        <li><a href="index.html#booking">Booking</a></li>
+                        <li><a href="index.html#contact">Contact</a></li>
+                        <li><a href="reviews.html">Reviews</a></li>
+                    </ul>
+                </div>
+                
+                <div class="social-media">
+                    <h4>Follow Us</h4>
+                    <div class="social-links">
+                        <p><a href="https://vm.tiktok.com/ZMHwSn9khM96S-gSAVf/" target="_blank" rel="noopener">TikTok</a></p>
+                        <p><a href="#" target="_blank" rel="noopener">Facebook</a></p>
+                        <p><a href="#" target="_blank" rel="noopener">Instagram</a></p>
+                        <p><a href="#" target="_blank" rel="noopener">Twitter</a></p>
+                    </div>
+                </div>
+                
+                <div class="affiliate-section">
+                    <h4>Our Affiliate</h4>
+                    <div class="affiliate-item" onclick="openAffiliateModal()">
+                        <img src="AnkesImages/Conadux-Prime-EnterpriseLogo.jpeg" alt="Conadux Prime Enterprise Logo" class="affiliate-logo">
+                        <p>Conadux Prime Enterprise</p>
+                    </div>
+                    <div class="follow-conadux">
+                        <h5>Follow Conadux</h5>
+                        <div class="conadux-social">
+                            <p><a href="https://facebook.com/conaduxprime" target="_blank">Facebook</a></p>
+                            <p><a href="https://instagram.com/conaduxprime" target="_blank">Instagram</a></p>
+                            <p><a href="https://tiktok.com/@conaduxprime" target="_blank">TikTok</a></p>
+                        </div>
+                        <p><a href="https://whatsapp.com/channel/0029Vb735aEC1Fu4s9zF9231" target="_blank">WhatsApp Channel</a></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2025 Ankes Lodge. All rights reserved | <a href="https://github.com/Konadu-Prince" target="_blank">conadux</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Affiliate Company Modal -->
+    <div id="affiliateModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAffiliateModal()">&times;</span>
+            <div class="affiliate-modal-body">
+                <img src="AnkesImages/Conadux-Prime-EnterpriseLogo.jpeg" alt="Conadux Prime Enterprise Logo">
+                <h3>Conadux Prime Enterprise</h3>
+                <p>We specialize in selling affordable and quality laptops and data bundles. Our commitment is to provide top-notch technology solutions and reliable internet services to meet your digital needs.</p>
+                <div class="affiliate-links">
+                    <a href="https://whatsapp.com/channel/0029Vb735aEC1Fu4s9zF9231" target="_blank" class="btn-primary">Follow on WhatsApp</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load booking details from URL parameters
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const bookingId = urlParams.get('id');
+            const name = urlParams.get('name');
+            const checkin = urlParams.get('checkin');
+            const checkout = urlParams.get('checkout');
+            const roomType = urlParams.get('room');
+            
+            // Display booking details
+            if (bookingId) {
+                document.getElementById('payment-booking-id').textContent = bookingId;
+                document.getElementById('payment-reference').textContent = bookingId;
+            }
+            
+            if (name) {
+                document.getElementById('payment-customer-name').textContent = name;
+            }
+            
+            if (email) {
+                document.getElementById('payment-customer-email').textContent = email;
+            }
+            
+            if (checkin) {
+                document.getElementById('payment-checkin').textContent = formatDate(checkin);
+            }
+            
+            if (checkout) {
+                document.getElementById('payment-checkout').textContent = formatDate(checkout);
+            }
+            
+            if (roomType) {
+                const roomTypes = {
+                    'executive': 'Executive Room (Inquire for Pricing)',
+                    'regular': 'Regular Bedroom (Inquire for Pricing)',
+                    'semi-standard': 'Semi Standard Room (Inquire for Pricing)',
+                    'full-house': 'Full House (Custom Pricing)'
+                };
+                document.getElementById('payment-room-type').textContent = roomTypes[roomType] || roomType;
+            }
+            
+            // Display inquiry message instead of calculating price
+            if (checkin && checkout) {
+                const checkinDate = new Date(checkin);
+                const checkoutDate = new Date(checkout);
+                const timeDiff = checkoutDate.getTime() - checkinDate.getTime();
+                const nights = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                
+                document.getElementById('payment-nights').textContent = nights;
+                document.getElementById('payment-amount').textContent = 'Inquire for Pricing';
+            }
+            
+            // Payment method selection
+            const paymentOptions = document.querySelectorAll('.payment-option');
+            paymentOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove active class from all options
+                    paymentOptions.forEach(opt => opt.classList.remove('active'));
+                    // Add active class to clicked option
+                    this.classList.add('active');
+                    // Check the radio button
+                    const radio = this.querySelector('input[type="radio"]');
+                    radio.checked = true;
+                });
+            });
+        });
+
+        // Format date function
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+        }
+
+        // Process payment function
+        async function processPayment() {
+            const selectedMethod = document.querySelector('input[name="payment-method"]:checked').value;
+            const bookingId = new URLSearchParams(window.location.search).get('id');
+            const name = new URLSearchParams(window.location.search).get('name');
+            const email = new URLSearchParams(window.location.search).get('email');
+            const roomType = new URLSearchParams(window.location.search).get('room');
+            const amountText = document.getElementById('payment-amount').textContent.replace('₵', '').replace(',', '');
+            const amount = parseFloat(amountText);
+
+            if (!bookingId || !name || !email || !roomType) {
+                alert('Booking information is incomplete. Please contact support.');
+                return;
+            }
+
+            const paymentLoading = document.getElementById('payment-loading');
+            const buttonText = document.getElementById('payment-button-text');
+
+            // Show loading state
+            paymentLoading.style.display = 'flex';
+            buttonText.textContent = 'Processing...';
+
+            try {
+                if (selectedMethod === 'paystack') {
+                    // Initiate Paystack payment
+                    const response = await fetch('/initiate-payment', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            booking_id: bookingId,
+                            email: email,
+                            customer_name: name,
+                            room_type: roomType,
+                            amount: amount
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        // Redirect to Paystack payment page
+                        window.location.href = result.authorization_url;
+                    } else {
+                        throw new Error(result.message || 'Payment initiation failed');
+                    }
+                } else if (selectedMethod === 'bank-transfer') {
+                    // Show bank transfer instructions
+                    alert('Bank transfer instructions have been sent to your email. Please complete the transfer within 24 hours.');
+                    window.location.href = `booking-confirmation.html?id=${bookingId}&name=${encodeURIComponent(name)}&checkin=${new URLSearchParams(window.location.search).get('checkin')}&checkout=${new URLSearchParams(window.location.search).get('checkout')}&room=${roomType}`;
+                } else if (selectedMethod === 'cash-on-arrival') {
+                    // Confirm cash on arrival
+                    const confirmed = confirm('Are you sure you want to pay cash on arrival? Your reservation will be held for 24 hours after scheduled arrival time.');
+                    if (confirmed) {
+                        // Update booking to cash on arrival
+                        const response = await fetch('/update-booking', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                booking_id: bookingId,
+                                payment_method: 'cash_on_arrival'
+                            })
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (result.success) {
+                            window.location.href = `booking-confirmation.html?id=${bookingId}&name=${encodeURIComponent(name)}&checkin=${new URLSearchParams(window.location.search).get('checkin')}&checkout=${new URLSearchParams(window.location.search).get('checkout')}&room=${roomType}`;
+                        } else {
+                            throw new Error(result.message || 'Failed to update booking');
+                        }
+                    } else {
+                        // Hide loading state and restore button text
+                        paymentLoading.style.display = 'none';
+                        buttonText.textContent = 'Process Payment';
+                        return;
+                    }
+                }
+            } catch (error) {
+                console.error('Error processing payment:', error);
+                alert('Error processing payment: ' + error.message + '\n\nPlease try again or contact support.');
+                // Hide loading state and restore button text
+                paymentLoading.style.display = 'none';
+                buttonText.textContent = 'Process Payment';
+            }
+        }
+
+        // Go back to booking function
+        function goBackToBooking() {
+            const bookingId = new URLSearchParams(window.location.search).get('id');
+            if (bookingId) {
+                window.location.href = `booking-confirmation.html?id=${bookingId}`;
+            } else {
+                window.history.back();
+            }
+        }
+
+        // Affiliate Company Modal Functions
+        function openAffiliateModal() {
+            const modal = document.getElementById('affiliateModal');
+            if (modal) {
+                modal.style.display = 'block';
+                document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            }
+        }
+
+        function closeAffiliateModal() {
+            const modal = document.getElementById('affiliateModal');
+            if (modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = ''; // Restore scrolling
+            }
+        }
+
+        // Close modal when clicking outside of it
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('affiliateModal');
+            if (modal) {
+                modal.addEventListener('click', function(event) {
+                    if (event.target === modal) {
+                        closeAffiliateModal();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

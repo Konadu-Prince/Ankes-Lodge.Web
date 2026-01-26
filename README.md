@@ -4,6 +4,34 @@ Welcome to the official website for Ankes Lodge, a premium guest house located i
 
 This website showcases our accommodations, facilities, and services, and provides an easy way for guests to book their stay with us. The site features a robust booking system with enhanced validation, comprehensive SEO optimization, and improved user experience.
 
+## Enhanced Features (Latest Updates)
+
+### 🔒 Security Improvements
+- **Proper Authentication**: JWT-based authentication for admin endpoints
+- **Rate Limiting**: Protection against form spamming and abuse
+- **Security Headers**: XSS protection, content-type sniffing prevention, clickjacking protection
+- **Input Validation**: Comprehensive server-side validation for all forms
+
+### 💾 Data Management
+- **Persistent Storage**: Bookings and contacts now stored in MongoDB with memory fallback
+- **Database Functions**: Proper CRUD operations for all data types
+- **Backup System**: File-based fallback when database is unavailable
+
+### 📧 Email Notifications
+- **Automated Emails**: Real-time email notifications for bookings and contact forms
+- **Retry Mechanism**: Automatic retry with exponential backoff for failed emails
+- **Professional Templates**: Well-formatted HTML email templates
+
+### 📊 Logging & Monitoring
+- **Winston Logger**: Professional logging system with file rotation
+- **Health Checks**: `/health` endpoint for monitoring server status
+- **Error Tracking**: Comprehensive error logging and handling
+
+### 🛠️ Admin Panel Enhancements
+- **Complete CRUD Operations**: Full booking and contact management
+- **Data Retrieval**: Real database queries instead of placeholders
+- **Secure Endpoints**: Proper authentication for all admin functions
+
 ## Booking System Features
 
 The booking system includes:
@@ -121,22 +149,33 @@ Note: Using external services may be more reliable than the built-in self-pinger
 
 ### Environment Variables
 
-**IMPORTANT**: For email functionality to work on either platform, you **MUST** set the following environment variables. Hardcoded credentials have been removed for security reasons.
+**IMPORTANT**: For full functionality, you **MUST** set the following environment variables:
 
 ```
-EMAIL_USER=your-email@gmail.com
-EMAIL_PASS=your-app-password
+# Database Configuration (Optional - defaults to localhost)
+MONGODB_URI=mongodb://localhost:27017/ankeslodge
+
+# Email Configuration (Required for email notifications)
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=ankeslodge@gmail.com
+EMAIL_PASS=your-app-password  # Use Gmail App Password
+
+# Server Configuration
+PORT=3000
+NODE_ENV=development
+
+# Security Configuration (Optional)
+SESSION_SECRET=your-session-secret-key-here
+JWT_SECRET=your-jwt-secret-key-here
 ```
 
-Important: For Gmail, you must use an App Password, not your regular password. Generate an App Password at: https://myaccount.google.com/apppasswords
+**Email Setup Instructions:**
+1. Enable 2-factor authentication on your Gmail account
+2. Generate an App Password at https://myaccount.google.com/apppasswords
+3. Use the App Password (not your regular Gmail password) as the `EMAIL_PASS` value
 
-Example:
-```
-EMAIL_USER=konaduprince@gmail.com
-EMAIL_PASS=svvnrkgzmgxuskyk
-```
-
-Without these environment variables, the email functionality will be disabled and only logged to the console.
+**Without EMAIL_PASS**: The application will still work but email notifications will be disabled and only logged to the console.
 
 ### Project Structure
 
@@ -149,12 +188,17 @@ Without these environment variables, the email functionality will be disabled an
 
 ### API Endpoints
 
-- `POST /process-booking` - Handle booking form submissions
-- `POST /process-contact` - Handle contact form submissions
-- `GET /bookings.json` - Retrieve booking data (for admin interface)
-- `POST /admin/login` - Admin login endpoint
-- `POST /admin/logout` - Admin logout endpoint
-- `GET /` - Serve the main website
+- `POST /submit-booking` - Handle booking form submissions with validation and email notifications
+- `POST /process-contact` - Handle contact form submissions with validation and email notifications
+- `GET /admin/bookings` - Retrieve all bookings (authenticated)
+- `GET /admin/contacts` - Retrieve all contacts (authenticated)
+- `GET /testimonials.json` - Retrieve testimonials with database fallback
+- `POST /add-testimonial` - Add new testimonial
+- `POST /admin/login` - Admin authentication with bcrypt password hashing
+- `GET /health` - Server health check endpoint
+- `GET /bookings.json` - Legacy endpoint for bookings (authenticated)
+- `GET /contacts.json` - Legacy endpoint for contacts (authenticated)
+- `DELETE /delete-testimonial/:id` - Delete testimonial by ID (authenticated)
 
 ### Admin Access
 

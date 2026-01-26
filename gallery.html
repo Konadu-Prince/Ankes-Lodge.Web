@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Explore Ankes Lodge through our photo gallery. View images of our rooms, facilities, and amenities.">
+    <meta name="keywords" content="Ankes Lodge, gallery, photos, rooms, facilities, amenities, images">
+    <meta name="author" content="Ankes Lodge">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:url" content="https://ankes-lodge.onrender.com/gallery">
+    <meta property="og:title" content="Gallery - Ankes Lodge">
+    <meta property="og:description" content="Explore Ankes Lodge through our photo gallery. View images of our rooms, facilities, and amenities.">
+    <meta property="og:image" content="https://ankes-lodge.onrender.com/main-flyer.jpeg">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://ankes-lodge.onrender.com/gallery">
+    <meta property="twitter:title" content="Gallery - Ankes Lodge">
+    <meta property="twitter:description" content="Explore Ankes Lodge through our photo gallery. View images of our rooms, facilities, and amenities.">
+    <meta property="twitter:image" content="https://ankes-lodge.onrender.com/main-flyer.jpeg">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://ankes-lodge.onrender.com/gallery">
+    
+    <title>Gallery - Ankes Lodge</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="AnkesImages/AnkesLodgeLogo.jpeg" type="image/jpeg">
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <img src="AnkesImages/AnkesLodgeLogo.jpeg" alt="Ankes Lodge Logo">
+                <h1>Ankes Lodge</h1>
+            </div>
+            <div class="menu-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/about.html">About</a></li>
+                    <li><a href="/rooms.html">Rooms</a></li>
+                    <li><a href="/gallery.html" class="active">Gallery</a></li>
+                    <li><a href="/reviews.html">Reviews</a></li>
+                    <li><a href="/contact.html">Contact</a></li>
+                    <li><a href="/booking.html">Book/Know About Us</a></li>
+                    <li><a href="/payment.html">Pay Now</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Gallery Hero Section -->
+    <section class="page-hero">
+        <div class="hero-content">
+            <h1>Our Gallery</h1>
+            <p>Discover the beauty and comfort of Ankes Lodge through our curated collection of photos and videos</p>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section class="gallery">
+        <div class="container">
+            <div class="section-header">
+                <h2>Explore Our Spaces</h2>
+                <p>Browse through our collection of images and videos showcasing our accommodations and facilities</p>
+            </div>
+            
+            <div class="gallery-filters">
+                <div class="filter-controls">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="rooms">Rooms</button>
+                    <button class="filter-btn" data-filter="facilities">Facilities</button>
+                    <button class="filter-btn" data-filter="videos">Videos</button>
+                    <button class="filter-btn" data-filter="flyers">Flyers</button>
+                </div>
+            </div>
+            
+            <div class="gallery-grid">
+                <div class="gallery-item" data-category="flyers">
+                    <img src="main-flyer.jpeg" alt="Ankes Lodge Flyer">
+                    <button class="expand-btn" aria-label="Expand image">⤢</button>
+                </div>
+                
+                <div class="gallery-item video-container" data-category="videos">
+                    <video id="gallery-video" controls preload="metadata" poster="video-thumbnail.jpg" muted playsinline>
+                        <source src="videoOftheroomsAndEverything.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <button class="expand-btn" aria-label="Expand video">⤢</button>
+                </div>
+                
+                <!-- Additional Room Tour Videos -->
+                <div class="gallery-item video-container" data-category="videos">
+                    <video id="gallery-video-2" controls preload="metadata" poster="video-thumbnail.jpg" muted playsinline>
+                        <source src="videoOftheroomsAndEverything2.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <button class="expand-btn" aria-label="Expand video">⤢</button>
+                </div>
+                
+                <div class="gallery-item video-container" data-category="videos">
+                    <video id="gallery-video-3" controls preload="metadata" poster="video-thumbnail.jpg" muted playsinline>
+                        <source src="videoOftheroomsAndEverything3.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <button class="expand-btn" aria-label="Expand video">⤢</button>
+                </div>
+                
+                <div class="gallery-item" data-category="rooms">
+                    <img src="executiveRoom.JPG" alt="Executive Room">
+                    <button class="expand-btn" aria-label="Expand image">⤢</button>
+                </div>
+                
+                <div class="gallery-item" data-category="rooms">
+                    <img src="full3.jpg" alt="Bedroom">
+                    <button class="expand-btn" aria-label="Expand image">⤢</button>
+                </div>
+                
+                <div class="gallery-item" data-category="facilities">
+                    <img src="corridorEntrance.jpeg" alt="Corridor Entrance">
+                    <button class="expand-btn" aria-label="Expand image">⤢</button>
+                </div>
+                
+                <div class="gallery-item" data-category="facilities">
+                    <img src="HALL1.jpg" alt="Event Hall">
+                    <button class="expand-btn" aria-label="Expand image">⤢</button>
+                </div>
+
+                <div class="gallery-item" data-category="facilities">
+                    <img src="fridge.jpeg" alt="Fridge in Room">
+                    <button class="expand-btn" aria-label="Expand image">⤢</button>
+                </div>
+
+                <div class="gallery-item" data-category="facilities">
+                    <img src="diningHall.jpeg" alt="Dining Hall">
+                    <button class="expand-btn" aria-label="Expand image">⤢</button>
+                </div>
+                
+                <div class="gallery-item" data-category="facilities">
+                    <img src="hall.jpeg" alt="Main Hall">
+                    <button class="expand-btn" aria-label="Expand image">⤢</button>
+                </div>
+                
+                <div class="gallery-item" data-category="facilities">
+                    <img src="airconditioner.jpeg" alt="Air Conditioner">
+                    <button class="expand-btn" aria-label="Expand image">⤢</button>
+                </div>
+                
+                <div class="gallery-item" data-category="facilities">
+                    <img src="tv and internet.jpeg" alt="TV and Internet Setup">
+                    <button class="expand-btn" aria-label="Expand image">⤢</button>
+                </div>
+                
+                <div class="gallery-item" data-category="rooms">
+                    <img src="FULLHOUSE.jpg" alt="Full House">
+                    <button class="expand-btn" aria-label="Expand image">⤢</button>
+                </div>
+                
+                <!-- Motivational Videos -->
+                <div class="gallery-item video-container" data-category="videos">
+                    <video id="motivation-video-1" controls preload="metadata" poster="video-thumbnail.jpg" muted playsinline>
+                        <source src="motivationMirrorPart1.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <button class="expand-btn" aria-label="Expand video">⤢</button>
+                </div>
+                
+                <div class="gallery-item video-container" data-category="videos">
+                    <video id="motivation-video-2" controls preload="metadata" poster="video-thumbnail.jpg" muted playsinline>
+                        <source src="MotivationMirrorPart2.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <button class="expand-btn" aria-label="Expand video">⤢</button>
+                </div>
+                
+                <div class="gallery-item video-container" data-category="videos">
+                    <video id="different-video" controls preload="metadata" poster="video-thumbnail.jpg" muted playsinline>
+                        <source src="differentMixedvideo.mp4" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <button class="expand-btn" aria-label="Expand video">⤢</button>
+                </div>
+                
+                <!-- Flyer Download -->
+                <div class="gallery-item" data-category="flyers">
+                    <div class="flyer-download-container">
+                        <h3>Download Our Flyer</h3>
+                        <button id="preview-flyer" class="btn-primary">Preview Flyer</button>
+                        <a href="DownloadableFlyer.jpeg" download="Ankes-Lodge-Flyer.jpeg" class="btn-secondary">Download Flyer</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Features Section -->
+    <section class="gallery-features">
+        <div class="container">
+            <h2>Gallery Highlights</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📷</div>
+                    <h3>Professional Photos</h3>
+                    <p>High-quality images showcasing the true beauty of our accommodations</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎥</div>
+                    <h3>Video Tours</h3>
+                    <p>Virtual tours of our rooms and facilities to experience before visiting</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3>Mobile Friendly</h3>
+                    <p>Optimized for viewing on all devices with responsive design</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Ready to Experience Ankes Lodge?</h2>
+                <p>Book your stay today and experience the luxury and comfort we offer.</p>
+                <div class="cta-buttons">
+                    <a href="/booking.html" class="btn-primary">Book/Know About Us</a>
+                    <a href="/rooms.html" class="btn-secondary">View Rooms</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-main">
+                    <div class="footer-logo">
+                        <img src="AnkesImages/AnkesLodgeLogo.jpeg" alt="Ankes Lodge Logo">
+                        <h3>Ankes Lodge</h3>
+                    </div>
+                    
+                    <div class="social-media">
+                        <h4>Follow Us</h4>
+                        <div class="social-links">
+                            <p><a href="https://www.tiktok.com/@ankes.like" target="_blank" rel="noopener">TikTok: @ankes.lodge</a></p>
+                            <p><a href="https://www.facebook.com/profile.php?id=61585622975473" target="_blank" rel="noopener">Facebook: Ankes Lodge</a></p>
+                            <p><a href="https://www.instagram.com/ankeslodge.2025?igsh=ODF5MnV6cG01aWd2" target="_blank" rel="noopener">Instagram: @ankeslodge.2025</a></p>
+                            <p><a href="https://x.com/CouQuincy" target="_blank" rel="noopener">Twitter: @CouQuincy</a></p>
+                            <p><a href="https://whatsapp.com/channel/0029Vb7dl4j5kg7AhA6B411q" target="_blank" rel="noopener">WhatsApp: Ankes Lodge Channel</a></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="affiliate-section">
+                    <div class="affiliate-company">
+                        <div class="affiliate-logo" onclick="openAffiliateModal()">
+                            <img src="AnkesImages/Conadux-Prime-EnterpriseLogo.jpeg" alt="Conadux Prime Enterprise Logo">
+                            <p>Affordable Quality Laptops & Data Bundles</p>
+                        </div>
+                        <div class="affiliate-social">
+                            <h4>Follow Conadux</h4>
+                            <div class="social-links">
+                                <p><a href="#" target="_blank" rel="noopener">TikTok: @conadux_prime</a></p>
+                                <p><a href="#" target="_blank" rel="noopener">Facebook: Conadux Prime Enterprise</a></p>
+                                <p><a href="#" target="_blank" rel="noopener">Instagram: @conadux.prime</a></p>
+                                <p><a href="https://whatsapp.com/channel/0029Vb735aEC1Fu4s9zF9231" target="_blank" rel="noopener">WhatsApp: Conadux Prime Enterprise</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/about.html">About</a></li>
+                        <li><a href="/rooms.html">Rooms</a></li>
+                        <li><a href="/gallery.html">Gallery</a></li>
+                        <li><a href="/reviews.html">Reviews</a></li>
+                        <li><a href="/contact.html">Contact</a></li>
+                        <li><a href="/booking.html">Booking</a></li>
+                        <li><a href="/payment.html">Payment</a></li>
+                        <li><a href="/login.html">Admin Login</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+           
+            <div class="copyright">
+                <p>&copy; 2025 Ankes Lodge. All rights reserved | <a href="https://github.com/Konadu-Prince" target="_blank" rel="noopener">conadux</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Affiliate Company Modal -->
+    <div id="affiliateModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAffiliateModal()">&times;</span>
+            <div class="modal-header">
+                <img src="AnkesImages/Conadux-Prime-EnterpriseLogo.jpeg" alt="Conadux Prime Enterprise Logo" class="modal-logo">
+                <h2>Conadux Prime Enterprise</h2>
+            </div>
+            <div class="modal-body">
+                <p>We specialize in providing affordable and quality laptops and data bundles. Your trusted partner for all your tech needs at competitive prices.</p>
+                <div class="modal-links">
+                    <a href="https://whatsapp.com/channel/0029Vb735aEC1Fu4s9zF9231" target="_blank" rel="noopener" class="btn-primary">Follow Our WhatsApp Channel</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scroll to Top Button -->
+    <button id="scrollToTop" class="scroll-to-top">
+        <span>↑</span>
+    </button>
+
+    <script src="script.js"></script>
+</body>
+</html>

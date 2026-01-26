@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reviews - Ankes Lodge</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="AnkesImages/AnkesLodgeLogo.jpeg" type="image/jpeg">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <img src="AnkesImages/AnkesLodgeLogo.jpeg" alt="Ankes Lodge Logo">
+                <h1>Ankes Lodge</h1>
+            </div>
+            <div class="menu-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/about.html">About</a></li>
+                    <li><a href="/rooms.html">Rooms</a></li>
+                    <li><a href="/gallery.html">Gallery</a></li>
+                    <li><a href="/contact.html">Contact</a></li>
+                    <li><a href="/reviews.html" class="active">Reviews</a></li>
+                    <li><a href="/booking.html" class="btn-primary">Book/Know About Us</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Page Hero Section -->
+    <section class="page-hero">
+        <div class="hero-content">
+            <h1>Share Your Experience</h1>
+            <p>Help us improve and assist future guests with your honest review</p>
+        </div>
+    </section>
+
+    <main>
+        <!-- Reviews Section -->
+        <section class="reviews">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Share Your Experience</h2>
+                    <p>We value your feedback and would love to hear about your stay at Ankes Lodge</p>
+                </div>
+                
+                <!-- Add Testimonial Form -->
+                <div class="add-testimonial-section">
+                    <h3>Leave a Review</h3>
+                    <form id="testimonial-form" class="testimonial-form">
+                        <div class="form-group">
+                            <input type="text" id="testimonial-name" name="name" placeholder="Your Name *" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="testimonial-location" name="location" placeholder="Your Location (optional)">
+                        </div>
+                        <div class="form-group">
+                            <select id="testimonial-rating" name="rating" required>
+                                <option value="">Select Rating *</option>
+                                <option value="5">★★★★★ - Excellent</option>
+                                <option value="4">★★★★☆ - Very Good</option>
+                                <option value="3">★★★☆☆ - Good</option>
+                                <option value="2">★★☆☆☆ - Fair</option>
+                                <option value="1">★☆☆☆☆ - Poor</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <textarea id="testimonial-comment" name="comment" placeholder="Share your experience *" rows="6" required></textarea>
+                        </div>
+                        <button type="submit" class="btn-primary">Submit Review</button>
+                    </form>
+                </div>
+                
+                <div class="testimonial-callout" style="margin-top: 50px;">
+                    <h3>Why Share Your Experience?</h3>
+                    <p>Your review helps us continuously improve our services and gives future guests valuable insights about their potential stay at Ankes Lodge.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Recent Reviews Section -->
+        <section class="recent-reviews">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Recent Guest Reviews</h2>
+                    <p>See what other guests are saying about their stay at Ankes Lodge</p>
+                </div>
+                
+                <div class="testimonial-marquee-container">
+                    <div class="testimonial-marquee">
+                        <div class="testimonial-card">
+                            <div class="testimonial-rating">
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                            </div>
+                            <div class="testimonial-content">
+                                <p>"Exceptional service and comfortable accommodations. Will definitely return!"</p>
+                            </div>
+                            <div class="testimonial-author">
+                                <h4>John Doe</h4>
+                                <p>Business Traveler</p>
+                            </div>
+                        </div>
+                        
+                        <div class="testimonial-card">
+                            <div class="testimonial-rating">
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                            </div>
+                            <div class="testimonial-content">
+                                <p>"Perfect location and wonderful staff. Highly recommended!"</p>
+                            </div>
+                            <div class="testimonial-author">
+                                <h4>Jane Smith</h4>
+                                <p>Tourist</p>
+                            </div>
+                        </div>
+                        
+                        <div class="testimonial-card">
+                            <div class="testimonial-rating">
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                            </div>
+                            <div class="testimonial-content">
+                                <p>"Clean rooms and excellent value for money. Great place to stay in Abesim."</p>
+                            </div>
+                            <div class="testimonial-author">
+                                <h4>Michael Johnson</h4>
+                                <p>Leisure Traveler</p>
+                            </div>
+                        </div>
+                        
+                        <div class="testimonial-card">
+                            <div class="testimonial-rating">
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                                <span class="star">★</span>
+                            </div>
+                            <div class="testimonial-content">
+                                <p>"Peaceful environment and friendly service. Perfect for a relaxing getaway."</p>
+                            </div>
+                            <div class="testimonial-author">
+                                <h4>Emily Davis</h4>
+                                <p>Vacationer</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-main">
+                    <div class="footer-logo">
+                        <img src="AnkesImages/AnkesLodgeLogo.jpeg" alt="Ankes Lodge Logo">
+                        <h3>Ankes Lodge</h3>
+                    </div>
+                    
+                    <div class="social-media">
+                        <h4>Follow Us</h4>
+                        <div class="social-links">
+                            <p><a href="https://www.tiktok.com/@ankes.like" target="_blank" rel="noopener">TikTok: @ankes.lodge</a></p>
+                            <p><a href="https://www.facebook.com/profile.php?id=61585622975473" target="_blank" rel="noopener">Facebook: Ankes Lodge</a></p>
+                            <p><a href="https://www.instagram.com/ankeslodge.2025?igsh=ODF5MnV6cG01aWd2" target="_blank" rel="noopener">Instagram: @ankeslodge.2025</a></p>
+                            <p><a href="https://x.com/CouQuincy" target="_blank" rel="noopener">Twitter: @CouQuincy</a></p>
+                            <p><a href="https://whatsapp.com/channel/0029Vb7dl4j5kg7AhA6B411q" target="_blank" rel="noopener">WhatsApp: Ankes Lodge Channel</a></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="affiliate-section">
+                    <div class="affiliate-logo">
+                        <img src="AnkesImages/Conadux-Prime-EnterpriseLogo.jpeg" alt="Conadux Prime Enterprise Logo">
+                        <h4>Conadux Prime Enterprise</h4>
+                    </div>
+                    <p>Affordable and quality laptops & databundles. Visit our store for all your tech needs.</p>
+                    <div class="affiliate-social">
+                        <h4>Follow Conadux</h4>
+                        <div class="social-links">
+                            <p><a href="https://www.facebook.com/conaduxprimeenterprise" target="_blank" rel="noopener">Facebook</a></p>
+                            <p><a href="https://www.instagram.com/conadux.prime.enterprise" target="_blank" rel="noopener">Instagram</a></p>
+                            <p><a href="https://www.tiktok.com/@conadux_prime_enterprise" target="_blank" rel="noopener">TikTok</a></p>
+                            <p><a href="https://whatsapp.com/channel/0029Vb735aEC1Fu4s9zF9231" target="_blank" rel="noopener">WhatsApp Channel</a></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/about.html">About Us</a></li>
+                        <li><a href="/rooms.html">Accommodations</a></li>
+                        <li><a href="/gallery.html">Gallery</a></li>
+                        <li><a href="/contact.html">Contact</a></li>
+                        <li><a href="/reviews.html">Reviews</a></li>
+                        <li><a href="/booking.html">Book/Know About Us</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2025 Ankes Lodge. All rights reserved | <a href="https://github.com/Konadu-Prince">conadux</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    
+    <!-- Custom script for reviews page to load testimonials -->
+    <script>
+        // Load testimonials when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTestimonials();
+        });
+        
+        function loadTestimonials() {
+            // Determine the correct base URL (Render.com when on GitHub Pages)
+            let baseUrl = window.location.origin;
+            
+            // Check if we're on GitHub Pages and use Render.com server instead
+            if (window.location.hostname.includes('github.io')) {
+                // Use your Render.com server URL for form submissions when hosted on GitHub Pages
+                baseUrl = 'https://ankes-lodge.onrender.com'; // Replace with your actual Render.com URL
+            }
+            
+            // Fetch testimonials with fallback mechanism
+            fetch(`${baseUrl}/testimonials.json`)
+                .then(response => response.json())
+                .then(testimonials => {
+                    // Check if we got valid testimonials from the server
+                    if (Array.isArray(testimonials) && testimonials.length > 0) {
+                        console.log(`Loaded ${testimonials.length} testimonials from server`);
+                        displayTestimonials(testimonials);
+                    } else {
+                        // Fallback to default testimonials if server returns empty array
+                        console.warn('No testimonials received from server, using defaults');
+                        displayDefaultTestimonials();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching testimonials from server:', error);
+                    // Fallback to default testimonials if fetch fails
+                    displayDefaultTestimonials();
+                });
+        }
+        
+        function displayTestimonials(testimonials) {
+            const marqueeContainer = document.querySelector('.testimonial-marquee');
+            if (!marqueeContainer) return;
+            
+            // Clear existing content
+            marqueeContainer.innerHTML = '';
+            
+            // Create testimonial cards
+            testimonials.forEach(testimonial => {
+                // Create star rating
+                let stars = '';
+                for (let i = 1; i <= 5; i++) {
+                    stars += `<span class="star">${i <= testimonial.rating ? '★' : '☆'}</span>`;
+                }
+                
+                // Create testimonial card
+                const card = document.createElement('div');
+                card.className = 'testimonial-card';
+                card.innerHTML = `
+                    <div class="testimonial-rating">
+                        ${stars}
+                    </div>
+                    <div class="testimonial-content">
+                        <p>"${testimonial.comment}"</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <h4>${testimonial.name}</h4>
+                        <p>${testimonial.location || 'Guest'} • ${testimonial.date}</p>
+                    </div>
+                `;
+                
+                marqueeContainer.appendChild(card);
+            });
+            
+            // Duplicate testimonials for continuous scrolling effect if needed
+            testimonials.forEach(testimonial => {
+                // Create star rating
+                let stars = '';
+                for (let i = 1; i <= 5; i++) {
+                    stars += `<span class="star">${i <= testimonial.rating ? '★' : '☆'}</span>`;
+                }
+                
+                // Create duplicate testimonial card
+                const card = document.createElement('div');
+                card.className = 'testimonial-card';
+                card.innerHTML = `
+                    <div class="testimonial-rating">
+                        ${stars}
+                    </div>
+                    <div class="testimonial-content">
+                        <p>"${testimonial.comment}"</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <h4>${testimonial.name}</h4>
+                        <p>${testimonial.location || 'Guest'} • ${testimonial.date}</p>
+                    </div>
+                `;
+                
+                marqueeContainer.appendChild(card);
+            });
+        }
+        
+        function displayDefaultTestimonials() {
+            const defaultTestimonials = [
+                {
+                    name: "Ama K.",
+                    location: "Kumasi, Ghana",
+                    comment: "Ankes Lodge is absolutely magical! The semi-standard room was beautifully designed and the staff treated us like family. The best hospitality experience in Ghana - we're already planning our return trip!",
+                    rating: 5,
+                    date: "2025-12-20"
+                },
+                {
+                    name: "Kwame O.",
+                    location: "Accra, Ghana",
+                    comment: "This place is a hidden gem! The peaceful environment and breathtaking views made our weekend truly unforgettable. The executive room was pure luxury - every detail was perfect!",
+                    rating: 5,
+                    date: "2025-12-15"
+                },
+                {
+                    name: "Sarah T.",
+                    location: "London, UK",
+                    comment: "Visited family in Ghana and Ankes Lodge was our perfect home base! The full house was ideal for our extended family. Serene location, impeccable service - an absolute must-book!",
+                    rating: 5,
+                    date: "2025-12-10"
+                },
+                {
+                    name: "Michael J.",
+                    location: "New York, USA",
+                    comment: "Ankes Lodge completely exceeded our expectations! The regular bedroom was spacious and spotless with all the amenities we needed. The staff were incredibly friendly and helpful. We'll definitely return!",
+                    rating: 5,
+                    date: "2025-12-05"
+                },
+                {
+                    name: "Esi A.",
+                    location: "Takoradi, Ghana",
+                    comment: "My family and I were blown away by the incredible experience at Ankes Lodge! The semi-standard room offered amazing value with top-notch amenities. Perfect location for exploring Abesim - we're already planning our next visit!",
+                    rating: 5,
+                    date: "2025-11-28"
+                }
+            ];
+            displayTestimonials(defaultTestimonials);
+        }
+    </script>
+</body>
+</html>

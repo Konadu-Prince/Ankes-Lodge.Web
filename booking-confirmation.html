@@ -75,7 +75,7 @@
                     <li><a href="index.html#facilities">Facilities</a></li>
                     <li><a href="index.html#location">Location</a></li>
                     <li><a href="index.html#contact">Contact</a></li>
-                    <li><a href="index.html#booking" class="btn-primary">Book Now</a></li>
+                    <li><a href="index.html#booking" class="btn-primary">Book/Know About Us</a></li>
                 </ul>
             </nav>
         </div>
@@ -122,7 +122,7 @@
                     <h3>Payment Options</h3>
                     <p>Required Amount: ₵<span id="required-amount">0.00</span></p>
                     <div class="payment-buttons">
-                        <button class="btn-primary" onclick="initiatePayment()">Pay Now Securely</button>
+                        <a href="payment.html" class="btn-primary">Proceed to Payment</a>
                         <button class="btn-secondary" onclick="initiateDonation()">Make a Donation</button>
                     </div>
                 </div>
@@ -201,39 +201,34 @@
             
             if (roomType) {
                 const roomTypes = {
-                    'executive': 'Executive Room (₵299/night)',
-                    'regular': 'Regular Bedroom (₵199/night)',
+                    'executive': 'Executive Room (Inquire for Pricing)',
+                    'regular': 'Regular Bedroom (Inquire for Pricing)',
                     'full-house': 'Full House (Custom Pricing)'
                 };
                 document.getElementById('room-type').textContent = roomTypes[roomType] || roomType;
             }
             
-            // Calculate required amount based on room type and duration
+            // Display inquiry message instead of calculating required amount
             if (checkin && checkout) {
                 const checkinDate = new Date(checkin);
                 const checkoutDate = new Date(checkout);
                 const timeDiff = checkoutDate.getTime() - checkinDate.getTime();
                 const nights = Math.ceil(timeDiff / (1000 * 3600 * 24));
                 
-                let roomPrice = 0;
-                if (roomType === 'executive') roomPrice = 299;
-                else if (roomType === 'regular') roomPrice = 199;
-                else if (roomType === 'full-house') roomPrice = 800; // Default for full house
-                else roomPrice = 250; // Default
-                
-                const requiredAmount = roomPrice * nights;
-                document.getElementById('required-amount').textContent = requiredAmount.toFixed(2);
+                document.getElementById('required-amount').textContent = 'Inquire for Pricing';
             }
         });
         
         // Function to initiate payment
         async function initiatePayment() {
-            const bookingId = new URLSearchParams(window.location.search).get('id');
-            const name = new URLSearchParams(window.location.search).get('name');
-            const roomType = new URLSearchParams(window.location.search).get('room');
+            const urlParams = new URLSearchParams(window.location.search);
+            const bookingId = urlParams.get('id');
+            const name = urlParams.get('name');
+            const email = urlParams.get('email');
+            const roomType = urlParams.get('room');
             const requiredAmount = document.getElementById('required-amount').textContent;
             
-            if (!bookingId || !name || !roomType) {
+            if (!bookingId || !name || !email || !roomType) {
                 alert('Booking information is incomplete. Please contact support.');
                 return;
             }
@@ -246,7 +241,7 @@
                     },
                     body: JSON.stringify({
                         booking_id: bookingId,
-                        email: '', // Will be retrieved from booking record
+                        email: email,
                         customer_name: name,
                         room_type: roomType,
                         amount: parseFloat(requiredAmount)
@@ -283,14 +278,18 @@
             }
             
             try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const email = urlParams.get('email') || '';
+                const customerName = urlParams.get('name') || 'Anonymous Donor';
+                
                 const response = await fetch('/initiate-donation', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        email: '', // Will be retrieved from user input or booking
-                        customer_name: new URLSearchParams(window.location.search).get('name') || 'Anonymous Donor',
+                        email: email,
+                        customer_name: customerName,
                         amount: donationFloat
                     })
                 });

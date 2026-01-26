@@ -38,7 +38,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     file_put_contents($bookingsFile, json_encode($bookings, JSON_PRETTY_PRINT));
     
     // Email configuration
-    $to = "reservations@ankeslodge.com";
+    $to = "ankeslodge@gmail.com";
     $subject = "New Booking Request from Ankes Lodge Website";
     
     // Create email body

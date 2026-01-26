@@ -50,13 +50,12 @@ This document explains how to integrate EmailJS with your existing system while 
         
         <div style="background-color: #e8f4e8; padding: 20px; margin: 20px 0; border-left: 4px solid #28a745; border-radius: 3px;">
             <h3 style="color: #333; margin-top: 0;">Contact Information</h3>
-            <p><strong>General Manager:</strong> 0544904547, 0558647156</p>
-            <p><strong>Managers:</strong> 0248293512</p>
+            <p><strong>Contact:</strong> 0248293512</p>
         </div>
     </div>
     
     <div style="text-align: center; padding: 20px; color: #666; font-size: 14px;">
-        <p>Contact: 0544904547, 0558647156, 0248293512</p>
+        <p>Contact: 0248293512</p>
         <p>&copy; 2025 Ankes Lodge. All rights reserved.</p>
     </div>
 </div>

@@ -697,7 +697,7 @@ function handleFormSubmit(formId, successMessage) {
             baseUrl = 'https://ankes-lodge.onrender.com';
         }
         
-        const endpoint = formId === 'booking-form' ? `${baseUrl}/process-booking` : `${baseUrl}/process-contact`;
+        const endpoint = formId === 'booking-form' ? `${baseUrl}/submit-booking` : `${baseUrl}/process-contact`;
 
         // Send data to backend with proper content type and timeout
         console.log(`Sending data to ${endpoint}`);
@@ -736,7 +736,8 @@ function handleFormSubmit(formId, successMessage) {
                     const checkout = form.querySelector('#checkout').value;
                     const roomType = form.querySelector('#room-type').value;
                     
-                    window.location.href = `booking-confirmation.html?id=${data.bookingId}&name=${encodeURIComponent(name)}&checkin=${checkin}&checkout=${checkout}&room=${roomType}`;
+                    const email = form.querySelector('#email').value;
+                    window.location.href = `payment.html?id=${data.bookingId}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&checkin=${checkin}&checkout=${checkout}&room=${roomType}`;
                 } else {
                     alert(data.message);
                     form.reset();
@@ -906,54 +907,67 @@ function initTestimonialMarquee() {
         baseUrl = 'https://ankes-lodge.onrender.com'; // Replace with your actual Render.com URL
     }
     
-    // Fetch testimonials from server
+    // Fetch testimonials with fallback mechanism
     fetch(`${baseUrl}/testimonials.json`)
         .then(response => response.json())
         .then(testimonials => {
-            renderMarqueeTestimonials(testimonials);
+            // Check if we got valid testimonials from the server
+            if (Array.isArray(testimonials) && testimonials.length > 0) {
+                console.log(`Loaded ${testimonials.length} testimonials from server`);
+                renderMarqueeTestimonials(testimonials);
+            } else {
+                // Fallback to default testimonials if server returns empty array
+                console.warn('No testimonials received from server, using defaults');
+                loadDefaultTestimonials();
+            }
         })
         .catch(error => {
-            console.error('Error fetching testimonials:', error);
-            // Use default testimonials if fetch fails
-            const defaultTestimonials = [
-                {
-                    name: "Ama K.",
-                    location: "Kumasi, Ghana",
-                    comment: "Ankes Lodge is absolutely magical! The semi-standard room was beautifully designed and the staff treated us like family. The best hospitality experience in Ghana - we're already planning our return trip!",
-                    rating: 5,
-                    date: "2025-12-20"
-                },
-                {
-                    name: "Kwame O.",
-                    location: "Accra, Ghana",
-                    comment: "This place is a hidden gem! The peaceful environment and breathtaking views made our weekend truly unforgettable. The executive room was pure luxury - every detail was perfect!",
-                    rating: 5,
-                    date: "2025-12-15"
-                },
-                {
-                    name: "Sarah T.",
-                    location: "London, UK",
-                    comment: "Visited family in Ghana and Ankes Lodge was our perfect home base! The full house was ideal for our extended family. Serene location, impeccable service - an absolute must-book!",
-                    rating: 5,
-                    date: "2025-12-10"
-                },
-                {
-                    name: "Michael J.",
-                    location: "New York, USA",
-                    comment: "Ankes Lodge completely exceeded our expectations! The regular bedroom was spacious and spotless with all the amenities we needed. The staff were incredibly friendly and helpful. We'll definitely return!",
-                    rating: 5,
-                    date: "2025-12-05"
-                },
-                {
-                    name: "Esi A.",
-                    location: "Takoradi, Ghana",
-                    comment: "My family and I were blown away by the incredible experience at Ankes Lodge! The semi-standard room offered amazing value with top-notch amenities. Perfect location for exploring Abesim - we're already planning our next visit!",
-                    rating: 5,
-                    date: "2025-11-28"
-                }
-            ];
-            renderMarqueeTestimonials(defaultTestimonials);
+            console.error('Error fetching testimonials from server:', error);
+            // Fallback to default testimonials if fetch fails
+            loadDefaultTestimonials();
         });
+
+    // Function to load default testimonials as fallback
+    function loadDefaultTestimonials() {
+        const defaultTestimonials = [
+            {
+                name: "Ama K.",
+                location: "Kumasi, Ghana",
+                comment: "Ankes Lodge is absolutely magical! The semi-standard room was beautifully designed and the staff treated us like family. The best hospitality experience in Ghana - we're already planning our return trip!",
+                rating: 5,
+                date: "2025-12-20"
+            },
+            {
+                name: "Kwame O.",
+                location: "Accra, Ghana",
+                comment: "This place is a hidden gem! The peaceful environment and breathtaking views made our weekend truly unforgettable. The executive room was pure luxury - every detail was perfect!",
+                rating: 5,
+                date: "2025-12-15"
+            },
+            {
+                name: "Sarah T.",
+                location: "London, UK",
+                comment: "Visited family in Ghana and Ankes Lodge was our perfect home base! The full house was ideal for our extended family. Serene location, impeccable service - an absolute must-book!",
+                rating: 5,
+                date: "2025-12-10"
+            },
+            {
+                name: "Michael J.",
+                location: "New York, USA",
+                comment: "Ankes Lodge completely exceeded our expectations! The regular bedroom was spacious and spotless with all the amenities we needed. The staff were incredibly friendly and helpful. We'll definitely return!",
+                rating: 5,
+                date: "2025-12-05"
+            },
+            {
+                name: "Esi A.",
+                location: "Takoradi, Ghana",
+                comment: "My family and I were blown away by the incredible experience at Ankes Lodge! The semi-standard room offered amazing value with top-notch amenities. Perfect location for exploring Abesim - we're already planning our next visit!",
+                rating: 5,
+                date: "2025-11-28"
+            }
+        ];
+        renderMarqueeTestimonials(defaultTestimonials);
+    }
 
     function renderMarqueeTestimonials(testimonials) {
         const marqueeContainer = document.querySelector('.testimonial-marquee');
@@ -1106,7 +1120,7 @@ function initTestimonialForm() {
         })
         .then(response => response.json())
         .then(data => {
-            if (data.status === 'success') {
+            if (data.success) {
                 alert(data.message);
                 form.reset();
                 
@@ -1427,18 +1441,7 @@ function initMultiStepBooking() {
         return Math.ceil(timeDiff / (1000 * 3600 * 24));
     }
     
-    function calculateCost(roomType, nights) {
-        const prices = {
-            'executive': 299,
-            'regular': 199,
-            'full-house': 0 // Custom pricing
-        };
-        
-        const pricePerNight = prices[roomType];
-        if (pricePerNight === 0) return null;
-        
-        return pricePerNight * nights;
-    }
+    // Removed price calculation as we're using inquiry-based pricing
 }
 
 // Affiliate Company Modal Functions
@@ -1468,4 +1471,521 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+});
+
+// Filter functionality for rooms and gallery
+document.addEventListener('DOMContentLoaded', function() {
+    // Room filters
+    const roomFilterButtons = document.querySelectorAll('[data-filter]');
+    if (roomFilterButtons.length > 0) {
+        roomFilterButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const filter = this.getAttribute('data-filter');
+                
+                // Update active button
+                roomFilterButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Filter rooms
+                const roomCards = document.querySelectorAll('.room-card');
+                roomCards.forEach(card => {
+                    if (filter === 'all' || card.getAttribute('data-category') === filter) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+    }
+    
+    // Gallery filters
+    const galleryFilterButtons = document.querySelectorAll('.filter-btn[data-filter]');
+    if (galleryFilterButtons.length > 0) {
+        galleryFilterButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const filter = this.getAttribute('data-filter');
+                
+                // Update active button
+                galleryFilterButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Filter gallery items
+                const galleryItems = document.querySelectorAll('.gallery-item');
+                galleryItems.forEach(item => {
+                    if (filter === 'all' || item.getAttribute('data-category') === filter) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        });
+    }
+});
+
+// Enhanced booking form functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const nextButtons = document.querySelectorAll('.next-step');
+    const prevButtons = document.querySelectorAll('.prev-step');
+    const steps = document.querySelectorAll('.booking-step');
+    const progressFill = document.querySelector('.progress-fill');
+    
+    if (steps.length > 0) {
+        // Initialize first step as active
+        steps[0].classList.add('active');
+        
+        // Next step functionality
+        nextButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const currentStep = parseInt(this.getAttribute('data-next')) - 1;
+                const nextStep = parseInt(this.getAttribute('data-next'));
+                
+                // Validate current step before proceeding
+                if (validateStep(currentStep)) {
+                    // Move to next step
+                    steps[currentStep - 1].classList.remove('active');
+                    steps[nextStep - 1].classList.add('active');
+                    
+                    // Update progress bar
+                    updateProgressBar(nextStep);
+                    
+                    // Update review section if moving to last step
+                    if (nextStep === 4) {
+                        updateReviewSection();
+                    }
+                }
+            });
+        });
+        
+        // Previous step functionality
+        prevButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const currentStep = parseInt(this.getAttribute('data-prev'));
+                const prevStep = currentStep - 1;
+                
+                // Move to previous step
+                steps[currentStep - 1].classList.remove('active');
+                steps[prevStep - 1].classList.add('active');
+                
+                // Update progress bar
+                updateProgressBar(prevStep);
+            });
+        });
+    }
+    
+    // Validate form step
+    function validateStep(stepIndex) {
+        const step = steps[stepIndex - 1];
+        const inputs = step.querySelectorAll('input[required], select[required]');
+        let isValid = true;
+        
+        inputs.forEach(input => {
+            if (!input.value.trim()) {
+                isValid = false;
+                input.style.borderColor = '#dc3545';
+            } else {
+                input.style.borderColor = '';
+            }
+        });
+        
+        return isValid;
+    }
+    
+    // Update progress bar
+    function updateProgressBar(currentStep) {
+        const totalSteps = steps.length;
+        const progressPercentage = (currentStep / totalSteps) * 100;
+        
+        if (progressFill) {
+            progressFill.style.width = `${progressPercentage}%`;
+        }
+        
+        // Update step indicators
+        const stepElements = document.querySelectorAll('.step');
+        stepElements.forEach((step, index) => {
+            if (index < currentStep) {
+                step.classList.add('completed');
+                if (index === currentStep - 1) {
+                    step.classList.add('active');
+                } else {
+                    step.classList.remove('active');
+                }
+            } else {
+                step.classList.remove('completed', 'active');
+            }
+        });
+    }
+    
+    // Update review section with form data
+    function updateReviewSection() {
+        document.getElementById('review-name').textContent = document.getElementById('name').value;
+        document.getElementById('review-email').textContent = document.getElementById('email').value;
+        document.getElementById('review-phone').textContent = document.getElementById('phone').value;
+        document.getElementById('review-checkin').textContent = formatDate(document.getElementById('checkin').value);
+        document.getElementById('review-checkout').textContent = formatDate(document.getElementById('checkout').value);
+        document.getElementById('review-adults').textContent = document.getElementById('adults').value;
+        document.getElementById('review-children').textContent = document.getElementById('children').value;
+        document.getElementById('review-room').textContent = document.querySelector('#room-type option:checked').textContent;
+        
+        // Calculate nights and cost
+        const checkinDate = new Date(document.getElementById('checkin').value);
+        const checkoutDate = new Date(document.getElementById('checkout').value);
+        const nights = Math.ceil((checkoutDate - checkinDate) / (1000 * 60 * 60 * 24));
+        
+        document.getElementById('review-nights').textContent = nights;
+        
+        // Calculate estimated cost based on room type
+        const roomType = document.getElementById('room-type').value;
+        let pricePerNight = 0;
+        
+        switch(roomType) {
+            case 'executive':
+                pricePerNight = 350;
+                break;
+            case 'regular':
+                pricePerNight = 250;
+                break;
+            case 'semi-standard':
+                pricePerNight = 300;
+                break;
+            default:
+                pricePerNight = 0;
+        }
+        
+        // Display inquiry message instead of calculated cost
+        document.getElementById('review-cost').textContent = 'Inquire for Pricing';
+        
+        // Handle special requests
+        const message = document.getElementById('message').value.trim();
+        const specialRequestsSection = document.getElementById('review-special-requests');
+        const messageElement = document.getElementById('review-message');
+        
+        if (message) {
+            messageElement.textContent = message;
+            specialRequestsSection.style.display = 'block';
+        } else {
+            specialRequestsSection.style.display = 'none';
+        }
+    }
+    
+    // Format date for display
+    function formatDate(dateString) {
+        if (!dateString) return '-';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric' 
+        });
+    }
+});
+
+// Add smooth scrolling for navigation links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href');
+        const targetElement = document.querySelector(targetId);
+        if (targetElement) {
+            window.scrollTo({
+                top: targetElement.offsetTop - 70,
+                behavior: 'smooth'
+            });
+        }
+    });
+});
+
+// Enhanced gallery functionality for expand buttons
+document.addEventListener('DOMContentLoaded', function() {
+    // Add expand buttons to gallery items if they don't exist
+    const galleryItems = document.querySelectorAll('.gallery-item:not(:has(.expand-btn))');
+    galleryItems.forEach(item => {
+        const expandBtn = document.createElement('button');
+        expandBtn.className = 'expand-btn';
+        expandBtn.innerHTML = '🔍';
+        expandBtn.title = 'Expand';
+        item.appendChild(expandBtn);
+        
+        // Add click event to expand button
+        expandBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const target = item.querySelector('img') || item.querySelector('video');
+            if (target) {
+                if (target.tagName === 'IMG') {
+                    // Handle image expansion
+                    const imageModal = document.querySelector('.image-modal');
+                    if (imageModal) {
+                        const imageModalImg = imageModal.querySelector('img');
+                        imageModalImg.src = target.src;
+                        imageModal.style.display = 'flex';
+                    }
+                } else if (target.tagName === 'VIDEO') {
+                    // Handle video expansion
+                    const videoModal = document.querySelector('.video-modal');
+                    if (videoModal) {
+                        const modalVideo = videoModal.querySelector('video');
+                        const source = target.querySelector('source');
+                        if (source) {
+                            modalVideo.querySelector('source').src = source.src;
+                            modalVideo.load();
+                            videoModal.style.display = 'flex';
+                            modalVideo.play().catch(e => console.log('Autoplay prevented:', e));
+                        }
+                    }
+                }
+            }
+        });
+    });
+    
+    // Add double-click functionality to gallery items
+    document.querySelectorAll('.gallery-item').forEach(item => {
+        item.addEventListener('dblclick', function(e) {
+            // Prevent double-click from triggering if it's on the expand button itself
+            if (e.target.classList.contains('expand-btn')) return;
+            
+            const target = this.querySelector('img') || this.querySelector('video');
+            if (target) {
+                if (target.tagName === 'IMG') {
+                    // Handle image expansion
+                    const imageModal = document.querySelector('.image-modal');
+                    if (imageModal) {
+                        const imageModalImg = imageModal.querySelector('img');
+                        imageModalImg.src = target.src;
+                        imageModal.style.display = 'flex';
+                    }
+                } else if (target.tagName === 'VIDEO') {
+                    // Handle video expansion
+                    const videoModal = document.querySelector('.video-modal');
+                    if (videoModal) {
+                        const modalVideo = videoModal.querySelector('video');
+                        const source = target.querySelector('source');
+                        if (source) {
+                            modalVideo.querySelector('source').src = source.src;
+                            modalVideo.load();
+                            videoModal.style.display = 'flex';
+                            modalVideo.play().catch(e => console.log('Autoplay prevented:', e));
+                        }
+                    }
+                }
+            }
+        });
+    });
+});
+
+// Initialize form validation and enhancement
+document.addEventListener('DOMContentLoaded', function() {
+    // Add input validation to all forms
+    const inputs = document.querySelectorAll('input, select, textarea');
+    inputs.forEach(input => {
+        // Add real-time validation feedback
+        input.addEventListener('blur', function() {
+            validateField(this);
+        });
+        
+        input.addEventListener('input', function() {
+            // Clear error state on input
+            this.classList.remove('error');
+            const errorElement = this.parentNode.querySelector('.field-error');
+            if (errorElement) {
+                errorElement.remove();
+            }
+        });
+    });
+    
+    // Enhanced form submission handling
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+        if (!form.dataset.listenerAttached) {
+            form.dataset.listenerAttached = 'true';
+            
+            form.addEventListener('submit', function(e) {
+                // Validate all required fields before submission
+                const requiredFields = form.querySelectorAll('[required]');
+                let isValid = true;
+                
+                requiredFields.forEach(field => {
+                    if (!validateField(field)) {
+                        isValid = false;
+                    }
+                });
+                
+                if (!isValid) {
+                    e.preventDefault();
+                    alert('Please fill in all required fields correctly before submitting.');
+                }
+            });
+        }
+    });
+    
+    // Add enhanced touch support for mobile devices
+    document.body.addEventListener('touchstart', function() {}, { passive: true });
+});
+
+// Field validation helper function
+function validateField(field) {
+    const value = field.value.trim();
+    const fieldName = field.name || field.id;
+    
+    // Clear previous errors
+    field.classList.remove('error');
+    const existingError = field.parentNode.querySelector('.field-error');
+    if (existingError) {
+        existingError.remove();
+    }
+    
+    // Required field validation
+    if (field.hasAttribute('required') && !value) {
+        showError(field, 'This field is required');
+        return false;
+    }
+    
+    // Email validation
+    if (fieldName === 'email' && value) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(value)) {
+            showError(field, 'Please enter a valid email address');
+            return false;
+        }
+    }
+    
+    // Phone validation
+    if (fieldName === 'phone' && value) {
+        const phoneRegex = /^(?:\+233|0)(?:20|50|24|54|27|57|26|56|23|28|55|59)\d{7}$/;
+        if (!phoneRegex.test(value)) {
+            showError(field, 'Please enter a valid Ghanaian phone number (+233 or 0 followed by 9 digits)');
+            return false;
+        }
+    }
+    
+    return true;
+}
+
+// Show error helper function
+function showError(field, message) {
+    field.classList.add('error');
+    
+    const errorElement = document.createElement('div');
+    errorElement.className = 'field-error';
+    errorElement.textContent = message;
+    
+    field.parentNode.appendChild(errorElement);
+}
+
+// Slideshow functionality for hero section
+let slideIndex = 0;
+showSlides();
+
+function showSlides() {
+    const slides = document.querySelectorAll('.slide');
+    const indicators = document.querySelectorAll('.indicator');
+    
+    if (slides.length === 0) return; // Exit if no slides found
+    
+    // Hide all slides
+    slides.forEach(slide => {
+        slide.classList.remove('active');
+    });
+    
+    // Remove active class from all indicators
+    indicators.forEach(indicator => {
+        indicator.classList.remove('active');
+    });
+    
+    // Increment slide index
+    slideIndex++;
+    if (slideIndex > slides.length) {
+        slideIndex = 1;
+    }
+    
+    // Show current slide
+    slides[slideIndex - 1].classList.add('active');
+    // Activate current indicator
+    if (indicators[slideIndex - 1]) {
+        indicators[slideIndex - 1].classList.add('active');
+    }
+    
+    // Change slide every 5 seconds
+    setTimeout(showSlides, 5000);
+}
+
+function changeSlide(n) {
+    const slides = document.querySelectorAll('.slide');
+    const indicators = document.querySelectorAll('.indicator');
+    
+    if (slides.length === 0) return; // Exit if no slides found
+    
+    slideIndex += n;
+    if (slideIndex > slides.length) {
+        slideIndex = 1;
+    }
+    if (slideIndex < 1) {
+        slideIndex = slides.length;
+    }
+    
+    // Hide all slides
+    slides.forEach(slide => {
+        slide.classList.remove('active');
+    });
+    
+    // Remove active class from all indicators
+    indicators.forEach(indicator => {
+        indicator.classList.remove('active');
+    });
+    
+    // Show current slide
+    slides[slideIndex - 1].classList.add('active');
+    // Activate current indicator
+    indicators[slideIndex - 1].classList.add('active');
+}
+
+function currentSlide(n) {
+    const slides = document.querySelectorAll('.slide');
+    const indicators = document.querySelectorAll('.indicator');
+    
+    if (slides.length === 0) return; // Exit if no slides found
+    
+    if (n < 1) n = 1;
+    if (n > slides.length) n = slides.length;
+    
+    slideIndex = n;
+    
+    // Hide all slides
+    slides.forEach(slide => {
+        slide.classList.remove('active');
+    });
+    
+    // Remove active class from all indicators
+    indicators.forEach(indicator => {
+        indicator.classList.remove('active');
+    });
+    
+    // Show current slide
+    slides[n - 1].classList.add('active');
+    // Activate current indicator
+    indicators[n - 1].classList.add('active');
+}
+
+// Active navigation highlighting
+window.addEventListener('scroll', function() {
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('nav a');
+    
+    let current = '';
+    
+    sections.forEach(section => {
+        const sectionTop = section.offsetTop;
+        const sectionHeight = section.clientHeight;
+        
+        if (pageYOffset >= (sectionTop - 200)) {
+            current = section.getAttribute('id');
+        }
+    });
+    
+    navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href').substring(1) === current) {
+            link.classList.add('active');
+        }
+    });
 });

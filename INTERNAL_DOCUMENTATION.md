@@ -86,8 +86,8 @@ This documentation provides an overview of the Ankes Lodge website structure and
 - Brief introduction to Ankes Lodge
 
 ### Rooms Section
-- Executive Room (₵299/night)
-- Regular Bedroom (₵199/night)
+- Executive Room (Inquire for Pricing)
+- Regular Bedroom (Inquire for Pricing)
 - Full House (Custom pricing)
 - "Book Now" buttons for each room type
 
@@ -111,8 +111,7 @@ This documentation provides an overview of the Ankes Lodge website structure and
 ### Location Information
 - Detailed address information
 - Contact numbers:
-  - General Manager: 0544904547, 0558647156
-  - Manager: 0248293512
+  - Contact: 0248293512
 - Map placeholder
 
 ### Contact Form

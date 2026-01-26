@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Ankes Lodge is a luxury guest house in Abesim, Sunyani, Ghana. Book comfortable accommodations with modern amenities for business and leisure travel.">
+    <meta name="description" content="Ankes Lodge - Luxury Guest House in Abesim, Sunyani, Ghana. Book comfortable accommodations with modern amenities for business and leisure travel.">
     <meta name="keywords" content="Ankes Lodge, guest house, hotel, accommodation, Sunyani, Abesim, Ghana, luxury lodging, business travel, leisure travel">
     <meta name="author" content="Ankes Lodge">
     <meta name="robots" content="index, follow">
@@ -44,7 +44,7 @@
         "postalCode": "BS-0484-4619",
         "addressCountry": "GH"
       },
-      "telephone": "+233 544904547",
+      "telephone": "+233 248293512",
       "email": "ankeslodge@gmail.com",
       "url": "https://ankes-lodge.onrender.com/",
       "priceRange": "₵199 - ₵350 per night",
@@ -63,6 +63,7 @@
       }
     }
     </script>
+    
     <!-- Header Section -->
     <header>
         <div class="container">
@@ -77,23 +78,42 @@
             </div>
             <nav>
                 <ul>
-                    <li><a href="#home">Home</a></li>
-                    <li><a href="#rooms">Rooms</a></li>
-                    <li><a href="#facilities">Facilities</a></li>
-                    <li><a href="#map-placeholder">Location 📍</a></li>
-                    <li><a href="#contact">Contact</a></li>
-                    <li><a href="#booking" class="btn-primary">Book Now</a></li>
+                    <li><a href="/" class="active">Home</a></li>
+                    <li><a href="/rooms.html">Rooms</a></li>
+                    <li><a href="/gallery.html">Gallery</a></li>
+                    <li><a href="/booking.html" class="btn-primary">Book/Know About Us</a></li>
+                    <li><a href="/payment.html" class="btn-primary">Pay Now</a></li>
+                    <li><a href="/contact.html">Contact</a></li>
+                    <li><a href="/about.html">About</a></li>
                 </ul>
             </nav>
         </div>
     </header>
 
-    <!-- Hero Section -->
+    <!-- Hero Section with Slideshow Background -->
     <section id="home" class="hero">
+        <!-- Slideshow Container -->
+        <div class="hero-slideshow">
+            <div class="slide active" style="background-image: url('main-flyer.jpeg');"></div>
+            <div class="slide" style="background-image: url('DownloadableFlyer.jpeg');"></div>
+        </div>
+        
         <div class="hero-content">
             <h1>Welcome to Ankes Lodge</h1>
             <p>Your home away from home in the heart of Abesim</p>
-            <a href="#booking" class="btn-secondary">Book Your Stay</a>
+            <a href="/booking.html" class="btn-secondary">Book Your Stay</a>
+        </div>
+        
+        <!-- Slideshow Controls -->
+        <div class="slideshow-controls">
+            <button class="slide-nav prev" onclick="changeSlide(-1)">‹</button>
+            <button class="slide-nav next" onclick="changeSlide(1)">›</button>
+        </div>
+        
+        <!-- Slide Indicators -->
+        <div class="slide-indicators">
+            <span class="indicator active" onclick="currentSlide(1)"></span>
+            <span class="indicator" onclick="currentSlide(2)"></span>
         </div>
     </section>
 
@@ -102,98 +122,6 @@
         <div class="container">
             <h2>About Ankes Lodge</h2>
             <p>Ankes Lodge is a premium guest house located in the serene neighborhood of Abesim, offering comfortable accommodation with top-notch amenities. Our lodge provides a perfect blend of comfort, convenience, and luxury for both business and leisure travelers.</p>
-        </div>
-    </section>
-
-    <!-- Rooms Section -->
-    <section id="rooms" class="rooms">
-        <div class="container">
-            <h2>Our Accommodations</h2>
-            <div class="room-types">
-                <div class="room-card">
-                    <img src="executiveRoom.JPG" alt="Executive Room">
-                    <div class="room-info">
-                        <h3>Executive Room</h3>
-                        <p>Luxurious accommodation with premium amenities for discerning guests.</p>
-                        <div class="price">₵350<span>/night</span></div>
-                        <!-- Recommended Airbnb Booking -->
-                        <a href="https://www.airbnb.com/rooms/1549395845337581857?check_in=2025-12-03&check_out=2025-12-04&guests=1&adults=1&s=67&unique_share_id=232d2a0c-3555-48fd-a51d-60efc3e4a9f2" target="_blank" class="btn-primary" style="margin-bottom: 10px;">Book on Airbnb (Recommended)</a>
-                        <!-- Direct Booking - Now Enabled -->
-                        <button class="btn-secondary book-room" data-room="executive">Book Directly coming soon</button>
-                    </div>
-                </div>
-                
-                <div class="room-card">
-                    <img src="regular bedroom.avif" alt="Semi Standard Bedroom">
-                    <div class="room-info">
-                        <h3>Semi Standard Bedroom</h3>
-                        <p>Comfortable and cozy room with all essential amenities with airconditioner.</p>
-                        <div class="price">₵300<span>/night</span></div>
-                        <!-- Recommended Airbnb Booking -->
-                        <a href="https://www.airbnb.com/rooms/1549395845337581857?check_in=2025-12-03&check_out=2025-12-04&guests=1&adults=1&s=67&unique_share_id=232d2a0c-3555-48fd-a51d-60efc3e4a9f2" target="_blank" class="btn-primary" style="margin-bottom: 10px;">Book on Airbnb (Recommended)</a>
-                        <!-- Direct Booking - Now Enabled -->
-                        <button class="btn-secondary book-room" data-room="regular">Book Directly coming soon</button>
-                    </div>
-                </div>
-
-                <div class="room-card">
-                    <img src="regular bedroom.avif" alt="Regular Bedroom">
-                    <div class="room-info">
-                        <h3>Regular Bedroom</h3>
-                        <p>Comfortable and cozy room with all essential amenities.</p>
-                        <div class="price">₵250<span>/night</span></div>
-                        <!-- Recommended Airbnb Booking -->
-                        <a href="https://www.airbnb.com/rooms/1549395845337581857?check_in=2025-12-03&check_out=2025-12-04&guests=1&adults=1&s=67&unique_share_id=232d2a0c-3555-48fd-a51d-60efc3e4a9f2" target="_blank" class="btn-primary" style="margin-bottom: 10px;">Book on Airbnb (Recommended)</a>
-                        <!-- Direct Booking - Now Enabled -->
-                        <button class="btn-secondary book-room" data-room="regular">Book Directly coming soon</button>
-                    </div>
-                </div>
-                
-                <div class="room-card">
-                    <img src="FULLHOUSE.jpg" alt="Full House">
-                    <div class="room-info">
-                        <h3>Full House</h3>
-                        <p>Entire lodge for exclusive use by your group or family.</p>
-                        <div class="price">Custom Pricing</div>
-                        <!-- Recommended Airbnb Booking -->
-                        <a href="https://www.airbnb.com/rooms/1549395845337581857?check_in=2025-12-03&check_out=2025-12-04&guests=1&adults=1&s=67&unique_share_id=232d2a0c-3555-48fd-a51d-60efc3e4a9f2" target="_blank" class="btn-primary" style="margin-bottom: 10px;">Book on Airbnb (Recommended)</a>
-                        <!-- Direct Booking - Now Enabled -->
-                        <button class="btn-secondary book-room" data-room="full-house">Inquire Directly coming soon</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Facilities Section -->
-    <section id="facilities" class="facilities">
-        <div class="container">
-            <h2>Our Facilities</h2>
-            <div class="facility-grid">
-                <div class="facility-item">
-                    <img src="HALL1.jpg" alt="Event Hall">
-                    <h3>Event Hall</h3>
-                    <p>Spacious hall perfect for meetings, parties, and events.</p>
-                </div>
-                
-                <div class="facility-item">
-                    <img src="dining.jpg" alt="Dining Hall">
-                    <h3>Dining Hall</h3>
-                    <p>Elegant dining space with delicious meals served.</p>
-                </div>
-                
-                <div class="facility-item">
-                    <img src="HALL2.jpg" alt="Reception Area">
-                    <h3>Reception Area</h3>
-                    <p>Welcoming space for guests with 24/7 service.</p>
-                </div>
-                
-                <div class="facility-item">
-                    <img src="fullwthcar.jpg" alt="Parking">
-                    <h3>Parking</h3>
-                    <p>Secure parking space for all guests.</p>
-                </div>
-            </div>
         </div>
     </section>
 
@@ -287,435 +215,138 @@
             <div class="testimonial-callout">
                 <h3>Love Your Stay at Ankes Lodge?</h3>
                 <p>Share your experience with future guests and help us create even better memories!</p>
-                <a href="#testimonial-form" class="btn-primary">Leave a Review</a>
-            </div>
-            
-            <!-- Add Testimonial Form -->
-            <div class="add-testimonial-section">
-                <h3>Share Your Experience</h3>
-                <form id="testimonial-form" class="testimonial-form">
-                    <div class="form-group">
-                        <input type="text" id="testimonial-name" name="name" placeholder="Your Name *" required>
-                    </div>
-                    <div class="form-group">
-                        <input type="text" id="testimonial-location" name="location" placeholder="Your Location (optional)">
-                    </div>
-                    <div class="form-group">
-                        <select id="testimonial-rating" name="rating" required>
-                            <option value="">Select Rating *</option>
-                            <option value="5">★★★★★ - Excellent</option>
-                            <option value="4">★★★★☆ - Very Good</option>
-                            <option value="3">★★★☆☆ - Good</option>
-                            <option value="2">★★☆☆☆ - Fair</option>
-                            <option value="1">★☆☆☆☆ - Poor</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <textarea id="testimonial-comment" name="comment" placeholder="Share your experience *" rows="4" required></textarea>
-                    </div>
-                    <button type="submit" class="btn-primary">Submit Review</button>
-                </form>
+                <a href="/reviews.html" class="btn-primary">Leave a Review</a>
             </div>
         </div>
     </section>
 
-    <!-- Gallery Section -->
-    <section class="gallery">
+    <!-- Rooms Preview Section -->
+    <section class="rooms-preview">
         <div class="container">
-            <h2>Gallery</h2>
-            <div class="gallery-grid">
-                <div class="gallery-item">
-                    <img src="main-flyer.jpeg" alt="Ankes Lodge Flyer">
-                    <button class="expand-btn" aria-label="Expand image">⤢</button>
-                </div>
-                <div class="gallery-item video-container">
-                    <video id="gallery-video" controls preload="none" poster="video-thumbnail.jpg" muted playsinline>
-                        <source src="videoOftheroomsAndEverything.mp4" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
-                    <button class="expand-btn" aria-label="Expand video">⤢</button>
-                </div>
-                <!-- Additional Room Tour Videos -->
-                <div class="gallery-item video-container">
-                    <video id="gallery-video-2" controls preload="none" poster="video-thumbnail.jpg" muted playsinline>
-                        <source src="videoOftheroomsAndEverything2.mp4" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
-                    <button class="expand-btn" aria-label="Expand video">⤢</button>
+            <div class="section-header">
+                <h2>Our Accommodations</h2>
+                <p>Discover our range of luxurious rooms designed for your comfort. <strong>Contact us for current pricing and availability.</strong></p>
+                <a href="/rooms.html" class="btn-secondary">See All Rooms</a>
+            </div>
+            
+            <div class="room-types">
+                <div class="room-card">
+                    <div class="room-image">
+                        <img src="executiveRoom.JPG" alt="Executive Room">
+                        <div class="room-badge">Popular</div>
+                    </div>
+                    <div class="room-info">
+                        <h3>Executive Room</h3>
+                        <p>Luxurious accommodation with premium amenities for discerning guests.</p>
+                        <div class="room-price">Inquire for Pricing</div>
+                    </div>
                 </div>
                 
-                <div class="gallery-item video-container">
-                    <video id="gallery-video-3" controls preload="none" poster="video-thumbnail.jpg" muted playsinline>
-                        <source src="videoOftheroomsAndEverything3.mp4" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
-                    <button class="expand-btn" aria-label="Expand video">⤢</button>
+                <div class="room-card">
+                    <div class="room-image">
+                        <img src="regular bedroom.avif" alt="Standard Bedroom">
+                    </div>
+                    <div class="room-info">
+                        <h3>Standard Bedroom</h3>
+                        <p>Comfortable and cozy room with all essential amenities.</p>
+                        <div class="room-price">Inquire for Pricing</div>
+                    </div>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Preview Section -->
+    <section class="gallery-preview">
+        <div class="container">
+            <div class="section-header">
+                <h2>Photo Gallery</h2>
+                <p>Explore the beauty and comfort of Ankes Lodge</p>
+                <a href="/gallery.html" class="btn-secondary">View Full Gallery</a>
+            </div>
+            
+            <div class="gallery-grid">
+                <div class="gallery-item">
+                    <img src="main-flyer.jpeg" alt="Ankes Lodge Exterior">
+                    <button class="expand-btn" aria-label="Expand image">⤢</button>
+                </div>
+                
                 <div class="gallery-item">
                     <img src="executiveRoom.JPG" alt="Executive Room">
                     <button class="expand-btn" aria-label="Expand image">⤢</button>
                 </div>
+                
                 <div class="gallery-item">
-                    <img src="full3.jpg" alt="Bedroom">
+                    <img src="HALL1.jpg" alt="Event Hall">
                     <button class="expand-btn" aria-label="Expand image">⤢</button>
                 </div>
-                <div class="gallery-item">
-                    <img src="corridorEntrance.jpeg" alt="Hall">
-                    <button class="expand-btn" aria-label="Expand image">⤢</button>
-                </div>
-                <div class="gallery-item">
-                    <img src="HALL1.jpg" alt="Hall">
-                    <button class="expand-btn" aria-label="Expand image">⤢</button>
-                </div>
-
-                <div class="gallery-item">
-                    <img src="fridge.jpeg" alt="Hall">
-                    <button class="expand-btn" aria-label="Expand image">⤢</button>
-                </div>
-
-                <div class="gallery-item">
-                    <img src="diningHall.jpeg" alt="Dining Hall">
-                    <button class="expand-btn" aria-label="Expand image">⤢</button>
-                </div>
-                <div class="gallery-item">
-                    <img src="hall.jpeg" alt="Hall">
-                    <button class="expand-btn" aria-label="Expand image">⤢</button>
-                </div>
-                <div class="gallery-item">
-                    <img src="airconditioner.jpeg" alt="Hall">
-                    <button class="expand-btn" aria-label="Expand image">⤢</button>
-                </div>
-                <div class="gallery-item">
-                    <img src="tv and internet.jpeg" alt="Hall">
-                    <button class="expand-btn" aria-label="Expand image">⤢</button>
-                </div>
+                
                 <div class="gallery-item">
                     <img src="FULLHOUSE.jpg" alt="Full House">
                     <button class="expand-btn" aria-label="Expand image">⤢</button>
                 </div>
-                
-                <!-- Motivational Videos -->
-                <div class="gallery-item video-container">
-                    <video id="motivation-video-1" controls preload="none" poster="video-thumbnail.jpg" muted playsinline>
-                        <source src="motivationMirrorPart1.mp4" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
-                    <button class="expand-btn" aria-label="Expand video">⤢</button>
-                </div>
-                
-                <div class="gallery-item video-container">
-                    <video id="motivation-video-2" controls preload="none" poster="video-thumbnail.jpg" muted playsinline>
-                        <source src="MotivationMirrorPart2.mp4" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
-                    <button class="expand-btn" aria-label="Expand video">⤢</button>
-                </div>
-                
-                <div class="gallery-item video-container">
-                    <video id="different-video" controls preload="none" poster="video-thumbnail.jpg" muted playsinline>
-                        <source src="differentMixedvideo.mp4" type="video/mp4">
-                        Your browser does not support the video tag.
-                    </video>
-                    <button class="expand-btn" aria-label="Expand video">⤢</button>
-                </div>
-                
-                <!-- Flyer Download -->
-                <div class="gallery-item">
-                    <div class="flyer-download-container">
-                        <h3>Download Our Flyer</h3>
-                        <button id="preview-flyer" class="btn-primary">Preview Flyer</button>
-                        <a href="DownloadableFlyer.jpeg" download="Ankes-Lodge-Flyer.jpeg" class="btn-secondary">Download Flyer</a>
-                    </div>
-                </div>
             </div>
         </div>
     </section>
 
-    <!-- Booking Section -->
-    <section id="booking" class="booking">
+    <!-- Testimonials Preview Section -->
+    <section class="testimonials">
         <div class="container">
-            <h2>Book Your Stay</h2>
-            <div class="booking-options-container">
-                <div class="airbnb-option">
-                    <h3>Recommended Booking Method</h3>
-                    <p>For the best experience and instant confirmation, we recommend booking through Airbnb:</p>
-                    <a href="https://www.airbnb.com/rooms/1549395845337581857?check_in=2025-12-03&check_out=2025-12-04&guests=1&adults=1&s=67&unique_share_id=232d2a0c-3555-48fd-a51d-60efc3e4a9f2" target="_blank" class="btn-primary">Book on Airbnb (Recommended)</a>
-                    <p style="margin-top: 15px; font-style: italic;">Our direct booking system is now available! You can also book directly with us using the form below.</p>
-                </div>
-                
-                <!-- Booking.com Booking Option - Placed side by side with Airbnb -->
-                <div class="booking-com-option">
-                    <h3>Alternative Booking Option</h3>
-                    <p>You can also book directly through Booking.com:</p>
-                    <a href="https://www.booking.com/hotel/gh/ankes-lodge.fr.html?msockid=317263099ef6676f06af75359f1666ae&chal_t=1764060834908&force_referer=https%3A%2F%2Fwww.bing.com%2F#map_closed" target="_blank" class="btn-secondary">Book on Booking.com</a>
-                </div>
+            <div class="section-header">
+                <h2>Guest Experiences</h2>
+                <p>Discover why our guests keep returning to Ankes Lodge</p>
+                <a href="/reviews.html" class="btn-secondary">Read All Reviews</a>
             </div>
             
-            <!-- Direct Booking Form -->
-            <div class="direct-booking-section">
-                <h3>Direct Booking with Ankes Lodge</h3>
-                <p>Book directly with us for a personalized experience. Fill out the form below and we'll contact you shortly to confirm your reservation.</p>
-                
-                <!-- Multi-step Progress Indicator -->
-                <div class="booking-progress">
-                    <div class="progress-steps">
-                        <div class="step active" data-step="1">
-                            <div class="step-number">1</div>
-                            <div class="step-label">Personal Info</div>
+            <div class="testimonial-marquee-container">
+                <div class="testimonial-marquee">
+                    <div class="testimonial-card">
+                        <div class="testimonial-rating">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
                         </div>
-                        <div class="step" data-step="2">
-                            <div class="step-number">2</div>
-                            <div class="step-label">Dates & Guests</div>
+                        <div class="testimonial-content">
+                            <p>"Exceptional service and comfortable accommodations. Will definitely return!"</p>
                         </div>
-                        <div class="step" data-step="3">
-                            <div class="step-number">3</div>
-                            <div class="step-label">Room Details</div>
-                        </div>
-                        <div class="step" data-step="4">
-                            <div class="step-number">4</div>
-                            <div class="step-label">Review & Submit</div>
+                        <div class="testimonial-author">
+                            <h4>John Doe</h4>
+                            <p>Business Traveler</p>
                         </div>
                     </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 25%"></div>
-                    </div>
-                </div>
-                
-                <form id="booking-form" aria-labelledby="booking-form-title">
-                    <!-- Step 1: Personal Information -->
-                    <div class="booking-step active" data-step="1">
-                        <h3>Personal Information</h3>
-                        <div class="form-group">
-                            <label for="name">Full Name <span aria-label="required">*</span></label>
-                            <input type="text" id="name" name="name" required aria-required="true" placeholder="Enter your full name">
+                    <div class="testimonial-card">
+                        <div class="testimonial-rating">
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
+                            <span class="star">★</span>
                         </div>
-                    
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="email">Email <span aria-label="required">*</span></label>
-                                <input type="email" id="email" name="email" required aria-required="true" placeholder="your.email@example.com">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="phone">Phone Number <span aria-label="required">*</span></label>
-                                <input type="tel" id="phone" name="phone" required aria-required="true" placeholder="+233XXXXXXXXX">
-                                <small class="form-help">Please include country code (+233 for Ghana)</small>
-                            </div>
+                        <div class="testimonial-content">
+                            <p>"Perfect location and wonderful staff. Highly recommended!"</p>
                         </div>
-                        <div class="step-navigation">
-                            <button type="button" class="btn-secondary next-step" data-next="2">Next: Dates & Guests</button>
+                        <div class="testimonial-author">
+                            <h4>Jane Smith</h4>
+                            <p>Tourist</p>
                         </div>
-                    </div>
-                    
-                    <!-- Step 2: Dates & Guests -->
-                    <div class="booking-step" data-step="2">
-                        <h3>Dates & Guests</h3>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="checkin">Check-in Date <span aria-label="required">*</span></label>
-                                <input type="date" id="checkin" name="checkin" required aria-required="true">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="checkout">Check-out Date <span aria-label="required">*</span></label>
-                                <input type="date" id="checkout" name="checkout" required aria-required="true">
-                            </div>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="adults">Adults <span aria-label="required">*</span></label>
-                                <select id="adults" name="adults" required aria-required="true">
-                                    <option value="">Select Number of Adults</option>
-                                    <option value="1">1 Adult</option>
-                                    <option value="2">2 Adults</option>
-                                    <option value="3">3 Adults</option>
-                                    <option value="4">4 Adults</option>
-                                    <option value="5">5 Adults</option>
-                                    <option value="6">6 Adults</option>
-                                    <option value="7">7 Adults</option>
-                                    <option value="8">8 Adults</option>
-                                    <option value="9">9 Adults</option>
-                                    <option value="10">10 Adults</option>
-                                </select>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="children">Children</label>
-                                <select id="children" name="children">
-                                    <option value="0" selected>0 Children</option>
-                                    <option value="1">1 Child</option>
-                                    <option value="2">2 Children</option>
-                                    <option value="3">3 Children</option>
-                                    <option value="4">4 Children</option>
-                                    <option value="5">5 Children</option>
-                                    <option value="6">6 Children</option>
-                                    <option value="7">7 Children</option>
-                                    <option value="8">8 Children</option>
-                                    <option value="9">9 Children</option>
-                                    <option value="10">10 Children</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="step-navigation">
-                            <button type="button" class="btn-secondary prev-step" data-prev="1">Previous</button>
-                            <button type="button" class="btn-secondary next-step" data-next="3">Next: Room Details</button>
-                        </div>
-                    </div>
-                    
-                    <!-- Step 3: Room Details -->
-                    <div class="booking-step" data-step="3">
-                        <h3>Room Details</h3>
-                        <div class="form-group">
-                            <label for="room-type">Room Type <span aria-label="required">*</span></label>
-                            <select id="room-type" name="room-type" required aria-required="true">
-                                <option value="">Select Room Type</option>
-                                <option value="executive">Executive Room (₵299/night)</option>
-                                <option value="regular">Regular Bedroom (₵199/night)</option>
-                                <option value="full-house">Full House (Custom Pricing)</option>
-                            </select>
-                        </div>
-                    
-                        <div class="form-group">
-                            <label for="message">Special Requests</label>
-                            <textarea id="message" name="message" rows="4" placeholder="Any special requests or requirements..."></textarea>
-                            <small class="form-help">Please include any dietary requirements, accessibility needs, or other special requests</small>
-                        </div>
-                        <div class="step-navigation">
-                            <button type="button" class="btn-secondary prev-step" data-prev="2">Previous</button>
-                            <button type="button" class="btn-secondary next-step" data-next="4">Next: Review Booking</button>
-                        </div>
-                    </div>
-                    
-                    <!-- Step 4: Review & Submit -->
-                    <div class="booking-step" data-step="4">
-                        <h3>Review Your Booking</h3>
-                        <div class="review-summary">
-                            <div class="review-section">
-                                <h4>Guest Information</h4>
-                                <p><strong>Name:</strong> <span id="review-name">-</span></p>
-                                <p><strong>Email:</strong> <span id="review-email">-</span></p>
-                                <p><strong>Phone:</strong> <span id="review-phone">-</span></p>
-                            </div>
-                            
-                            <div class="review-section">
-                                <h4>Stay Details</h4>
-                                <p><strong>Check-in:</strong> <span id="review-checkin">-</span></p>
-                                <p><strong>Check-out:</strong> <span id="review-checkout">-</span></p>
-                                <p><strong>Adults:</strong> <span id="review-adults">-</span></p>
-                                <p><strong>Children:</strong> <span id="review-children">-</span></p>
-                            </div>
-                            
-                            <div class="review-section">
-                                <h4>Room Selection</h4>
-                                <p><strong>Room Type:</strong> <span id="review-room">-</span></p>
-                                <p><strong>Total Nights:</strong> <span id="review-nights">-</span></p>
-                                <p><strong>Estimated Cost:</strong> <span id="review-cost">-</span></p>
-                            </div>
-                            
-                            <div class="review-section" id="review-special-requests" style="display: none;">
-                                <h4>Special Requests</h4>
-                                <p id="review-message">-</p>
-                            </div>
-                        </div>
-                        
-                        <div class="step-navigation">
-                            <button type="button" class="btn-secondary prev-step" data-prev="3">Previous</button>
-                            <button type="submit" class="btn-primary">Confirm Booking</button>
-                        </div>
-                    </div>
-
-                    
-                    <div class="form-group">
-                        <button type="submit" class="btn-primary">Submit Booking Request</button>
-                    </div>
-                    
-                    <div class="payment-info">
-                        <h4>Payment Information</h4>
-                        <p>After submitting your booking, you will receive a confirmation email with payment options. You can pay securely online or on arrival.</p>
-                        <p>Don't forget you can also make a donation to support our services!</p>
-                    </div>
-                    
-                    <div id="booking-form-feedback" class="form-feedback" aria-live="polite" role="alert"></div>
-                </form>
-            </div>
-        </div>
-    </section>
-
-    <!-- Location Section -->
-    <section id="location" class="location">
-        <div class="container">
-            <h2 id="location-heading"> <a href="#map-placeholder" class="heading-link">Our Location 📍</a></h2>
-            <div class="location-content">
-                <div class="location-text">
-                    <p><strong>Address:</strong> Sunyani Abesim - After Olistar School - Nkran Kese Road, Opposite Omega Water Production Centre<br><strong>Digital Address:</strong> BS-0484-4619</p>
-                    <p>We are conveniently located in a peaceful area of Abesim, easily accessible and surrounded by beautiful scenery.</p>
-                    <div class="contact-info">
-                        <h3>Contact Numbers:</h3>
-                        <p>General Manager: 0544904547, 0558647156</p>
-                        <p>Manager: 0248293512</p>
-                    </div>
-                </div>
-                <div id="map-placeholder" class="map-placeholder">
-                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3957.699294690092!2d-2.2975885!3d7.275017299999999!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xfdac51663957897%3A0xe2b28c108bd39d06!2sAnkes%20Lodge!5e0!3m2!1sen!2sgh!4v1766488841258!5m2!1sen!2sgh" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Ankes Lodge Location"></iframe>
-                </div>
-                
-                <!-- Google Search and Share Section -->
-                <div class="search-share-section">
-                    <h3>Find Us Easily</h3>
-                    <div class="search-instructions">
-                        <p>Search for <strong>"Ankes Lodge"</strong> on Google to find us easily:</p>
-                        <a href="https://www.google.com/search?q=Ankes+Lodge" target="_blank" class="btn-primary">Search on Google</a>
-                    </div>
-                    <div class="share-section">
-                        <p>Share our business with others using this link:</p>
-                        <div class="link-container">
-                            <input type="text" id="share-link" value="https://share.google/V4M0L5GiVYaE12GyR" readonly>
-                            <button id="copy-link-btn" class="btn-secondary">📋 Copy Link</button>
-                        </div>
-                        <p class="small-text">Click the copy button to save the link to your clipboard</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Contact Section -->
-    <section id="contact" class="contact">
+    <!-- Call to Action Section -->
+    <section class="cta">
         <div class="container">
-            <h2>Contact Us</h2>
-            <div class="contact-content">
-                <div class="contact-info">
-                    <h3>Get In Touch</h3>
-                    <p><strong>General Manager:</strong> 0544904547, 0558647156</p>
-                    <p><strong>Manager:</strong> 0248293512</p>
-                    <p><strong>Email:</strong> <a href="mailto:ankeslodge@gmail.com">ankeslodge@gmail.com</a></p>
-                    <p><strong>Address:</strong> Sunyani Abesim - After Olistar School - Nkran Kese Road, Opposite Omega Water Production Centre<br><strong>Digital Address:</strong> BS-0484-4619</p>
+            <div class="cta-content">
+                <h2>Ready to Experience Luxury?</h2>
+                <p>Book your stay at Ankes Lodge today and enjoy our premium accommodations and exceptional service.</p>
+                <div class="cta-buttons">
+                    <a href="/booking.html" class="btn-primary">Book/Know About Us</a>
+                    <a href="/rooms.html" class="btn-secondary">View Rooms</a>
                 </div>
-                
-                <form id="contact-form" action="/process-contact" method="POST">
-                    <div class="form-group">
-                        <label for="contact-name">Name</label>
-                        <input type="text" id="contact-name" name="contact-name" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="contact-email">Email</label>
-                        <input type="email" id="contact-email" name="contact-email" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="subject">Subject</label>
-                        <input type="text" id="subject" name="subject" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="contact-message">Message</label>
-                        <textarea id="contact-message" name="contact-message" rows="5" required></textarea>
-                    </div>
-                    
-                    <button type="submit" class="btn-primary">Send Message</button>
-                </form>
             </div>
         </div>
     </section>
@@ -763,18 +394,18 @@
                 <div class="footer-links">
                     <h4>Quick Links</h4>
                     <ul>
-                        <li><a href="#home">Home</a></li>
-                        <li><a href="#rooms">Rooms</a></li>
-                        <li><a href="#facilities">Facilities</a></li>
-                        <li><a href="#booking">Booking</a></li>
-                        <li><a href="#contact">Contact</a></li>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/rooms.html">Rooms</a></li>
+                        <li><a href="/gallery.html">Gallery</a></li>
+                        <li><a href="/booking.html">Booking</a></li>
+                        <li><a href="/contact.html">Contact</a></li>
+                        <li><a href="/about.html">About</a></li>
                         <li><a href="/login.html">Admin Login</a></li>
                     </ul>
                 </div>
             </div>
             
            
-            
             <div class="copyright">
                 <p>&copy; 2025 Ankes Lodge. All rights reserved | <a href="https://github.com/Konadu-Prince" target="_blank" rel="noopener">conadux</a></p>
             </div>
