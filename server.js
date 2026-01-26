@@ -17,10 +17,7 @@ const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/ankesl
 
 async function connectToDatabase() {
     try {
-        const client = new MongoClient(MONGODB_URI, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-        });
+        const client = new MongoClient(MONGODB_URI);
         await client.connect();
         db = client.db();
         logger.info('Connected to MongoDB database');
@@ -64,20 +61,21 @@ const emailConfig = {
     port: process.env.EMAIL_PORT || 587,
     secure: false, // true for 465, false for other ports
     auth: {
-        user: process.env.EMAIL_USER || 'ankeslodge@gmail.com',
-        pass: process.env.EMAIL_PASS || '' // You'll need to set this in .env
+        user: process.env.EMAIL_USER || 'konaduprince26@gmail.com',
+        pass: process.env.EMAIL_PASS || 'svvnrkgzmgxuskyl' // You'll need to set this in .env
     }
 };
 
 // Create reusable transporter object
-const transporter = nodemailer.createTransporter(emailConfig);
+const transporter = nodemailer.createTransport(emailConfig);
 
 // Verify transporter configuration
 transporter.verify((error, success) => {
     if (error) {
-        console.error('Email transporter configuration error:', error);
+        logger.error('Email transporter configuration error:', error.message);
+        logger.warn('Email functionality will be disabled. Please check your email credentials in .env file.');
     } else {
-        console.log('Email transporter is ready to send messages');
+        logger.info('Email transporter is ready to send messages');
     }
 });
 
@@ -102,9 +100,10 @@ async function sendEmailWithRetry(mailOptions, maxRetries = 3) {
 
 // Booking notification email function
 async function sendBookingNotification(booking) {
+    const adminEmail = process.env.ADMIN_EMAIL || 'konaduprince26@gmail.com';
     const mailOptions = {
-        from: '"Ankes Lodge" <ankeslodge@gmail.com>',
-        to: 'ankeslodge@gmail.com',
+        from: '"Ankes Lodge" <' + adminEmail + '>',
+        to: adminEmail,
         subject: `New Booking Request - ${booking.id}`,
         html: `
             <h2>New Booking Request Received</h2>
@@ -127,9 +126,10 @@ async function sendBookingNotification(booking) {
 
 // Contact form notification email function
 async function sendContactNotification(contact) {
+    const adminEmail = process.env.ADMIN_EMAIL || 'konaduprince26@gmail.com';
     const mailOptions = {
-        from: '"Ankes Lodge Website" <ankeslodge@gmail.com>',
-        to: 'ankeslodge@gmail.com',
+        from: '"Ankes Lodge Website" <' + adminEmail + '>',
+        to: adminEmail,
         subject: `New Contact Form Submission - ${contact.subject}`,
         html: `
             <h2>New Contact Form Submission</h2>
