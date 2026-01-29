@@ -605,6 +605,20 @@ app.post('/add-testimonial', async (req, res) => {
         if (db) {
             // Save to MongoDB
             const collection = db.collection('testimonials');
+            
+            // Check for duplicates before inserting
+            const existingTestimonial = await collection.findOne({
+                name: name,
+                comment: comment
+            });
+            
+            if (existingTestimonial) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'This testimonial already exists'
+                });
+            }
+            
             await collection.insertOne(newTestimonial);
             console.log('Saved testimonial to database:', newTestimonial.name);
         } else {
@@ -614,6 +628,18 @@ app.post('/add-testimonial', async (req, res) => {
             
             if (fs.existsSync(testimonialsPath)) {
                 testimonials = JSON.parse(fs.readFileSync(testimonialsPath, 'utf8'));
+            }
+            
+            // Check for duplicates before inserting
+            const isDuplicate = testimonials.some(t => 
+                t.name === name && t.comment === comment
+            );
+            
+            if (isDuplicate) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'This testimonial already exists'
+                });
             }
             
             testimonials.push(newTestimonial);
