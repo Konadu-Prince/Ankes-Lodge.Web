@@ -257,6 +257,11 @@ app.get('/health', (req, res) => {
     });
 });
 
+// PWA Manifest endpoint
+app.get('/manifest.json', (req, res) => {
+    res.sendFile(path.join(__dirname, 'manifest.json'));
+});
+
 // Fallback route for any other routes
 app.get('*', (req, res) => {
     // Don't serve HTML pages for API endpoints

@@ -8,6 +8,16 @@
     <meta name="author" content="Ankes Lodge">
     <meta name="robots" content="index, follow">
     
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#FFA500">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Ankes Lodge">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="AnkesImages/AnkesLodgeLogo.jpeg">
+    <link rel="apple-touch-startup-image" href="main-flyer.jpeg">
+    
     <!-- Open Graph / Facebook -->
     <meta property="og:url" content="https://ankes-lodge.onrender.com/">
     <meta property="og:title" content="Ankes Lodge - Luxury Guest House in Abesim, Sunyani">
@@ -434,6 +444,143 @@
         <span>↑</span>
     </button>
 
+    <!-- Self-Pinning Prompt -->
+    <div id="installPrompt" class="install-prompt" style="display: none;">
+        <div class="install-content">
+            <div class="install-header">
+                <img src="AnkesImages/AnkesLodgeLogo.jpeg" alt="Ankes Lodge" class="install-logo">
+                <h3>Install Ankes Lodge App</h3>
+            </div>
+            <p>Get quick access to our services by installing our app on your device!</p>
+            <div class="install-buttons">
+                <button id="installButton" class="btn-primary">Install Now</button>
+                <button id="dismissButton" class="btn-secondary">Not Now</button>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
+    <script>
+        // Self-Pinning (PWA Installation) Functionality
+        let deferredPrompt;
+        
+        // Listen for the beforeinstallprompt event
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent the mini-infobar from appearing on mobile
+            e.preventDefault();
+            // Stash the event so it can be triggered later
+            deferredPrompt = e;
+            // Show the install prompt after a delay or user interaction
+            showInstallPrompt();
+        });
+
+        // Show install prompt with delay
+        function showInstallPrompt() {
+            // Show after 30 seconds or on user interaction
+            setTimeout(() => {
+                const installPrompt = document.getElementById('installPrompt');
+                if (installPrompt && deferredPrompt && !localStorage.getItem('installPromptDismissed')) {
+                    installPrompt.style.display = 'block';
+                    document.body.style.overflow = 'hidden'; // Prevent background scrolling
+                }
+            }, 30000); // 30 seconds delay
+        }
+
+        // Install button click handler
+        document.getElementById('installButton')?.addEventListener('click', async () => {
+            if (!deferredPrompt) return;
+            
+            // Show the install prompt
+            deferredPrompt.prompt();
+            
+            // Wait for the user to respond to the prompt
+            const { outcome } = await deferredPrompt.userChoice;
+            
+            // Hide the install prompt
+            hideInstallPrompt();
+            
+            // Clear the saved prompt since it can't be used again
+            deferredPrompt = null;
+            
+            // Track installation attempt
+            if (outcome === 'accepted') {
+                console.log('User accepted the install prompt');
+                // You could send this to analytics
+            } else {
+                console.log('User dismissed the install prompt');
+            }
+        });
+
+        // Dismiss button click handler
+        document.getElementById('dismissButton')?.addEventListener('click', () => {
+            hideInstallPrompt();
+            // Remember that user dismissed the prompt
+            localStorage.setItem('installPromptDismissed', 'true');
+        });
+
+        // Hide install prompt
+        function hideInstallPrompt() {
+            const installPrompt = document.getElementById('installPrompt');
+            if (installPrompt) {
+                installPrompt.style.display = 'none';
+                document.body.style.overflow = ''; // Restore scrolling
+            }
+        }
+
+        // Close prompt when clicking outside
+        document.getElementById('installPrompt')?.addEventListener('click', (e) => {
+            if (e.target.id === 'installPrompt') {
+                hideInstallPrompt();
+                localStorage.setItem('installPromptDismissed', 'true');
+            }
+        });
+
+        // Listen for app installed event
+        window.addEventListener('appinstalled', () => {
+            console.log('PWA was installed');
+            hideInstallPrompt();
+            // You could show a success message here
+            alert('Ankes Lodge app has been installed successfully!');
+        });
+
+        // Manual installation trigger (can be called from any button)
+        function triggerInstall() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+            } else {
+                // Fallback for browsers that don't support beforeinstallprompt
+                alert('To install this app, use your browser\'s install option (usually in the menu or address bar)');
+            }
+        }
+
+        // Add install button to header (optional)
+        document.addEventListener('DOMContentLoaded', () => {
+            const header = document.querySelector('header .container');
+            if (header) {
+                const installBtn = document.createElement('button');
+                installBtn.id = 'headerInstallBtn';
+                installBtn.className = 'install-header-btn';
+                installBtn.innerHTML = '📱 Install App';
+                installBtn.style.cssText = `
+                    background: #FFA500;
+                    color: white;
+                    border: none;
+                    padding: 8px 15px;
+                    border-radius: 20px;
+                    font-size: 14px;
+                    cursor: pointer;
+                    margin-left: 15px;
+                    display: none;
+                `;
+                installBtn.addEventListener('click', triggerInstall);
+                header.appendChild(installBtn);
+
+                // Show install button when install is available
+                window.addEventListener('beforeinstallprompt', () => {
+                    installBtn.style.display = 'block';
+                });
+            }
+        });
+    </script>
 </body>
 </html>
