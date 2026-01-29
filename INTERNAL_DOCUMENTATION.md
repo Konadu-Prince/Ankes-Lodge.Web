@@ -12,7 +12,7 @@ This documentation provides an overview of the Ankes Lodge website structure and
 - `script.js` - Interactive functionality and form handling
 
 ### Asset Files
-- `orangeLogo.png` - Official logo (orange theme)
+- `AnkesImages/AnkesLodgeLogo.jpeg` - Official logo
 - `main-flyer.jpg` - Main promotional flyer (used as hero banner)
 - Room images:
   - `executive room.jpg` - Executive room photo
