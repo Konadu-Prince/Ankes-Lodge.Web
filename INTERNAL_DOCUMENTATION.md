@@ -111,7 +111,7 @@ This documentation provides an overview of the Ankes Lodge website structure and
 ### Location Information
 - Detailed address information
 - Contact numbers:
-  - Contact: 0248293512
+  - Contact: 0544904547
 - Map placeholder
 
 ### Contact Form
