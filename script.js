@@ -1,3 +1,101 @@
+// PWA Installation Variables
+let deferredPrompt;
+let isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+let isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+// PWA Installation Functions
+function showInstallPrompt() {
+    const installModal = document.getElementById('pwa-install-modal');
+    if (installModal) {
+        installModal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function hideInstallPrompt() {
+    const installModal = document.getElementById('pwa-install-modal');
+    if (installModal) {
+        installModal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+}
+
+function showIOSInstallInstructions() {
+    const iosModal = document.getElementById('ios-install-modal');
+    if (iosModal) {
+        iosModal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function hideIOSInstallInstructions() {
+    const iosModal = document.getElementById('ios-install-modal');
+    if (iosModal) {
+        iosModal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+}
+
+function installPWA() {
+    if (deferredPrompt) {
+        // Show the install prompt
+        deferredPrompt.prompt();
+        
+        // Wait for the user to respond to the prompt
+        deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === 'accepted') {
+                console.log('User accepted the install prompt');
+            } else {
+                console.log('User dismissed the install prompt');
+            }
+            deferredPrompt = null;
+        });
+    } else if (isIOS) {
+        showIOSInstallInstructions();
+    }
+}
+
+// Listen for the install prompt event
+window.addEventListener('beforeinstallprompt', (e) => {
+    console.log('Install prompt available');
+    // Prevent the mini-infobar from appearing on mobile
+    e.preventDefault();
+    // Stash the event so it can be triggered later
+    deferredPrompt = e;
+    // Show install button in menu
+    showInstallButton();
+});
+
+// Listen for app installed event
+window.addEventListener('appinstalled', (evt) => {
+    console.log('PWA was installed');
+    deferredPrompt = null;
+    hideInstallButton();
+});
+
+function showInstallButton() {
+    const installMenuItem = document.getElementById('install-menu-item');
+    if (installMenuItem) {
+        installMenuItem.style.display = 'block';
+    }
+}
+
+function hideInstallButton() {
+    const installMenuItem = document.getElementById('install-menu-item');
+    if (installMenuItem) {
+        installMenuItem.style.display = 'none';
+    }
+}
+
+// Check if app is already installed
+function checkIfInstalled() {
+    if (isStandalone) {
+        hideInstallButton();
+        return true;
+    }
+    return false;
+}
+
 // Smooth scrolling for navigation links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {

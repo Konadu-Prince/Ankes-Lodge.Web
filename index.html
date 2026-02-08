@@ -95,6 +95,7 @@
                     <li><a href="/payment.html" class="btn-primary">Pay Now</a></li>
                     <li><a href="/contact.html">Contact</a></li>
                     <li><a href="/about.html">About</a></li>
+                    <li id="install-menu-item" style="display: none;"><a href="#" onclick="installPWA(); return false;">Install App</a></li>
                 </ul>
             </nav>
         </div>
@@ -580,6 +581,118 @@
                     installBtn.style.display = 'block';
                 });
             }
+        });
+    </script>
+    
+    <!-- PWA Installation Modals -->
+    <!-- Main Installation Prompt Modal -->
+    <div id="pwa-install-modal" class="modal" style="display: none;">
+        <div class="modal-content install-modal">
+            <span class="close" onclick="hideInstallPrompt()">&times;</span>
+            <div class="modal-header">
+                <img src="AnkesImages/AnkesLodgeLogo.jpeg" alt="Ankes Lodge Logo" class="modal-logo">
+                <h2>Install Ankes Lodge App</h2>
+            </div>
+            <div class="modal-body">
+                <p>Add Ankes Lodge to your home screen for quick access and offline browsing!</p>
+                <div class="install-benefits">
+                    <div class="benefit-item">
+                        <span class="benefit-icon">⚡</span>
+                        <span>Faster loading times</span>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="benefit-icon">📱</span>
+                        <span>App-like experience</span>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="benefit-icon">📥</span>
+                        <span>Works offline</span>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="benefit-icon">🔔</span>
+                        <span>Push notifications</span>
+                    </div>
+                </div>
+                <button class="btn-primary install-btn" onclick="installPWA()">Install Now</button>
+                <button class="btn-secondary" onclick="hideInstallPrompt()">Maybe Later</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- iOS Installation Instructions Modal -->
+    <div id="ios-install-modal" class="modal" style="display: none;">
+        <div class="modal-content ios-modal">
+            <span class="close" onclick="hideIOSInstallInstructions()">&times;</span>
+            <div class="modal-header">
+                <img src="AnkesImages/AnkesLodgeLogo.jpeg" alt="Ankes Lodge Logo" class="modal-logo">
+                <h2>Install on iPhone/iPad</h2>
+            </div>
+            <div class="modal-body">
+                <p>To install Ankes Lodge on your iOS device:</p>
+                <div class="ios-instructions">
+                    <div class="instruction-step">
+                        <span class="step-number">1</span>
+                        <span>Tap the <strong>Share</strong> button <span class="ios-share-icon">⎘</span> at the bottom of your screen</span>
+                    </div>
+                    <div class="instruction-step">
+                        <span class="step-number">2</span>
+                        <span>Scroll down and tap <strong>"Add to Home Screen"</strong></span>
+                    </div>
+                    <div class="instruction-step">
+                        <span class="step-number">3</span>
+                        <span>Tap <strong>"Add"</strong> in the top right corner</span>
+                    </div>
+                </div>
+                <div class="ios-visual-guide">
+                    <div class="ios-guide-placeholder">
+                        <p><strong>Visual Guide:</strong> Tap Share → Add to Home Screen → Add</p>
+                        <div class="ios-guide-steps">
+                            <div class="guide-step">1. Share</div>
+                            <div class="guide-step">2. Add to Home Screen</div>
+                            <div class="guide-step">3. Add</div>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn-primary" onclick="hideIOSInstallInstructions()">Got it!</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Auto-trigger installation prompt after user interaction -->
+    <script>
+        // Auto-show install prompt after user has been on the site for 30 seconds
+        // and has interacted with the page
+        let userInteraction = false;
+        let timeOnSite = 0;
+        
+        // Track user interaction
+        document.addEventListener('click', () => {
+            userInteraction = true;
+        }, { once: true });
+        
+        document.addEventListener('touchstart', () => {
+            userInteraction = true;
+        }, { once: true });
+        
+        // Timer to check for installation eligibility
+        const installTimer = setInterval(() => {
+            timeOnSite += 1000;
+            
+            // Show install prompt after 30 seconds if user has interacted
+            if (timeOnSite >= 30000 && userInteraction && deferredPrompt && !isStandalone) {
+                showInstallPrompt();
+                clearInterval(installTimer);
+            }
+            
+            // Stop checking after 2 minutes
+            if (timeOnSite >= 120000) {
+                clearInterval(installTimer);
+            }
+        }, 1000);
+        
+        // Initialize installation check
+        document.addEventListener('DOMContentLoaded', () => {
+            checkIfInstalled();
         });
     </script>
 </body>
