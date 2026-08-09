@@ -4875,3 +4875,79 @@ footer {
         font-size: 0.95rem;
     }
 }
+
+/* ============================================================
+   Lodge Info Banner (Contact & About pages)
+   ============================================================ */
+
+.lodge-info-banner {
+    background: linear-gradient(135deg, #075E54 0%, #128C7E 100%);
+    color: #fff;
+    padding: 48px 20px;
+    text-align: center;
+}
+
+.lodge-info-content {
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.lodge-info-content h2 {
+    font-size: 2rem;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+    color: #fff;
+}
+
+.lodge-info-tagline {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #e0f5ef;
+}
+
+.lodge-info-location {
+    font-size: 1rem;
+    margin-bottom: 20px;
+    color: #c8ece3;
+}
+
+.lodge-info-links {
+    text-align: left;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 20px 24px;
+    line-height: 1.8;
+    font-size: 0.95rem;
+}
+
+.lodge-info-links p {
+    margin-bottom: 10px;
+}
+
+.lodge-info-links a {
+    color: #FFD700;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.lodge-info-links a:hover {
+    color: #fff;
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .lodge-info-banner {
+        padding: 36px 16px;
+    }
+
+    .lodge-info-content h2 {
+        font-size: 1.6rem;
+    }
+
+    .lodge-info-links {
+        padding: 16px;
+        font-size: 0.9rem;
+    }
+}

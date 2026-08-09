@@ -2167,6 +2167,17 @@ function generateWhatsAppMessage() {
 
     lines.push('', 'Please confirm availability and share payment details. Thank you!');
 
+    lines.push(
+        '',
+        '---',
+        '*Ankes Lodge*',
+        'Located in Abesim, Ghana, Bono Region, Sunyani',
+        'Call/WhatsApp: 0544904547',
+        'Website: www.ankeslodge.com',
+        'Book on Airbnb or Booking.com — search "Ankes Lodge"',
+        'Explore More: https://tr.ee/9mbwVo4uOq'
+    );
+
     return lines.join('\n');
 }
 
@@ -2329,7 +2340,15 @@ function generateContactWhatsAppMessage() {
         subject,
         '',
         '*Message*',
-        message
+        message,
+        '',
+        '---',
+        '*Ankes Lodge*',
+        'Located in Abesim, Ghana, Bono Region, Sunyani',
+        'Call/WhatsApp: 0544904547',
+        'Website: www.ankeslodge.com',
+        'Book on Airbnb or Booking.com — search "Ankes Lodge"',
+        'Explore More: https://tr.ee/9mbwVo4uOq'
     ];
 
     return lines.join('\n');
