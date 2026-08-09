@@ -4692,3 +4692,186 @@ footer {
         min-width: 150px;
     }
 }
+
+/* ============================================================
+   WhatsApp Booking Integration Styles
+   ============================================================ */
+
+/* Info text above review summary */
+.whatsapp-info-text {
+    color: var(--secondary-color);
+    font-size: 0.95rem;
+    margin-bottom: 20px;
+    text-align: center;
+    font-style: italic;
+}
+
+/* WhatsApp message preview container */
+.whatsapp-message-preview {
+    background: #f0f2f5;
+    border: 2px solid #25D366;
+    border-radius: 12px;
+    margin: 24px 0;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(37, 211, 102, 0.12);
+}
+
+.whatsapp-preview-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: #075E54;
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.whatsapp-preview-header .whatsapp-icon-svg {
+    flex-shrink: 0;
+}
+
+.whatsapp-preview-header span {
+    flex: 1;
+}
+
+/* Edit toggle button inside preview header */
+.whatsapp-edit-toggle {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.whatsapp-edit-toggle:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+/* WhatsApp message bubble (display mode) */
+.whatsapp-message-bubble {
+    background: #fff;
+    margin: 16px;
+    padding: 16px 20px;
+    border-radius: 0 12px 12px 12px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 0.92rem;
+    line-height: 1.65;
+    color: #111;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    position: relative;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.whatsapp-message-bubble::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -8px;
+    width: 0;
+    height: 0;
+    border-top: 0px solid transparent;
+    border-bottom: 12px solid transparent;
+    border-right: 10px solid #fff;
+}
+
+.whatsapp-message-bubble strong {
+    color: #075E54;
+    font-weight: 700;
+}
+
+/* WhatsApp message edit textarea */
+.whatsapp-message-edit {
+    width: calc(100% - 32px);
+    margin: 0 16px 16px;
+    padding: 14px 16px;
+    border: 2px solid #25D366;
+    border-radius: 8px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    resize: vertical;
+    min-height: 200px;
+    background: #fff;
+    color: #111;
+    outline: none;
+    transition: border-color 0.2s ease;
+    box-sizing: border-box;
+}
+
+.whatsapp-message-edit:focus {
+    border-color: #075E54;
+    box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.15);
+}
+
+/* Edit hint text */
+.whatsapp-edit-hint {
+    padding: 0 16px 14px;
+    margin: 0;
+    font-size: 0.82rem;
+    color: #667781;
+    font-style: italic;
+}
+
+/* WhatsApp send button */
+.btn-whatsapp {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #25D366;
+    color: #fff;
+    border: none;
+    padding: 14px 28px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    letter-spacing: 0.3px;
+    box-shadow: 0 3px 10px rgba(37, 211, 102, 0.3);
+}
+
+.btn-whatsapp:hover {
+    background: #128C7E;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(37, 211, 102, 0.35);
+}
+
+.btn-whatsapp:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(37, 211, 102, 0.3);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .whatsapp-preview-header {
+        font-size: 0.85rem;
+        padding: 10px 12px;
+        gap: 8px;
+    }
+
+    .whatsapp-message-bubble {
+        margin: 12px;
+        padding: 12px 14px;
+        font-size: 0.88rem;
+    }
+
+    .whatsapp-message-edit {
+        width: calc(100% - 24px);
+        margin: 0 12px 12px;
+        min-height: 180px;
+    }
+
+    .btn-whatsapp {
+        width: 100%;
+        padding: 14px 20px;
+        font-size: 0.95rem;
+    }
+}

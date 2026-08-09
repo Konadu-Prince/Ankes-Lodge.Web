@@ -1272,9 +1272,16 @@ document.addEventListener('DOMContentLoaded', function() {
     initTestimonialForm();
 });
 
-// Apply to both forms
+// Apply to forms
+// Booking form now uses WhatsApp instead of backend POST, so we only
+// prevent default submission to avoid accidental backend calls.
 document.addEventListener('DOMContentLoaded', function() {
-    handleFormSubmit('booking-form', 'Thank you for your booking request! We will contact you shortly to confirm your reservation.');
+    const bookingForm = document.getElementById('booking-form');
+    if (bookingForm) {
+        bookingForm.addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent default - bookings go through WhatsApp
+        });
+    }
     handleFormSubmit('contact-form', 'Thank you for your message! We will get back to you soon.');
     
     // Initialize multi-step booking functionality
@@ -1493,6 +1500,7 @@ function initMultiStepBooking() {
         const roomNames = {
             'executive': 'Executive Room',
             'regular': 'Regular Bedroom',
+            'semi-standard': 'Semi Standard Bedroom',
             'full-house': 'Full House'
         };
         
@@ -2086,4 +2094,201 @@ window.addEventListener('scroll', function() {
             link.classList.add('active');
         }
     });
+});
+
+// ============================================================
+// WhatsApp Booking Integration
+// Sends selected booking details to Ankes Lodge WhatsApp chat
+// allowing the sender to preview and edit before sending.
+// ============================================================
+
+const WHATSAPP_LODGE_NUMBER = '544904547';
+
+/**
+ * Generate a formatted WhatsApp message from the booking form data.
+ */
+function generateWhatsAppMessage() {
+    const name       = document.getElementById('name')?.value.trim()       || '';
+    const email      = document.getElementById('email')?.value.trim()     || '';
+    const phone      = document.getElementById('phone')?.value.trim()     || '';
+    const checkin    = document.getElementById('checkin')?.value          || '';
+    const checkout   = document.getElementById('checkout')?.value         || '';
+    const adults     = document.getElementById('adults')?.value           || '';
+    const children   = document.getElementById('children')?.value         || '0';
+    const roomType   = document.getElementById('room-type')?.value        || '';
+    const message    = document.getElementById('message')?.value.trim()   || '';
+
+    const roomNames = {
+        'executive':     'Executive Room',
+        'regular':       'Regular Bedroom',
+        'semi-standard': 'Semi Standard Bedroom',
+        'full-house':    'Full House'
+    };
+
+    const formatDateStr = (dateString) => {
+        if (!dateString) return '-';
+        const d = new Date(dateString);
+        return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    };
+
+    let nights = '-';
+    if (checkin && checkout) {
+        const diffMs = new Date(checkout) - new Date(checkin);
+        nights = Math.ceil(diffMs / (1000 * 3600 * 24));
+    }
+
+    const lines = [
+        '*New Booking Request - Ankes Lodge*',
+        '',
+        '*Guest Information*',
+        `Name: ${name}`,
+        `Email: ${email}`,
+        `Phone: ${phone}`,
+        '',
+        '*Stay Details*',
+        `Check-in: ${formatDateStr(checkin)}`,
+        `Check-out: ${formatDateStr(checkout)}`,
+        `Adults: ${adults}`,
+        `Children: ${parseInt(children) > 0 ? children : 'None'}`,
+        '',
+        '*Room Selection*',
+        `Room Type: ${roomNames[roomType] || roomType}`,
+        `Total Nights: ${nights}`,
+        `Estimated Cost: Inquire for Pricing`
+    ];
+
+    if (message) {
+        lines.push('', '*Special Requests*', message);
+    }
+
+    lines.push('', 'Please confirm availability and share payment details. Thank you!');
+
+    return lines.join('\n');
+}
+
+/**
+ * Show the WhatsApp message preview in Step 4.
+ * Called when the user clicks "Preview WhatsApp Message".
+ */
+function showWhatsAppPreview() {
+    const messageText  = generateWhatsAppMessage();
+    const previewArea  = document.getElementById('whatsapp-message-preview');
+    const displayEl    = document.getElementById('whatsapp-message-display');
+    const editArea     = document.getElementById('whatsapp-message-edit');
+    const editHint     = document.getElementById('whatsapp-edit-hint');
+    const btnPreview   = document.getElementById('btn-preview-whatsapp');
+    const btnSend      = document.getElementById('btn-send-whatsapp');
+    const btnEdit      = document.getElementById('btn-edit-message');
+
+    if (!previewArea || !displayEl) return;
+
+    // Render message as HTML with line breaks and bold markers
+    displayEl.innerHTML = messageText
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\*([^*]+)\*/g, '<strong>$1</strong>')
+        .replace(/\n/g, '<br>');
+
+    // Populate edit textarea with raw text
+    if (editArea) editArea.value = messageText;
+
+    // Reset to display mode (not edit mode)
+    displayEl.style.display = 'block';
+    if (editArea) editArea.style.display = 'none';
+    if (editHint) editHint.style.display = 'none';
+    if (btnEdit)  btnEdit.textContent = 'Edit Message';
+
+    // Show preview area and send button; hide preview trigger button
+    previewArea.style.display = 'block';
+    if (btnSend)    btnSend.style.display    = 'inline-flex';
+    if (btnPreview) btnPreview.style.display = 'none';
+
+    // Scroll preview into view
+    previewArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/**
+ * Toggle between display mode and edit mode for the WhatsApp message.
+ */
+function toggleEditWhatsAppMessage() {
+    const displayEl = document.getElementById('whatsapp-message-display');
+    const editArea  = document.getElementById('whatsapp-message-edit');
+    const editHint  = document.getElementById('whatsapp-edit-hint');
+    const btnEdit   = document.getElementById('btn-edit-message');
+
+    if (!displayEl || !editArea || !btnEdit) return;
+
+    const isEditing = editArea.style.display === 'block';
+
+    if (isEditing) {
+        // Switch back to display mode with updated text
+        const updatedText = editArea.value;
+        displayEl.innerHTML = updatedText
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/\*([^*]+)\*/g, '<strong>$1</strong>')
+            .replace(/\n/g, '<br>');
+
+        displayEl.style.display = 'block';
+        editArea.style.display  = 'none';
+        if (editHint) editHint.style.display = 'none';
+        btnEdit.textContent   = 'Edit Message';
+    } else {
+        // Switch to edit mode
+        displayEl.style.display = 'none';
+        editArea.style.display  = 'block';
+        if (editHint) editHint.style.display = 'block';
+        btnEdit.textContent   = 'Done Editing';
+        editArea.focus();
+        editArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+}
+
+/**
+ * Send the booking message to WhatsApp.
+ * Opens wa.me with the (possibly user-edited) message pre-filled.
+ */
+function sendBookingToWhatsApp() {
+    const editArea    = document.getElementById('whatsapp-message-edit');
+    const displayEl   = document.getElementById('whatsapp-message-display');
+
+    // Use the edited text if the user was editing, otherwise use the displayed text
+    let finalMessage;
+    if (editArea && editArea.style.display === 'block') {
+        finalMessage = editArea.value;
+    } else {
+        // Extract plain text from the display element
+        finalMessage = displayEl?.innerText || displayEl?.textContent || generateWhatsAppMessage();
+    }
+
+    if (!finalMessage.trim()) {
+        alert('Your booking message is empty. Please go back and fill in the form.');
+        return;
+    }
+
+    // Encode the message for the URL
+    const encodedMessage = encodeURIComponent(finalMessage);
+    const whatsappUrl    = `https://wa.me/${WHATSAPP_LODGE_NUMBER}?text=${encodedMessage}`;
+
+    // Open WhatsApp in a new tab
+    window.open(whatsappUrl, '_blank');
+
+    // Show a confirmation notice
+    const feedback = document.getElementById('booking-form-feedback');
+    if (feedback) {
+        feedback.innerHTML = 'Your booking message has been opened in WhatsApp. Please press <strong>Send</strong> in the WhatsApp chat to complete your booking request.';
+        feedback.className = 'form-feedback success';
+        feedback.style.display = 'block';
+        feedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+}
+
+// Attach the edit toggle handler after DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    const btnEdit = document.getElementById('btn-edit-message');
+    if (btnEdit) {
+        btnEdit.addEventListener('click', toggleEditWhatsAppMessage);
+    }
 });
