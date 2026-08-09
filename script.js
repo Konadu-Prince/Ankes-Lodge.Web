@@ -1273,8 +1273,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Apply to forms
-// Booking form now uses WhatsApp instead of backend POST, so we only
-// prevent default submission to avoid accidental backend calls.
+// Both booking and contact forms now use WhatsApp instead of backend POST.
 document.addEventListener('DOMContentLoaded', function() {
     const bookingForm = document.getElementById('booking-form');
     if (bookingForm) {
@@ -1282,7 +1281,12 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault(); // Prevent default - bookings go through WhatsApp
         });
     }
-    handleFormSubmit('contact-form', 'Thank you for your message! We will get back to you soon.');
+    const contactForm = document.getElementById('contact-form');
+    if (contactForm) {
+        contactForm.addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent default - contact goes through WhatsApp
+        });
+    }
     
     // Initialize multi-step booking functionality
     initMultiStepBooking();
@@ -2291,4 +2295,150 @@ document.addEventListener('DOMContentLoaded', function() {
     if (btnEdit) {
         btnEdit.addEventListener('click', toggleEditWhatsAppMessage);
     }
+
+    // Contact form edit toggle
+    const btnContactEdit = document.getElementById('btn-contact-edit-message');
+    if (btnContactEdit) {
+        btnContactEdit.addEventListener('click', toggleEditContactMessage);
+    }
 });
+
+// ============================================================
+// WhatsApp Contact Form Integration
+// Sends contact messages to Ankes Lodge WhatsApp chat
+// with preview and edit capability before sending.
+// ============================================================
+
+/**
+ * Generate a formatted WhatsApp message from the contact form data.
+ */
+function generateContactWhatsAppMessage() {
+    const name    = document.getElementById('contact-name')?.value.trim()    || '';
+    const email   = document.getElementById('contact-email')?.value.trim()   || '';
+    const subject = document.getElementById('subject')?.value.trim()         || '';
+    const message = document.getElementById('contact-message')?.value.trim() || '';
+
+    const lines = [
+        '*New Contact Message - Ankes Lodge Website*',
+        '',
+        '*From*',
+        `Name: ${name}`,
+        `Email: ${email}`,
+        '',
+        '*Subject*',
+        subject,
+        '',
+        '*Message*',
+        message
+    ];
+
+    return lines.join('\n');
+}
+
+/**
+ * Render text into the contact message display element with WhatsApp formatting.
+ */
+function renderContactMessageDisplay(text) {
+    const displayEl = document.getElementById('contact-message-display');
+    if (!displayEl) return;
+    displayEl.innerHTML = text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\*([^*]+)\*/g, '<strong>$1</strong>')
+        .replace(/\n/g, '<br>');
+}
+
+/**
+ * Show the WhatsApp message preview for the contact form.
+ */
+function showContactWhatsAppPreview() {
+    const messageText = generateContactWhatsAppMessage();
+    const previewArea = document.getElementById('contact-whatsapp-preview');
+    const editArea    = document.getElementById('contact-message-edit');
+    const editHint    = document.getElementById('contact-edit-hint');
+    const btnPreview  = document.getElementById('btn-contact-preview-whatsapp');
+    const btnSend     = document.getElementById('btn-contact-send-whatsapp');
+    const btnEdit     = document.getElementById('btn-contact-edit-message');
+
+    if (!previewArea) return;
+
+    renderContactMessageDisplay(messageText);
+
+    if (editArea) editArea.value = messageText;
+
+    // Reset to display mode
+    const displayEl = document.getElementById('contact-message-display');
+    if (displayEl) displayEl.style.display = 'block';
+    if (editArea)  editArea.style.display  = 'none';
+    if (editHint)  editHint.style.display  = 'none';
+    if (btnEdit)   btnEdit.textContent     = 'Edit Message';
+
+    previewArea.style.display = 'block';
+    if (btnSend)    btnSend.style.display    = 'inline-flex';
+    if (btnPreview) btnPreview.style.display = 'none';
+
+    previewArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/**
+ * Toggle between display mode and edit mode for the contact WhatsApp message.
+ */
+function toggleEditContactMessage() {
+    const displayEl = document.getElementById('contact-message-display');
+    const editArea  = document.getElementById('contact-message-edit');
+    const editHint  = document.getElementById('contact-edit-hint');
+    const btnEdit   = document.getElementById('btn-contact-edit-message');
+
+    if (!displayEl || !editArea || !btnEdit) return;
+
+    const isEditing = editArea.style.display === 'block';
+
+    if (isEditing) {
+        renderContactMessageDisplay(editArea.value);
+        displayEl.style.display = 'block';
+        editArea.style.display  = 'none';
+        if (editHint) editHint.style.display = 'none';
+        btnEdit.textContent = 'Edit Message';
+    } else {
+        displayEl.style.display = 'none';
+        editArea.style.display  = 'block';
+        if (editHint) editHint.style.display = 'block';
+        btnEdit.textContent = 'Done Editing';
+        editArea.focus();
+        editArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+}
+
+/**
+ * Send the contact message to WhatsApp.
+ */
+function sendContactToWhatsApp() {
+    const editArea  = document.getElementById('contact-message-edit');
+    const displayEl = document.getElementById('contact-message-display');
+
+    let finalMessage;
+    if (editArea && editArea.style.display === 'block') {
+        finalMessage = editArea.value;
+    } else {
+        finalMessage = displayEl?.innerText || displayEl?.textContent || generateContactWhatsAppMessage();
+    }
+
+    if (!finalMessage.trim()) {
+        alert('Your message is empty. Please fill in the form first.');
+        return;
+    }
+
+    const encodedMessage = encodeURIComponent(finalMessage);
+    const whatsappUrl    = `https://wa.me/${WHATSAPP_LODGE_NUMBER}?text=${encodedMessage}`;
+
+    window.open(whatsappUrl, '_blank');
+
+    const feedback = document.getElementById('contact-form-feedback');
+    if (feedback) {
+        feedback.innerHTML = 'Your message has been opened in WhatsApp. Please press <strong>Send</strong> in the WhatsApp chat to complete.';
+        feedback.className = 'form-feedback success';
+        feedback.style.display = 'block';
+        feedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+}
