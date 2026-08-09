@@ -29,6 +29,12 @@
     box-sizing: border-box;
 }
 
+/* Prevent any element from overflowing viewport */
+img, video, iframe {
+    max-width: 100%;
+    height: auto;
+}
+
 html {
     scroll-behavior: smooth;
 }
@@ -3048,7 +3054,7 @@ footer {
     }
     
     .step-label {
-        font-size: 0.75rem;
+        font-size: 0.72rem;
     }
     
     .step-number {
@@ -3059,7 +3065,7 @@ footer {
     
     .step-navigation {
         flex-direction: column;
-        gap: 15px;
+        gap: 12px;
     }
     
     .step-navigation button {
@@ -3068,31 +3074,212 @@ footer {
     }
     
     .review-summary {
-        padding: 20px;
+        padding: 16px;
+    }
+
+    /* Booking options cards: tighter on tablet */
+    .booking-options-container {
+        gap: 20px;
+    }
+
+    /* Direct booking section: tighter padding */
+    .direct-booking-section {
+        padding: 20px 15px;
+    }
+
+    /* WhatsApp preview: keep scrollable on tablet */
+    .whatsapp-message-bubble {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .whatsapp-message-edit {
+        min-height: 160px;
+    }
+
+    /* Page hero shorter on tablet */
+    .page-hero {
+        height: 280px;
     }
 }
 
 @media (max-width: 480px) {
     .booking-progress {
-        padding: 12px;
+        padding: 10px;
     }
     
     .step-label {
-        font-size: 0.7rem;
+        font-size: 0.65rem;
+        max-width: 60px;
+        word-wrap: break-word;
     }
     
     .step-number {
-        width: 30px;
-        height: 30px;
-        font-size: 0.8rem;
+        width: 28px;
+        height: 28px;
+        font-size: 0.75rem;
+        margin-bottom: 5px;
     }
-    
+
+    .progress-steps::before {
+        top: 14px;
+    }
+
+    .progress-bar {
+        height: 4px;
+    }
+
     .review-section h4 {
-        font-size: 1rem;
+        font-size: 0.95rem;
     }
     
     .review-section p {
+        font-size: 0.85rem;
+        word-break: break-word;
+    }
+
+    /* WhatsApp preview: compact on small phones */
+    .whatsapp-message-preview {
+        margin: 16px 0;
+    }
+
+    .whatsapp-preview-header {
+        font-size: 0.8rem;
+        padding: 8px 10px;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .whatsapp-message-bubble {
+        margin: 8px;
+        padding: 10px 12px;
+        font-size: 0.82rem;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    /* Hide the speech-bubble arrow on mobile to prevent overflow */
+    .whatsapp-message-bubble::before {
+        display: none;
+    }
+
+    .whatsapp-message-edit {
+        width: calc(100% - 16px);
+        margin: 0 8px 8px;
+        min-height: 140px;
+        font-size: 0.82rem;
+        padding: 10px;
+    }
+
+    .whatsapp-edit-hint {
+        padding: 0 8px 10px;
+        font-size: 0.75rem;
+    }
+
+    .whatsapp-edit-toggle {
+        font-size: 0.7rem;
+        padding: 4px 8px;
+    }
+
+    .btn-whatsapp {
+        width: 100%;
         font-size: 0.9rem;
+        padding: 12px 16px;
+    }
+
+    /* Booking option cards: full-width, less padding */
+    .booking-options-container {
+        gap: 15px;
+    }
+
+    .booking-option-card {
+        padding: 18px 15px;
+    }
+
+    .airbnb-option, .booking-com-option {
+        padding: 18px 15px;
+        min-width: 0;
+    }
+
+    /* Direct booking section compact */
+    .direct-booking-section {
+        padding: 16px 10px;
+    }
+
+    .direct-booking-section h3 {
+        font-size: 1.15rem;
+    }
+
+    /* Page hero even shorter on phones */
+    .page-hero {
+        height: 220px;
+    }
+
+    .page-hero h1 {
+        font-size: 1.6rem;
+    }
+
+    .page-hero p {
+        font-size: 0.9rem;
+    }
+
+    /* Review summary tighter */
+    .review-summary {
+        padding: 12px;
+    }
+
+    .review-section {
+        margin-bottom: 14px;
+        padding-bottom: 10px;
+    }
+
+    /* Booking form label and inputs */
+    .booking-step h3 {
+        font-size: 1.1rem;
+    }
+
+    .form-group label {
+        font-size: 0.88rem;
+    }
+
+    .form-help {
+        font-size: 0.75rem;
+    }
+
+    /* WhatsApp info text smaller */
+    .whatsapp-info-text {
+        font-size: 0.85rem;
+    }
+
+    /* Payment info box compact */
+    .payment-info {
+        padding: 14px;
+    }
+
+    .payment-info h4 {
+        font-size: 1rem;
+    }
+
+    .payment-info p {
+        font-size: 0.85rem;
+    }
+
+    /* Booking benefits grid single column */
+    .benefits-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .benefit-card {
+        padding: 18px;
+    }
+
+    .benefit-card h3 {
+        font-size: 1rem;
+    }
+
+    .benefit-card p {
+        font-size: 0.88rem;
     }
 }
 
