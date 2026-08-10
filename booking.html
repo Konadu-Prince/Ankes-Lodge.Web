@@ -207,10 +207,10 @@
                             <label for="room-type">Room Type <span aria-label="required">*</span></label>
                             <select id="room-type" name="room-type" required aria-required="true">
                                 <option value="">Select Room Type</option>
-                                <option value="executive">Executive Room (Inquire for Pricing)</option>
-                                <option value="regular">Regular Bedroom (Inquire for Pricing)</option>
-                                <option value="semi-standard">Semi Standard Bedroom (Inquire for Pricing)</option>
-                                <option value="full-house">Full House (Custom Pricing)</option>
+                                <option value="executive">Executive Room — GH₵350/night</option>
+                                <option value="deluxe">Deluxe Room — GH₵300/night</option>
+                                <option value="standard">Standard Room — GH₵250/night</option>
+                                <option value="full-house">Full House — Enquire for Pricing</option>
                             </select>
                         </div>
                     
@@ -249,8 +249,9 @@
                             <div class="review-section">
                                 <h4>Room Selection</h4>
                                 <p><strong>Room Type:</strong> <span id="review-room">-</span></p>
+                                <p><strong>Rate Per Night:</strong> <span id="review-rate">-</span></p>
                                 <p><strong>Total Nights:</strong> <span id="review-nights">-</span></p>
-                                <p><strong>Estimated Cost:</strong> <span id="review-cost">-</span></p>
+                                <p><strong>Total Accommodation Cost:</strong> <span id="review-cost">-</span></p>
                             </div>
                             
                             <div class="review-section" id="review-special-requests" style="display: none;">
@@ -272,6 +273,26 @@
                             <textarea class="whatsapp-message-edit" id="whatsapp-message-edit" style="display: none;" rows="10" placeholder="Edit your booking message here..."></textarea>
                             <p class="whatsapp-edit-hint" id="whatsapp-edit-hint" style="display: none;">You can edit the message above before sending. The lodge will receive exactly what you see.</p>
                         </div>
+                        
+                        <!-- TODO: PAYMENT SECTION — uncomment when Paystack keys are configured -->
+                        <!--
+                        <div class="booking-payment-section" id="booking-payment-section" style="display: none;">
+                            <div class="review-section">
+                                <h4>Payment</h4>
+                                <p>Pay securely via Mobile Money using Paystack.</p>
+                                <p><strong>Ankes Lodge Payment Number:</strong> 0544904547</p>
+                                <div id="payment-status-display" class="payment-status-display" style="display: none;"></div>
+                                <button type="button" class="btn-primary" id="btn-pay-now" onclick="initiatePaystackPayment()" style="margin-top: 10px;">
+                                    Pay Now
+                                </button>
+                                <button type="button" class="btn-secondary" id="btn-retry-payment" onclick="initiatePaystackPayment()" style="display: none; margin-top: 10px;">
+                                    Retry Payment
+                                </button>
+                            </div>
+                        </div>
+                        <input type="hidden" id="payment-reference" value="">
+                        <input type="hidden" id="payment-status" value="">
+                        -->
                         
                         <div class="step-navigation">
                             <button type="button" class="btn-secondary prev-step" data-prev="3">Previous</button>
@@ -408,6 +429,8 @@
         <span>↑</span>
     </button>
 
+    <!-- TODO: PAYSTACK — uncomment when ready to enable payments -->
+    <!-- <script src="https://js.paystack.co/v1/inline.js"></script> -->
     <script src="script.js"></script>
 </body>
 </html>

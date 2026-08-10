@@ -223,8 +223,8 @@ document.querySelectorAll('.room-card .btn-secondary').forEach(button => {
 function getRoomTypeName(roomType) {
     const roomTypes = {
         'executive': 'Executive Room',
-        'regular': 'Regular Bedroom',
-        'semi-standard': 'Semi Standard Room',
+        'deluxe': 'Deluxe Room',
+        'standard': 'Standard Room',
         'full-house': 'Full House'
     };
     return roomTypes[roomType] || 'Room';
@@ -736,7 +736,7 @@ function handleFormSubmit(formId, successMessage) {
             }
             
             // Validate room type
-            const validRoomTypes = ['executive', 'regular', 'semi-standard', 'full-house'];
+            const validRoomTypes = ['executive', 'deluxe', 'standard', 'full-house'];
             if (!validRoomTypes.includes(roomType)) {
                 const errorMsg = 'Please select a valid room type.';
                 
@@ -1503,9 +1503,14 @@ function initMultiStepBooking() {
         const roomType = document.getElementById('room-type').value;
         const roomNames = {
             'executive': 'Executive Room',
-            'regular': 'Regular Bedroom',
-            'semi-standard': 'Semi Standard Bedroom',
+            'deluxe': 'Deluxe Room',
+            'standard': 'Standard Room',
             'full-house': 'Full House'
+        };
+        const roomPrices = {
+            'executive': 350,
+            'deluxe': 300,
+            'standard': 250
         };
         
         document.getElementById('review-room').textContent = roomNames[roomType] || '-';
@@ -1515,11 +1520,27 @@ function initMultiStepBooking() {
             const nights = calculateNights(checkinDate, checkoutDate);
             document.getElementById('review-nights').textContent = `${nights} night${nights > 1 ? 's' : ''}`;
             
-            const cost = calculateCost(roomType, nights);
-            document.getElementById('review-cost').textContent = cost ? `₵${cost}` : 'Custom Pricing';
+            const pricePerNight = roomPrices[roomType];
+            const rateEl = document.getElementById('review-rate');
+            const costEl = document.getElementById('review-cost');
+            
+            if (roomType === 'full-house') {
+                if (rateEl) rateEl.textContent = 'Enquire for Pricing';
+                if (costEl) costEl.textContent = 'Price varies — please enquire';
+            } else if (pricePerNight && nights > 0) {
+                const total = pricePerNight * nights;
+                if (rateEl) rateEl.textContent = `GH₵${pricePerNight}/night`;
+                if (costEl) costEl.textContent = `GH₵${total.toLocaleString()}`;
+            } else {
+                if (rateEl) rateEl.textContent = '-';
+                if (costEl) costEl.textContent = '-';
+            }
         } else {
             document.getElementById('review-nights').textContent = '-';
-            document.getElementById('review-cost').textContent = '-';
+            const rateEl = document.getElementById('review-rate');
+            const costEl = document.getElementById('review-cost');
+            if (rateEl) rateEl.textContent = '-';
+            if (costEl) costEl.textContent = '-';
         }
         
         // Update special requests
@@ -1550,8 +1571,6 @@ function initMultiStepBooking() {
         const timeDiff = checkoutDate.getTime() - checkinDate.getTime();
         return Math.ceil(timeDiff / (1000 * 3600 * 24));
     }
-    
-    // Removed price calculation as we're using inquiry-based pricing
 }
 
 // Affiliate Company Modal Functions
@@ -1736,35 +1755,48 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('review-checkout').textContent = formatDate(document.getElementById('checkout').value);
         document.getElementById('review-adults').textContent = document.getElementById('adults').value;
         document.getElementById('review-children').textContent = document.getElementById('children').value;
-        document.getElementById('review-room').textContent = document.querySelector('#room-type option:checked').textContent;
+        
+        const roomType = document.getElementById('room-type').value;
+        const roomNames = {
+            'executive': 'Executive Room',
+            'deluxe': 'Deluxe Room',
+            'standard': 'Standard Room',
+            'full-house': 'Full House'
+        };
+        const roomPrices = {
+            'executive': 350,
+            'deluxe': 300,
+            'standard': 250
+        };
+        
+        document.getElementById('review-room').textContent = roomNames[roomType] || '-';
         
         // Calculate nights and cost
         const checkinDate = new Date(document.getElementById('checkin').value);
         const checkoutDate = new Date(document.getElementById('checkout').value);
         const nights = Math.ceil((checkoutDate - checkinDate) / (1000 * 60 * 60 * 24));
         
-        document.getElementById('review-nights').textContent = nights;
+        document.getElementById('review-nights').textContent = nights > 0 ? `${nights} night${nights > 1 ? 's' : ''}` : '-';
         
-        // Calculate estimated cost based on room type
-        const roomType = document.getElementById('room-type').value;
-        let pricePerNight = 0;
+        const pricePerNight = roomPrices[roomType];
+        const rateEl = document.getElementById('review-rate');
+        const costEl = document.getElementById('review-cost');
+        const paymentSection = document.getElementById('booking-payment-section');
         
-        switch(roomType) {
-            case 'executive':
-                pricePerNight = 350;
-                break;
-            case 'regular':
-                pricePerNight = 250;
-                break;
-            case 'semi-standard':
-                pricePerNight = 300;
-                break;
-            default:
-                pricePerNight = 0;
+        if (roomType === 'full-house') {
+            if (rateEl) rateEl.textContent = 'Enquire for Pricing';
+            if (costEl) costEl.textContent = 'Price varies — please enquire';
+            if (paymentSection) paymentSection.style.display = 'none';
+        } else if (pricePerNight && nights > 0) {
+            const total = pricePerNight * nights;
+            if (rateEl) rateEl.textContent = `GH₵${pricePerNight}/night`;
+            if (costEl) costEl.textContent = `GH₵${total.toLocaleString()}`;
+            if (paymentSection) paymentSection.style.display = 'block';
+        } else {
+            if (rateEl) rateEl.textContent = '-';
+            if (costEl) costEl.textContent = '-';
+            if (paymentSection) paymentSection.style.display = 'none';
         }
-        
-        // Display inquiry message instead of calculated cost
-        document.getElementById('review-cost').textContent = 'Inquire for Pricing';
         
         // Handle special requests
         const message = document.getElementById('message').value.trim();
@@ -2107,6 +2139,9 @@ window.addEventListener('scroll', function() {
 // ============================================================
 
 const WHATSAPP_LODGE_NUMBER = '544904547';
+const ANKES_LODGE_PAYMENT_NUMBER = '0544904547';
+// TODO: PAYSTACK — uncomment when ready to enable payments
+// let paystackConfig = null;
 
 /**
  * Generate a formatted WhatsApp message from the booking form data.
@@ -2123,10 +2158,16 @@ function generateWhatsAppMessage() {
     const message    = document.getElementById('message')?.value.trim()   || '';
 
     const roomNames = {
-        'executive':     'Executive Room',
-        'regular':       'Regular Bedroom',
-        'semi-standard': 'Semi Standard Bedroom',
-        'full-house':    'Full House'
+        'executive':  'Executive Room',
+        'deluxe':     'Deluxe Room',
+        'standard':   'Standard Room',
+        'full-house': 'Full House'
+    };
+
+    const roomPrices = {
+        'executive': 350,
+        'deluxe':    300,
+        'standard':  250
     };
 
     const formatDateStr = (dateString) => {
@@ -2141,31 +2182,79 @@ function generateWhatsAppMessage() {
         nights = Math.ceil(diffMs / (1000 * 3600 * 24));
     }
 
+    const pricePerNight = roomPrices[roomType];
+    const isFullHouse = roomType === 'full-house';
+    let totalCost = '-';
+    let rateDisplay = '-';
+
+    if (pricePerNight && typeof nights === 'number' && nights > 0) {
+        totalCost = pricePerNight * nights;
+        rateDisplay = `GH₵${pricePerNight}/night`;
+    }
+
+    const paymentRef     = document.getElementById('payment-reference')?.value || '';
+    const paymentStatus  = document.getElementById('payment-status')?.value || '';
+
     const lines = [
-        '*New Booking Request - Ankes Lodge*',
+        '*BOOKING REQUEST — ANKES LODGE*',
         '',
         '*Guest Information*',
         `Name: ${name}`,
-        `Email: ${email}`,
         `Phone: ${phone}`,
+        `Email: ${email}`,
         '',
         '*Stay Details*',
-        `Check-in: ${formatDateStr(checkin)}`,
-        `Check-out: ${formatDateStr(checkout)}`,
-        `Adults: ${adults}`,
-        `Children: ${parseInt(children) > 0 ? children : 'None'}`,
-        '',
-        '*Room Selection*',
-        `Room Type: ${roomNames[roomType] || roomType}`,
-        `Total Nights: ${nights}`,
-        `Estimated Cost: Inquire for Pricing`
+        `Room: ${roomNames[roomType] || roomType}`,
     ];
+
+    if (isFullHouse) {
+        lines.push(
+            `Check-in: ${formatDateStr(checkin)}`,
+            `Check-out: ${formatDateStr(checkout)}`,
+            `Number of Nights: ${nights}`,
+            `Adults: ${adults}`,
+            `Children: ${parseInt(children) > 0 ? children : 'None'}`,
+            '',
+            '*Pricing*',
+            'Price varies depending on the activities and requirements of the booking. Please enquire for applicable pricing.',
+            '',
+            '*Payment*',
+            'Payment will be arranged after pricing is confirmed.'
+        );
+    } else {
+        lines.push(
+            `Rate: GH₵${pricePerNight || 0}/night`,
+            `Check-in: ${formatDateStr(checkin)}`,
+            `Check-out: ${formatDateStr(checkout)}`,
+            `Number of Nights: ${nights}`,
+            `Adults: ${adults}`,
+            `Children: ${parseInt(children) > 0 ? children : 'None'}`,
+            '',
+            `*Total Accommodation Cost: GH₵${typeof totalCost === 'number' ? totalCost.toLocaleString() : totalCost}*`,
+            '',
+            '*Payment*',
+            'Payment Method: Mobile Money / Paystack',
+            `Ankes Lodge Payment Number: ${ANKES_LODGE_PAYMENT_NUMBER}`
+        );
+
+        if (paymentRef && paymentStatus === 'success') {
+            lines.push(
+                `Pay Now: https://paystack.com/pay/${paymentRef}`,
+                'Payment Status: Paid ✓'
+            );
+        } else if (paymentRef) {
+            lines.push(
+                `Pay Now: https://paystack.com/pay/${paymentRef}`,
+                `Payment Status: ${paymentStatus || 'Payment Required'}`
+            );
+        } else {
+            lines.push('Payment Status: Payment Required');
+        }
+    }
 
     if (message) {
         lines.push('', '*Special Requests*', message);
     }
-
-    lines.push('', 'Please confirm availability and share payment details. Thank you!');
 
     lines.push(
         '',
@@ -2313,6 +2402,196 @@ document.addEventListener('DOMContentLoaded', function() {
         btnContactEdit.addEventListener('click', toggleEditContactMessage);
     }
 });
+
+// ============================================================
+// TODO: PAYSTACK PAYMENT INTEGRATION
+// Uncomment the functions below when Paystack keys are configured
+// and the Paystack script tag is uncommented in booking.html.
+// ============================================================
+
+function formatCurrency(amount) {
+    return 'GH₵' + Number(amount).toLocaleString();
+}
+
+/*
+async function getPaystackConfig() {
+    if (paystackConfig) return paystackConfig;
+    try {
+        const res = await fetch('/api/paystack/config');
+        const data = await res.json();
+        if (data.publicKey) {
+            paystackConfig = data;
+            return data;
+        }
+    } catch (e) {
+        console.error('Failed to load Paystack config:', e);
+    }
+    return null;
+}
+
+async function initiatePaystackPayment() {
+    const roomType = document.getElementById('room-type')?.value;
+    const roomPrices = { 'executive': 350, 'deluxe': 300, 'standard': 250 };
+    const pricePerNight = roomPrices[roomType];
+
+    if (!pricePerNight) {
+        alert('Payment is only available for fixed-price rooms.');
+        return;
+    }
+
+    const name = document.getElementById('name')?.value?.trim();
+    const email = document.getElementById('email')?.value?.trim();
+    const phone = document.getElementById('phone')?.value?.trim();
+    const checkin = document.getElementById('checkin')?.value;
+    const checkout = document.getElementById('checkout')?.value;
+    const adults = document.getElementById('adults')?.value;
+    const children = document.getElementById('children')?.value || '0';
+    const message = document.getElementById('message')?.value?.trim() || '';
+
+    if (!name || !email || !phone || !checkin || !checkout || !adults || !roomType) {
+        alert('Please complete all required booking fields before paying.');
+        return;
+    }
+
+    const checkinDate = new Date(checkin);
+    const checkoutDate = new Date(checkout);
+    const nights = Math.ceil((checkoutDate - checkinDate) / (1000 * 60 * 60 * 24));
+
+    if (nights <= 0) {
+        alert('Invalid dates. Check-out must be after check-in.');
+        return;
+    }
+
+    const totalAmount = pricePerNight * nights;
+
+    const btnPay = document.getElementById('btn-pay-now');
+    const btnRetry = document.getElementById('btn-retry-payment');
+    if (btnPay) { btnPay.disabled = true; btnPay.textContent = 'Processing...'; }
+
+    try {
+        const response = await fetch('/initiate-booking-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                name, email, phone, checkin, checkout,
+                adults: parseInt(adults),
+                children: parseInt(children),
+                roomType, message,
+                amount: totalAmount,
+                nights
+            })
+        });
+
+        const result = await response.json();
+
+        if (!result.success) {
+            throw new Error(result.message || 'Payment initialization failed');
+        }
+
+        const config = await getPaystackConfig();
+        if (!config || !config.publicKey) {
+            throw new Error('Payment system is not configured. Please contact support.');
+        }
+
+        const handler = PaystackPop.setup({
+            key: config.publicKey,
+            email: email,
+            amount: result.amount_in_pesewas,
+            currency: 'GHS',
+            ref: result.reference,
+            metadata: {
+                booking_id: result.bookingId,
+                customer_name: name,
+                customer_phone: phone
+            },
+            callback: function(response) {
+                verifyPayment(response.reference);
+            },
+            onClose: function() {
+                updatePaymentStatusDisplay('cancelled', '');
+                if (btnPay) { btnPay.disabled = false; btnPay.textContent = 'Pay Now'; }
+                if (btnRetry) btnRetry.style.display = 'inline-flex';
+            }
+        });
+        handler.openIframe();
+
+    } catch (error) {
+        console.error('Payment error:', error);
+        alert('Payment error: ' + error.message);
+        if (btnPay) { btnPay.disabled = false; btnPay.textContent = 'Pay Now'; }
+        if (btnRetry) btnRetry.style.display = 'inline-flex';
+    }
+}
+
+async function verifyPayment(reference) {
+    const btnPay = document.getElementById('btn-pay-now');
+    const btnRetry = document.getElementById('btn-retry-payment');
+
+    updatePaymentStatusDisplay('verifying', '');
+
+    try {
+        const response = await fetch('/verify-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ reference })
+        });
+
+        const result = await response.json();
+
+        if (result.success && result.status === 'success') {
+            document.getElementById('payment-reference').value = reference;
+            document.getElementById('payment-status').value = 'success';
+            updatePaymentStatusDisplay('success', result.transaction_id);
+
+            if (btnPay) { btnPay.style.display = 'none'; }
+            if (btnRetry) btnRetry.style.display = 'none';
+
+            const feedback = document.getElementById('booking-form-feedback');
+            if (feedback) {
+                feedback.innerHTML = '<strong>Payment Successful ✓</strong> — Transaction: ' + (result.transaction_id || reference) + '<br>You can now send your booking via WhatsApp.';
+                feedback.className = 'form-feedback success';
+                feedback.style.display = 'block';
+            }
+        } else {
+            throw new Error(result.message || 'Payment verification failed');
+        }
+    } catch (error) {
+        console.error('Verification error:', error);
+        updatePaymentStatusDisplay('failed', '');
+        if (btnPay) { btnPay.disabled = false; btnPay.textContent = 'Pay Now'; }
+        if (btnRetry) btnRetry.style.display = 'inline-flex';
+
+        const feedback = document.getElementById('booking-form-feedback');
+        if (feedback) {
+            feedback.innerHTML = 'Payment verification failed: ' + error.message + '<br>Please try again or contact support.';
+            feedback.className = 'form-feedback error';
+            feedback.style.display = 'block';
+        }
+    }
+}
+
+function updatePaymentStatusDisplay(status, transactionId) {
+    const statusEl = document.getElementById('payment-status-display');
+    if (!statusEl) return;
+
+    statusEl.style.display = 'block';
+    const statusMessages = {
+        'verifying': { text: '⏳ Verifying payment...', color: '#ffc107', bg: '#fff3cd' },
+        'success':   { text: '✅ Payment Successful ✓' + (transactionId ? ' (Ref: ' + transactionId + ')' : ''), color: '#28a745', bg: '#d4edda' },
+        'failed':    { text: '❌ Payment Failed. Please try again.', color: '#dc3545', bg: '#f8d7da' },
+        'cancelled': { text: '⚠️ Payment Cancelled.', color: '#ffc107', bg: '#fff3cd' }
+    };
+
+    const s = statusMessages[status] || statusMessages['verifying'];
+    statusEl.textContent = s.text;
+    statusEl.style.color = s.color;
+    statusEl.style.backgroundColor = s.bg;
+    statusEl.style.padding = '10px 15px';
+    statusEl.style.borderRadius = '6px';
+    statusEl.style.marginTop = '10px';
+    statusEl.style.fontWeight = '600';
+}
+*/
 
 // ============================================================
 // WhatsApp Contact Form Integration

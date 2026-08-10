@@ -3042,6 +3042,42 @@ footer {
     color: var(--secondary-color);
 }
 
+/* TODO: PAYSTACK — uncomment when payment section is enabled
+.booking-payment-section {
+    margin-top: 20px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+.booking-payment-section .review-section {
+    margin-bottom: 0;
+}
+
+.booking-payment-section .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.booking-payment-section .btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.payment-status-display {
+    margin-top: 10px;
+    padding: 10px 15px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+*/
+
 /* Mobile responsiveness for multi-step form */
 @media (max-width: 768px) {
     .booking-progress {

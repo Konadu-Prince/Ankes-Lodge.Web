@@ -139,35 +139,61 @@
     <footer>
         <div class="container">
             <div class="footer-content">
-                <div class="footer-logo">
-                    <img src="AnkesImages/AnkesLodgeLogo.jpeg" alt="Ankes Lodge Logo">
-                    <h3>Ankes Lodge</h3>
+                <div class="footer-main">
+                    <div class="footer-logo">
+                        <img src="AnkesImages/AnkesLodgeLogo.jpeg" alt="Ankes Lodge Logo">
+                        <h3>Ankes Lodge</h3>
+                    </div>
+                    
+                    <div class="social-media">
+                        <h4>Follow Us</h4>
+                        <div class="social-links">
+                            <p><a href="https://www.tiktok.com/@ankes.like" target="_blank" rel="noopener">TikTok: @ANKES.LODGE</a></p>
+                            <p><a href="https://www.facebook.com/profile.php?id=61585622975473" target="_blank" rel="noopener">Facebook:ANKES LODGE</a></p>
+                            <p><a href="https://www.instagram.com/ankeslodge.2025?igsh=ODF5MnV6cG01aWd2" target="_blank" rel="noopener">Instagram:@ANKESLODGE.2025</a></p>
+                            <p><a href="https://x.com/ANKES_LODGE" target="_blank" rel="noopener">Twitter:@ANKES_LODGE</a></p>
+                            <p><a href="https://whatsapp.com/channel/0029Vb7dl4j5kg7AhA6B411q" target="_blank" rel="noopener">WhatsApp Channel:ANKES LODGE</a></p>
+                        </div>
+                    </div>
                 </div>
-                
+ <!--             
+                <div class="affiliate-section">
+                    <div class="affiliate-company">
+                        <div class="affiliate-logo" onclick="openAffiliateModal()">
+                            <img src="AnkesImages/Conadux-Prime-EnterpriseLogo.jpeg" alt="Conadux Prime Enterprise Logo">
+                            <p>Affordable Quality Laptops & Data Bundles</p>
+                        </div>
+                        <div class="affiliate-social">
+                            <h4>Follow Conadux</h4>
+                            <div class="social-links">
+                                <p><a href="#" target="_blank" rel="noopener">TikTok: @conadux_prime</a></p>
+                                <p><a href="#" target="_blank" rel="noopener">Facebook: Conadux Prime TECH Enterprise</a></p>
+                                <p><a href="#" target="_blank" rel="noopener">Instagram: @conadux.prime</a></p>
+                                <p><a href="https://whatsapp.com/channel/0029Vb735aEC1Fu4s9zF9231" target="_blank" rel="noopener">WhatsApp: Conadux Prime Tech Enterprise</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+ -->              
                 <div class="footer-links">
                     <h4>Quick Links</h4>
                     <ul>
-                        <li><a href="index.html#home">Home</a></li>
-                        <li><a href="index.html#rooms">Rooms</a></li>
-                        <li><a href="index.html#facilities">Facilities</a></li>
-                        <li><a href="index.html#booking">Booking</a></li>
-                        <li><a href="index.html#contact">Contact</a></li>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/about.html">About</a></li>
+                        <li><a href="/rooms.html">Rooms</a></li>
+                        <li><a href="/gallery.html">Gallery</a></li>
+                        <li><a href="/reviews.html">Reviews</a></li>
+                        <li><a href="/contact.html">Contact</a></li>
+                        <li><a href="/booking.html">Booking</a></li>
+                        <li><a href="/payment.html">Payment</a></li>
+                        <li><a href="/login.html">Admin Login</a></li>
                     </ul>
-                </div>
-                
-                <div class="social-media">
-                    <h4>Follow Us</h4>
-                    <div class="social-links">
-                        <p><a href="https://vm.tiktok.com/ZMHwSn9khM96S-gSAVf/" target="_blank" rel="noopener">TikTok</a></p>
-                        <p><a href="#" target="_blank" rel="noopener">Facebook</a></p>
-                        <p><a href="#" target="_blank" rel="noopener">Instagram</a></p>
-                        <p><a href="#" target="_blank" rel="noopener">Twitter</a></p>
-                    </div>
                 </div>
             </div>
             
+           
             <div class="copyright">
-                <p>&copy; 2025 Ankes Lodge. All rights reserved.</p>
+                <p>&copy; 2025 Ankes Lodge. All rights reserved | <a href="https://vm.tiktok.com/ZS4jE2eWw/" target="_blank" rel="noopener">ANKES LODGE</a></p>
             </div>
         </div>
     </footer>
@@ -201,21 +227,30 @@
             
             if (roomType) {
                 const roomTypes = {
-                    'executive': 'Executive Room (Inquire for Pricing)',
-                    'regular': 'Regular Bedroom (Inquire for Pricing)',
-                    'full-house': 'Full House (Custom Pricing)'
+                    'executive': 'Executive Room — GH₵350/night',
+                    'deluxe': 'Deluxe Room — GH₵300/night',
+                    'standard': 'Standard Room — GH₵250/night',
+                    'full-house': 'Full House — Enquire for Pricing'
                 };
                 document.getElementById('room-type').textContent = roomTypes[roomType] || roomType;
             }
             
-            // Display inquiry message instead of calculating required amount
-            if (checkin && checkout) {
+            // Display pricing based on room type
+            if (checkin && checkout && roomType) {
                 const checkinDate = new Date(checkin);
                 const checkoutDate = new Date(checkout);
                 const timeDiff = checkoutDate.getTime() - checkinDate.getTime();
                 const nights = Math.ceil(timeDiff / (1000 * 3600 * 24));
                 
-                document.getElementById('required-amount').textContent = 'Inquire for Pricing';
+                const roomPrices = { 'executive': 350, 'deluxe': 300, 'standard': 250 };
+                const pricePerNight = roomPrices[roomType];
+                
+                if (pricePerNight && nights > 0) {
+                    const total = pricePerNight * nights;
+                    document.getElementById('required-amount').textContent = `₵${total.toLocaleString()}.00`;
+                } else {
+                    document.getElementById('required-amount').textContent = 'Enquire for Pricing';
+                }
             }
         });
         

@@ -7,6 +7,8 @@ const rateLimit = require('express-rate-limit');
 const cors = require('cors');
 const nodemailer = require('nodemailer');
 const winston = require('winston');
+// TODO: PAYSTACK — uncomment when enabling payment endpoints
+// const axios = require('axios');
 require('dotenv').config();
 
 const app = express();
@@ -261,6 +263,235 @@ app.get('/health', (req, res) => {
 app.get('/manifest.json', (req, res) => {
     res.sendFile(path.join(__dirname, 'manifest.json'));
 });
+
+// TODO: PAYSTACK — uncomment the endpoints below when Paystack keys are configured in .env
+/*
+// Paystack configuration endpoint (returns public key only)
+app.get('/api/paystack/config', (req, res) => {
+    res.json({
+        publicKey: process.env.PAYSTACK_PUBLIC_KEY || ''
+    });
+});
+
+// Initiate booking payment via Paystack
+app.post('/initiate-booking-payment', bookingLimiter, async (req, res) => {
+    try {
+        const { name, email, phone, checkin, checkout, adults, children, roomType, message, amount, nights } = req.body;
+
+        // Validate required fields
+        if (!email || !name || !roomType || !checkin || !checkout) {
+            return res.status(400).json({ success: false, message: 'Missing required booking fields' });
+        }
+
+        // Server-side pricing validation — NEVER trust frontend amount
+        const roomPrices = { 'executive': 350, 'deluxe': 300, 'standard': 250 };
+        const pricePerNight = roomPrices[roomType];
+
+        if (!pricePerNight) {
+            return res.status(400).json({ success: false, message: 'Invalid room type for payment. Full House requires manual pricing.' });
+        }
+
+        // Validate dates server-side
+        const checkinDate = new Date(checkin);
+        const checkoutDate = new Date(checkout);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (checkinDate < today) {
+            return res.status(400).json({ success: false, message: 'Check-in date cannot be in the past' });
+        }
+        if (checkoutDate <= checkinDate) {
+            return res.status(400).json({ success: false, message: 'Check-out date must be after check-in date' });
+        }
+
+        const calculatedNights = Math.ceil((checkoutDate - checkinDate) / (1000 * 60 * 60 * 24));
+        if (calculatedNights <= 0) {
+            return res.status(400).json({ success: false, message: 'Invalid number of nights' });
+        }
+
+        // Use server-calculated amount
+        const serverAmount = pricePerNight * calculatedNights;
+        const secretKey = process.env.PAYSTACK_SECRET_KEY;
+
+        if (!secretKey) {
+            return res.status(500).json({ success: false, message: 'Payment system not configured' });
+        }
+
+        // Create booking record
+        const bookingId = 'BK' + Date.now();
+        const booking = {
+            id: bookingId,
+            timestamp: new Date().toISOString(),
+            name: String(name).substring(0, 100),
+            email: String(email).substring(0, 100),
+            phone: String(phone || '').substring(0, 20),
+            checkin: checkin,
+            checkout: checkout,
+            adults: parseInt(adults) || 1,
+            children: parseInt(children) || 0,
+            roomType: String(roomType).substring(0, 50),
+            message: message ? String(message).substring(0, 500) : '',
+            totalAmount: serverAmount,
+            nights: calculatedNights,
+            pricePerNight: pricePerNight,
+            paymentStatus: 'pending',
+            paymentReference: null
+        };
+
+        // Save booking
+        const savedToDb = await saveBookingToDatabase(booking);
+        if (!savedToDb) {
+            bookings.push(booking);
+        }
+
+        // Initialize Paystack transaction
+        const paystackResponse = await axios.post('https://api.paystack.co/transaction/initialize', {
+            email: email,
+            amount: serverAmount * 100, // Convert to pesewas
+            currency: 'GHS',
+            reference: bookingId,
+            metadata: {
+                booking_id: bookingId,
+                customer_name: name,
+                customer_phone: phone,
+                room_type: roomType,
+                nights: calculatedNights
+            }
+        }, {
+            headers: {
+                Authorization: `Bearer ${secretKey}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (paystackResponse.data && paystackResponse.data.status) {
+            res.json({
+                success: true,
+                authorization_url: paystackResponse.data.data.authorization_url,
+                reference: paystackResponse.data.data.reference,
+                bookingId: bookingId,
+                amount: serverAmount,
+                amount_in_pesewas: serverAmount * 100
+            });
+        } else {
+            res.status(500).json({ success: false, message: 'Failed to initialize payment' });
+        }
+    } catch (error) {
+        console.error('Payment initialization error:', error.response?.data || error.message);
+        res.status(500).json({ success: false, message: 'Failed to initialize payment' });
+    }
+});
+
+// Verify Paystack payment
+app.post('/verify-payment', async (req, res) => {
+    try {
+        const { reference } = req.body;
+
+        if (!reference) {
+            return res.status(400).json({ success: false, message: 'Payment reference is required' });
+        }
+
+        const secretKey = process.env.PAYSTACK_SECRET_KEY;
+        if (!secretKey) {
+            return res.status(500).json({ success: false, message: 'Payment system not configured' });
+        }
+
+        // Verify with Paystack
+        const verifyResponse = await axios.get(`https://api.paystack.co/transaction/verify/${reference}`, {
+            headers: {
+                Authorization: `Bearer ${secretKey}`
+            }
+        });
+
+        if (verifyResponse.data && verifyResponse.data.data) {
+            const data = verifyResponse.data.data;
+            const status = data.status;
+            const amount = data.amount / 100; // Convert from pesewas
+
+            // Find the booking
+            let booking = null;
+            if (db) {
+                try {
+                    const collection = db.collection('bookings');
+                    booking = await collection.findOne({ id: reference });
+                } catch (e) {
+                    console.error('Error finding booking:', e);
+                }
+            }
+            if (!booking) {
+                booking = bookings.find(b => b.id === reference);
+            }
+
+            if (status === 'success') {
+                // Verify amount matches expected
+                if (booking && booking.totalAmount && Math.abs(amount - booking.totalAmount) > 0.01) {
+                    return res.json({
+                        success: false,
+                        status: 'amount_mismatch',
+                        message: `Payment amount mismatch. Expected GH₵${booking.totalAmount}, received GH₵${amount}`
+                    });
+                }
+
+                // Update booking payment status
+                if (booking) {
+                    booking.paymentStatus = 'paid';
+                    booking.paymentReference = reference;
+                    booking.transactionId = data.id || reference;
+                    booking.paidAt = new Date().toISOString();
+
+                    if (db) {
+                        try {
+                            const collection = db.collection('bookings');
+                            await collection.updateOne(
+                                { id: reference },
+                                { $set: { paymentStatus: 'paid', paymentReference: reference, transactionId: data.id || reference, paidAt: booking.paidAt } }
+                            );
+                        } catch (e) {
+                            console.error('Error updating booking payment status:', e);
+                        }
+                    }
+                }
+
+                res.json({
+                    success: true,
+                    status: 'success',
+                    message: 'Payment verified successfully',
+                    transaction_id: data.id || reference,
+                    amount: amount,
+                    gateway_response: data.gateway_response || 'Approved'
+                });
+            } else {
+                // Update booking with failed status
+                if (booking) {
+                    booking.paymentStatus = 'failed';
+                    if (db) {
+                        try {
+                            const collection = db.collection('bookings');
+                            await collection.updateOne(
+                                { id: reference },
+                                { $set: { paymentStatus: 'failed' } }
+                            );
+                        } catch (e) {
+                            console.error('Error updating booking:', e);
+                        }
+                    }
+                }
+
+                res.json({
+                    success: false,
+                    status: 'failed',
+                    message: data.gateway_response || 'Payment was not successful'
+                });
+            }
+        } else {
+            res.json({ success: false, status: 'unknown', message: 'Unable to verify payment' });
+        }
+    } catch (error) {
+        console.error('Payment verification error:', error.response?.data || error.message);
+        res.status(500).json({ success: false, message: 'Payment verification failed' });
+    }
+});
+*/
 
 // Fallback route for any other routes
 app.get('*', (req, res) => {
