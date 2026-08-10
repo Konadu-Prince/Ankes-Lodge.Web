@@ -139,10 +139,12 @@ header .container {
 
 .logo img {
     height: 55px;
-    width: auto;
+    width: 55px;
+    object-fit: contain;
     border-radius: 50%;
     border: 2px solid var(--primary-color);
     padding: 2px;
+    flex-shrink: 0;
 }
 
 .logo h1 {
@@ -254,6 +256,13 @@ nav ul li .btn-primary {
     background-repeat: no-repeat;
     opacity: 0;
     transition: opacity 1.5s ease-in-out;
+}
+
+@media (max-width: 768px) {
+    .slide {
+        background-size: contain;
+        background-color: rgba(0, 0, 0, 0.8);
+    }
 }
 
 .slide.active {
@@ -1597,7 +1606,8 @@ footer {
 
 .footer-logo img {
     height: 70px;
-    width: auto;
+    width: 70px;
+    object-fit: contain;
     border-radius: 50%;
     border: 2px solid var(--primary-color);
     padding: 3px;
@@ -1766,6 +1776,8 @@ footer {
 
 .modal-logo {
     height: 80px;
+    width: 80px;
+    object-fit: cover;
     margin-bottom: 15px;
     border-radius: 10px;
 }
@@ -1841,6 +1853,8 @@ footer {
 
 .footer-logo img {
     height: 60px;
+    width: 60px;
+    object-fit: contain;
     margin-bottom: 15px;
 }
 
@@ -2053,7 +2067,7 @@ footer {
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    object-fit: cover;
+    object-fit: contain;
     border: 3px solid var(--primary-color);
     margin-bottom: 15px;
 }
@@ -2499,7 +2513,8 @@ footer {
     }
     
     .logo img {
-        height: 40px;
+        height: 45px;
+        width: 45px;
     }
     
     nav ul li {
@@ -2589,6 +2604,15 @@ footer {
     /* Improved mobile hero section */
     .hero {
         padding: 20px 0;
+    }
+    
+    .logo img {
+        height: 38px;
+        width: 38px;
+    }
+    
+    .logo h1 {
+        font-size: 1.2rem;
     }
     
     .hero-content {
@@ -3321,7 +3345,8 @@ footer {
 
 /* Page Hero Section */
 .page-hero {
-    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('main-flyer.jpeg') center/cover no-repeat;
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('main-flyer.jpeg') center/contain no-repeat;
+    background-color: #1a1a2e;
     height: 400px;
     display: flex;
     align-items: center;

@@ -3,6 +3,36 @@ let deferredPrompt;
 let isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
 let isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
+/**
+ * Normalize a phone number to international format.
+ * If the number starts with 0 (local format), it is converted to +233 (Ghana).
+ * If it starts with 233 (without +), the + is prepended.
+ * Otherwise the number is kept as-is (with + prefix if it only contains digits).
+ */
+function normalizePhone(phone) {
+    if (!phone) return phone;
+    // Strip spaces, dashes, parentheses — keep digits and leading +
+    const cleaned = phone.replace(/[\s\-\(\)]/g, '');
+
+    // Local format: 0XXXXXXXX → +233XXXXXXXX
+    if (cleaned.startsWith('0')) {
+        return '+233' + cleaned.substring(1);
+    }
+    // Country code without plus: 233XXXXXXXX → +233XXXXXXXX
+    if (cleaned.startsWith('233')) {
+        return '+' + cleaned;
+    }
+    // Already has + prefix
+    if (cleaned.startsWith('+')) {
+        return cleaned;
+    }
+    // Plain digits with no recognized prefix — add +
+    if (/^\d+$/.test(cleaned)) {
+        return '+' + cleaned;
+    }
+    return cleaned;
+}
+
 // PWA Installation Functions
 function showInstallPrompt() {
     const installModal = document.getElementById('pwa-install-modal');
@@ -657,10 +687,10 @@ function handleFormSubmit(formId, successMessage) {
                 return;
             }
             
-            // Validate Ghana phone number format (+233 or 0 followed by 9 digits)
-            const phoneRegex = /^(?:\+233|0)(?:20|50|24|54|27|57|26|56|23|28|55|59)\d{7}$/;
+            // Validate phone number (international and local formats accepted)
+            const phoneRegex = /^\+?[0-9\s\-\(\)]{7,20}$/;
             if (!phoneRegex.test(phone)) {
-                const errorMsg = 'Please enter a valid Ghana phone number (e.g., +23324XXXXXXX or 024XXXXXXX).';
+                const errorMsg = 'Please enter a valid phone number (e.g., +23324XXXXXXX, 024XXXXXXX, +1XXXXXXXXXX).';
                 
                 if (feedbackContainer) {
                     feedbackContainer.textContent = errorMsg;
@@ -675,6 +705,10 @@ function handleFormSubmit(formId, successMessage) {
                 
                 return;
             }
+
+            // Normalize phone number to international format
+            const normalizedPhone = normalizePhone(phone);
+            phoneField.value = normalizedPhone;
             
             // Validate dates
             const checkinDate = new Date(checkin);
@@ -1430,11 +1464,13 @@ function initMultiStepBooking() {
         
         // Phone validation
         if (fieldName === 'phone' && value) {
-            const phoneRegex = /^(?:\+233|0)(?:20|50|24|54|27|57|26|56|23|28|55|59)\d{7}$/;
+            const phoneRegex = /^\+?[0-9\s\-\(\)]{7,20}$/;
             if (!phoneRegex.test(value)) {
-                showError(field, 'Please enter a valid Ghanaian phone number (+233 or 0 followed by 9 digits)');
+                showError(field, 'Please enter a valid phone number (e.g., +23324XXXXXXX, 024XXXXXXX, +1XXXXXXXXXX)');
                 return false;
             }
+            // Normalize to international format
+            field.value = normalizePhone(value);
         }
         
         // Date validation
@@ -1508,7 +1544,7 @@ function initMultiStepBooking() {
             'full-house': 'Full House'
         };
         const roomPrices = {
-            'executive': 350,
+            'executive': 400,
             'deluxe': 300,
             'standard': 250
         };
@@ -1525,8 +1561,8 @@ function initMultiStepBooking() {
             const costEl = document.getElementById('review-cost');
             
             if (roomType === 'full-house') {
-                if (rateEl) rateEl.textContent = 'Enquire for Pricing';
-                if (costEl) costEl.textContent = 'Price varies — please enquire';
+                if (rateEl) rateEl.textContent = 'Inquire for Pricing';
+                if (costEl) costEl.textContent = 'Price varies — please inquire';
             } else if (pricePerNight && nights > 0) {
                 const total = pricePerNight * nights;
                 if (rateEl) rateEl.textContent = `GH₵${pricePerNight}/night`;
@@ -1764,7 +1800,7 @@ document.addEventListener('DOMContentLoaded', function() {
             'full-house': 'Full House'
         };
         const roomPrices = {
-            'executive': 350,
+            'executive': 400,
             'deluxe': 300,
             'standard': 250
         };
@@ -1784,8 +1820,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const paymentSection = document.getElementById('booking-payment-section');
         
         if (roomType === 'full-house') {
-            if (rateEl) rateEl.textContent = 'Enquire for Pricing';
-            if (costEl) costEl.textContent = 'Price varies — please enquire';
+            if (rateEl) rateEl.textContent = 'Inquire for Pricing';
+            if (costEl) costEl.textContent = 'Price varies — please inquire';
             if (paymentSection) paymentSection.style.display = 'none';
         } else if (pricePerNight && nights > 0) {
             const total = pricePerNight * nights;
@@ -1993,11 +2029,13 @@ function validateField(field) {
     
     // Phone validation
     if (fieldName === 'phone' && value) {
-        const phoneRegex = /^(?:\+233|0)(?:20|50|24|54|27|57|26|56|23|28|55|59)\d{7}$/;
+        const phoneRegex = /^\+?[0-9\s\-\(\)]{7,20}$/;
         if (!phoneRegex.test(value)) {
-            showError(field, 'Please enter a valid Ghanaian phone number (+233 or 0 followed by 9 digits)');
+            showError(field, 'Please enter a valid phone number (e.g., +23324XXXXXXX, 024XXXXXXX, +1XXXXXXXXXX)');
             return false;
         }
+        // Normalize to international format
+        field.value = normalizePhone(value);
     }
     
     return true;
@@ -2149,7 +2187,7 @@ const ANKES_LODGE_PAYMENT_NUMBER = '0544904547';
 function generateWhatsAppMessage() {
     const name       = document.getElementById('name')?.value.trim()       || '';
     const email      = document.getElementById('email')?.value.trim()     || '';
-    const phone      = document.getElementById('phone')?.value.trim()     || '';
+    const phone      = normalizePhone(document.getElementById('phone')?.value.trim() || '');
     const checkin    = document.getElementById('checkin')?.value          || '';
     const checkout   = document.getElementById('checkout')?.value         || '';
     const adults     = document.getElementById('adults')?.value           || '';
@@ -2165,7 +2203,7 @@ function generateWhatsAppMessage() {
     };
 
     const roomPrices = {
-        'executive': 350,
+        'executive': 400,
         'deluxe':    300,
         'standard':  250
     };
@@ -2216,7 +2254,7 @@ function generateWhatsAppMessage() {
             `Children: ${parseInt(children) > 0 ? children : 'None'}`,
             '',
             '*Pricing*',
-            'Please enquire for Full House pricing.',
+            'Please inquire for Full House pricing.',
             '',
             '*Payment*',
             'Payment will be arranged after pricing is confirmed.'
@@ -2431,7 +2469,7 @@ async function getPaystackConfig() {
 
 async function initiatePaystackPayment() {
     const roomType = document.getElementById('room-type')?.value;
-    const roomPrices = { 'executive': 350, 'deluxe': 300, 'standard': 250 };
+    const roomPrices = { 'executive': 400, 'deluxe': 300, 'standard': 250 };
     const pricePerNight = roomPrices[roomType];
 
     if (!pricePerNight) {

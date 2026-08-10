@@ -284,7 +284,7 @@ app.post('/initiate-booking-payment', bookingLimiter, async (req, res) => {
         }
 
         // Server-side pricing validation — NEVER trust frontend amount
-        const roomPrices = { 'executive': 350, 'deluxe': 300, 'standard': 250 };
+        const roomPrices = { 'executive': 400, 'deluxe': 300, 'standard': 250 };
         const pricePerNight = roomPrices[roomType];
 
         if (!pricePerNight) {
@@ -621,13 +621,28 @@ app.post('/submit-booking', bookingLimiter, async (req, res) => {
         });
     }
     
-    // Validate phone format (Ghanaian phone number format)
-    const phoneRegex = /^(?:\+233|0)(?:20|50|24|54|27|57|26|56|23|28|55|59)\d{7}$/;
+    // Validate phone format (international and local formats accepted)
+    const phoneRegex = /^\+?[0-9\s\-\(\)]{7,20}$/;
     if (!phoneRegex.test(phone)) {
         return res.status(400).json({
             success: false,
-            message: 'Please provide a valid Ghanaian phone number (+233 or 0 followed by 9 digits)'
+            message: 'Please provide a valid phone number (e.g., +23324XXXXXXX, 024XXXXXXX, +1XXXXXXXXXX)'
         });
+    }
+
+    // Normalize phone to international format
+    const cleanedPhone = phone.replace(/[\s\-\(\)]/g, '');
+    let normalizedPhone;
+    if (cleanedPhone.startsWith('0')) {
+        normalizedPhone = '+233' + cleanedPhone.substring(1);
+    } else if (cleanedPhone.startsWith('233')) {
+        normalizedPhone = '+' + cleanedPhone;
+    } else if (cleanedPhone.startsWith('+')) {
+        normalizedPhone = cleanedPhone;
+    } else if (/^\d+$/.test(cleanedPhone)) {
+        normalizedPhone = '+' + cleanedPhone;
+    } else {
+        normalizedPhone = cleanedPhone;
     }
     
     // Validate dates
@@ -684,7 +699,7 @@ app.post('/submit-booking', bookingLimiter, async (req, res) => {
         timestamp: new Date().toISOString(),
         name: name.toString().substring(0, 100),
         email: email.toString().substring(0, 100),
-        phone: phone.toString(),
+        phone: normalizedPhone,
         checkin: checkin.toString(),
         checkout: checkout.toString(),
         adults: adultsNum,
