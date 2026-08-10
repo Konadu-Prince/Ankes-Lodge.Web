@@ -104,7 +104,7 @@ async function sendEmailWithRetry(mailOptions, maxRetries = 3) {
 async function sendBookingNotification(booking) {
     const adminEmail = process.env.ADMIN_EMAIL || 'konaduprince26@gmail.com';
     const mailOptions = {
-        from: '"Ankes Lodge" <' + adminEmail + '>',
+        from: '"ANKES LODGE" <' + adminEmail + '>',
         to: adminEmail,
         subject: `New Booking Request - ${booking.id}`,
         html: `
@@ -130,7 +130,7 @@ async function sendBookingNotification(booking) {
 async function sendContactNotification(contact) {
     const adminEmail = process.env.ADMIN_EMAIL || 'konaduprince26@gmail.com';
     const mailOptions = {
-        from: '"Ankes Lodge Website" <' + adminEmail + '>',
+        from: '"ANKES LODGE Website" <' + adminEmail + '>',
         to: adminEmail,
         subject: `New Contact Form Submission - ${contact.subject}`,
         html: `
@@ -1192,7 +1192,7 @@ app.delete("/delete-testimonial/:id", requireAuth, async (req, res) => {
 function startServer(port = 3000) {
     const server = app.listen(port, () => {
         logger.info(`Server is running on http://localhost:${port}`);
-        logger.info('Ankes Lodge website is now accessible at the above address.');
+        logger.info('ANKES LODGE website is now accessible at the above address.');
     });
 
     server.on('error', (err) => {

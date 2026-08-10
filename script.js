@@ -1065,7 +1065,7 @@ function initTestimonialMarquee() {
             {
                 name: "Ama K.",
                 location: "Kumasi, Ghana",
-                comment: "Ankes Lodge is absolutely magical! The semi-standard room was beautifully designed and the staff treated us like family. The best hospitality experience in Ghana - we're already planning our return trip!",
+                comment: "ANKES LODGE is absolutely magical! The semi-standard room was beautifully designed and the staff treated us like family. The best hospitality experience in Ghana - we're already planning our return trip!",
                 rating: 5,
                 date: "2025-12-20"
             },
@@ -1079,21 +1079,21 @@ function initTestimonialMarquee() {
             {
                 name: "Sarah T.",
                 location: "London, UK",
-                comment: "Visited family in Ghana and Ankes Lodge was our perfect home base! The full house was ideal for our extended family. Serene location, impeccable service - an absolute must-book!",
+                comment: "Visited family in Ghana and ANKES LODGE was our perfect home base! The full house was ideal for our extended family. Serene location, impeccable service - an absolute must-book!",
                 rating: 5,
                 date: "2025-12-10"
             },
             {
                 name: "Michael J.",
                 location: "New York, USA",
-                comment: "Ankes Lodge completely exceeded our expectations! The regular bedroom was spacious and spotless with all the amenities we needed. The staff were incredibly friendly and helpful. We'll definitely return!",
+                comment: "ANKES LODGE completely exceeded our expectations! The regular bedroom was spacious and spotless with all the amenities we needed. The staff were incredibly friendly and helpful. We'll definitely return!",
                 rating: 5,
                 date: "2025-12-05"
             },
             {
                 name: "Esi A.",
                 location: "Takoradi, Ghana",
-                comment: "My family and I were blown away by the incredible experience at Ankes Lodge! The semi-standard room offered amazing value with top-notch amenities. Perfect location for exploring Abesim - we're already planning our next visit!",
+                comment: "My family and I were blown away by the incredible experience at ANKES LODGE! The semi-standard room offered amazing value with top-notch amenities. Perfect location for exploring Abesim - we're already planning our next visit!",
                 rating: 5,
                 date: "2025-11-28"
             }
@@ -2172,7 +2172,7 @@ window.addEventListener('scroll', function() {
 
 // ============================================================
 // WhatsApp Booking Integration
-// Sends selected booking details to Ankes Lodge WhatsApp chat
+// Sends selected booking details to ANKES LODGE WhatsApp chat
 // allowing the sender to preview and edit before sending.
 // ============================================================
 
@@ -2272,7 +2272,7 @@ function generateWhatsAppMessage() {
             '',
             '*Payment*',
             'Payment Method: Mobile Money / Paystack',
-            `Ankes Lodge Payment Number: ${ANKES_LODGE_PAYMENT_NUMBER}`
+            `ANKES LODGE Payment Number: ${ANKES_LODGE_PAYMENT_NUMBER}`
         );
 
         if (paymentRef && paymentStatus === 'success') {
@@ -2297,11 +2297,11 @@ function generateWhatsAppMessage() {
     lines.push(
         '',
         '---',
-        '*Ankes Lodge*',
+        '*ANKES LODGE*',
         'Located in Abesim, Ghana, Bono Region, Sunyani',
         'Call/WhatsApp: 0544904547',
         'Website: www.ankeslodge.com',
-        'Book on Airbnb or Booking.com — search "Ankes Lodge"',
+        'Book on Airbnb or Booking.com — search "ANKES LODGE"',
         'Explore More: https://tr.ee/9mbwVo4uOq'
     );
 
@@ -2633,7 +2633,7 @@ function updatePaymentStatusDisplay(status, transactionId) {
 
 // ============================================================
 // WhatsApp Contact Form Integration
-// Sends contact messages to Ankes Lodge WhatsApp chat
+// Sends contact messages to ANKES LODGE WhatsApp chat
 // with preview and edit capability before sending.
 // ============================================================
 
@@ -2647,7 +2647,7 @@ function generateContactWhatsAppMessage() {
     const message = document.getElementById('contact-message')?.value.trim() || '';
 
     const lines = [
-        '*New Contact Message - Ankes Lodge Website*',
+        '*New Contact Message - ANKES LODGE Website*',
         '',
         '*From*',
         `Name: ${name}`,
@@ -2660,11 +2660,11 @@ function generateContactWhatsAppMessage() {
         message,
         '',
         '---',
-        '*Ankes Lodge*',
+        '*ANKES LODGE*',
         'Located in Abesim, Ghana, Bono Region, Sunyani',
         'Call/WhatsApp: 0544904547',
         'Website: www.ankeslodge.com',
-        'Book on Airbnb or Booking.com — search "Ankes Lodge"',
+        'Book on Airbnb or Booking.com — search "ANKES LODGE"',
         'Explore More: https://tr.ee/9mbwVo4uOq'
     ];
 

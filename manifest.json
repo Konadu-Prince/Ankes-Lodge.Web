@@ -1,7 +1,7 @@
 {
-  "name": "Ankes Lodge - Luxury Guest House",
-  "short_name": "Ankes Lodge",
-  "description": "Book comfortable accommodations at Ankes Lodge in Abesim, Sunyani. Modern amenities, excellent service, and convenient location for business and leisure travel.",
+  "name": "ANKES LODGE - Luxury Guest House",
+  "short_name": "ANKES LODGE",
+  "description": "Book comfortable accommodations at ANKES LODGE in Abesim, Sunyani. Modern amenities, excellent service, and convenient location for business and leisure travel.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -45,7 +45,7 @@
     {
       "name": "Book a Room",
       "short_name": "Book",
-      "description": "Quickly book a room at Ankes Lodge",
+      "description": "Quickly book a room at ANKES LODGE",
       "url": "/booking.html",
       "icons": [{ "src": "AnkesImages/AnkesLodgeLogo.jpeg", "sizes": "192x192" }]
     },
@@ -59,7 +59,7 @@
     {
       "name": "Contact Us",
       "short_name": "Contact",
-      "description": "Get in touch with Ankes Lodge",
+      "description": "Get in touch with ANKES LODGE",
       "url": "/contact.html",
       "icons": [{ "src": "AnkesImages/AnkesLodgeLogo.jpeg", "sizes": "192x192" }]
     }
