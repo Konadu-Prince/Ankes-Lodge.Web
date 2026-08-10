@@ -2216,7 +2216,7 @@ function generateWhatsAppMessage() {
             `Children: ${parseInt(children) > 0 ? children : 'None'}`,
             '',
             '*Pricing*',
-            'Price varies depending on the activities and requirements of the booking. Please enquire for applicable pricing.',
+            'Please enquire for Full House pricing.',
             '',
             '*Payment*',
             'Payment will be arranged after pricing is confirmed.'
