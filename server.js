@@ -727,7 +727,8 @@ app.post('/submit-booking', bookingLimiter, async (req, res) => {
     }
     
     res.json({ 
-        success: true, 
+        success: true,
+        status: 'success',
         bookingId: bookingId,
         message: 'Your booking has been received. We will contact you shortly to confirm your reservation.' 
     });
@@ -751,7 +752,7 @@ app.get('/payment.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'payment.html'));
 });
 
-// Initiate payment endpoint
+// Initiate payment endpoint (MoMo confirmation via WhatsApp)
 app.post('/initiate-payment', (req, res) => {
     // Log the payment initiation request
     console.log('Payment initiation request:', req.body);
@@ -766,27 +767,84 @@ app.post('/initiate-payment', (req, res) => {
         });
     }
     
-    // In a real application, you would integrate with Paystack here
-    // For now, simulate a successful response with proper structure
+    // Return booking details for WhatsApp confirmation
     res.json({ 
         success: true, 
-        authorization_url: 'https://google.com', // This would be the actual Paystack URL
-        reference: 'REF_' + Date.now(),
-        message: 'Payment initialized successfully'
+        booking_id: booking_id,
+        amount: amount,
+        message: 'Payment details ready for WhatsApp confirmation'
     });
 });
 
-// Update booking endpoint (for cash on arrival)
-app.post('/update-booking', (req, res) => {
-    // Log the booking update request
-    console.log('Booking update request:', req.body);
+// Update booking endpoint (for cash on arrival or MoMo confirmation)
+app.post('/update-booking', async (req, res) => {
+    const { booking_id, payment_method, momo_reference } = req.body;
     
-    // In a real application, you would update the booking in a database
-    // For now, just send a success response
-    res.json({ 
-        success: true, 
-        message: 'Booking updated successfully' 
-    });
+    if (!booking_id || !payment_method) {
+        return res.status(400).json({
+            success: false,
+            message: 'Missing booking_id or payment_method'
+        });
+    }
+    
+    try {
+        let booking = null;
+        
+        // Try database first
+        if (db) {
+            const collection = db.collection('bookings');
+            booking = await collection.findOne({ id: booking_id });
+            
+            if (booking) {
+                const updateData = {
+                    paymentMethod: payment_method,
+                    paymentStatus: payment_method === 'cash_on_arrival' ? 'pending' : 'confirmed',
+                    updatedAt: new Date().toISOString()
+                };
+                if (momo_reference) {
+                    updateData.momoReference = momo_reference;
+                }
+                
+                await collection.updateOne(
+                    { id: booking_id },
+                    { $set: updateData }
+                );
+            }
+        }
+        
+        // Fallback to memory
+        if (!booking) {
+            booking = bookings.find(b => b.id === booking_id);
+            if (booking) {
+                booking.paymentMethod = payment_method;
+                booking.paymentStatus = payment_method === 'cash_on_arrival' ? 'pending' : 'confirmed';
+                booking.updatedAt = new Date().toISOString();
+                if (momo_reference) {
+                    booking.momoReference = momo_reference;
+                }
+            }
+        }
+        
+        if (!booking) {
+            return res.status(404).json({
+                success: false,
+                message: 'Booking not found'
+            });
+        }
+        
+        res.json({ 
+            success: true, 
+            message: 'Booking payment method updated successfully',
+            booking_id: booking_id,
+            payment_method: payment_method
+        });
+    } catch (error) {
+        console.error('Error updating booking:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Failed to update booking' 
+        });
+    }
 });
 
 // Get testimonials - prioritizes database if available, falls back to file
@@ -1051,10 +1109,7 @@ async function getAllContacts() {
 app.get('/admin/bookings', async (req, res) => {
     try {
         const allBookings = await getAllBookings();
-        res.json({
-            success: true,
-            bookings: allBookings
-        });
+        res.json(allBookings);
     } catch (error) {
         console.error('Error retrieving bookings:', error);
         res.status(500).json({
@@ -1068,10 +1123,7 @@ app.get('/admin/bookings', async (req, res) => {
 app.get('/admin/contacts', async (req, res) => {
     try {
         const allContacts = await getAllContacts();
-        res.json({
-            success: true,
-            contacts: allContacts
-        });
+        res.json(allContacts);
     } catch (error) {
         console.error('Error retrieving contacts:', error);
         res.status(500).json({
@@ -1081,31 +1133,249 @@ app.get('/admin/contacts', async (req, res) => {
     }
 });
 
-// Admin endpoint to update a booking (placeholder)
-app.put('/admin/bookings/:id', (req, res) => {
+// Admin endpoint to update a booking
+app.put('/admin/bookings/:id', async (req, res) => {
     const bookingId = req.params.id;
     const updateData = req.body;
     
-    // In a real application, you would update the booking in the database
-    console.log(`Updating booking ${bookingId} with:`, updateData);
-    
-    res.json({
-        success: true,
-        message: `Booking ${bookingId} updated successfully`
-    });
+    try {
+        if (db) {
+            const collection = db.collection('bookings');
+            await collection.updateOne({ id: bookingId }, { $set: updateData });
+        } else {
+            const booking = bookings.find(b => b.id === bookingId);
+            if (booking) {
+                Object.assign(booking, updateData);
+            }
+        }
+        res.json({ success: true, message: `Booking ${bookingId} updated` });
+    } catch (error) {
+        console.error('Error updating booking:', error);
+        res.status(500).json({ success: false, message: 'Failed to update booking' });
+    }
 });
 
-// Admin endpoint to delete a booking (placeholder)
-app.delete('/admin/bookings/:id', (req, res) => {
+// Admin endpoint to delete a booking
+app.delete('/admin/bookings/:id', async (req, res) => {
     const bookingId = req.params.id;
     
-    // In a real application, you would delete the booking from the database
-    console.log(`Deleting booking ${bookingId}`);
+    try {
+        if (db) {
+            const collection = db.collection('bookings');
+            await collection.deleteOne({ id: bookingId });
+        } else {
+            const index = bookings.findIndex(b => b.id === bookingId);
+            if (index !== -1) bookings.splice(index, 1);
+        }
+        res.json({ success: true, message: `Booking ${bookingId} deleted` });
+    } catch (error) {
+        console.error('Error deleting booking:', error);
+        res.status(500).json({ success: false, message: 'Failed to delete booking' });
+    }
+});
+
+// Admin logout endpoint
+app.post('/admin/logout', (req, res) => {
+    res.json({ success: true, message: 'Logged out successfully' });
+});
+
+// Admin update booking dates
+app.post('/admin/update-booking-dates/:id', async (req, res) => {
+    const bookingId = req.params.id;
+    const { checkin, checkout, reason } = req.body;
     
-    res.json({
-        success: true,
-        message: `Booking ${bookingId} deleted successfully`
-    });
+    if (!checkin || !checkout) {
+        return res.status(400).json({ success: false, error: 'Check-in and check-out dates are required' });
+    }
+    
+    try {
+        const updateData = { checkin, checkout, dateChangeReason: reason || '', updatedAt: new Date().toISOString() };
+        
+        if (db) {
+            const collection = db.collection('bookings');
+            await collection.updateOne({ id: bookingId }, { $set: updateData });
+        } else {
+            const booking = bookings.find(b => b.id === bookingId);
+            if (booking) {
+                booking.checkin = checkin;
+                booking.checkout = checkout;
+                booking.dateChangeReason = reason || '';
+                booking.updatedAt = new Date().toISOString();
+            }
+        }
+        res.json({ success: true, message: 'Booking dates updated' });
+    } catch (error) {
+        console.error('Error updating booking dates:', error);
+        res.status(500).json({ success: false, error: 'Failed to update booking dates' });
+    }
+});
+
+// Admin process refund
+app.post('/admin/process-refund/:id', async (req, res) => {
+    const bookingId = req.params.id;
+    const { amount, reason, refund_method } = req.body;
+    
+    if (!amount || !reason) {
+        return res.status(400).json({ success: false, error: 'Amount and reason are required' });
+    }
+    
+    try {
+        const updateData = {
+            refundAmount: amount,
+            refundReason: reason,
+            refundMethod: refund_method || 'original_method',
+            status: 'refunded',
+            updatedAt: new Date().toISOString()
+        };
+        
+        if (db) {
+            const collection = db.collection('bookings');
+            await collection.updateOne({ id: bookingId }, { $set: updateData });
+        } else {
+            const booking = bookings.find(b => b.id === bookingId);
+            if (booking) {
+                Object.assign(booking, updateData);
+            }
+        }
+        res.json({ success: true, message: `Refund of GH₵${amount} processed for booking ${bookingId}` });
+    } catch (error) {
+        console.error('Error processing refund:', error);
+        res.status(500).json({ success: false, error: 'Failed to process refund' });
+    }
+});
+
+// Admin delete testimonial
+app.delete('/admin/testimonials/:id', async (req, res) => {
+    try {
+        const id = req.params.id;
+        
+        if (db) {
+            const collection = db.collection('testimonials');
+            const result = await collection.deleteOne({ id: parseInt(id) });
+            
+            if (result.deletedCount > 0) {
+                res.json({ status: 'success', message: 'Testimonial deleted successfully' });
+            } else {
+                res.status(404).json({ status: 'error', message: 'Testimonial not found' });
+            }
+        } else {
+            const testimonialsPath = path.join(__dirname, 'data', 'testimonials.json');
+            if (fs.existsSync(testimonialsPath)) {
+                let testimonials = JSON.parse(fs.readFileSync(testimonialsPath, 'utf8'));
+                testimonials = testimonials.filter(t => t.id != id);
+                fs.writeFileSync(testimonialsPath, JSON.stringify(testimonials, null, 2));
+                res.json({ status: 'success', message: 'Testimonial deleted successfully' });
+            } else {
+                res.status(404).json({ status: 'error', message: 'Testimonials file not found' });
+            }
+        }
+    } catch (error) {
+        console.error('Error deleting testimonial:', error);
+        res.status(500).json({ status: 'error', message: 'Failed to delete testimonial' });
+    }
+});
+
+// In-memory store for password reset tokens (expires after 30 min)
+const passwordResetTokens = new Map();
+
+// Admin forgot password - sends reset email
+app.post('/admin/forgot-password', async (req, res) => {
+    const { email } = req.body;
+    
+    if (!email) {
+        return res.status(400).json({ success: false, message: 'Email is required' });
+    }
+    
+    // Check if email matches the admin email
+    const adminEmail = process.env.ADMIN_EMAIL || 'konaduprince26@gmail.com';
+    if (email !== adminEmail) {
+        // Don't reveal whether the email exists - just say we sent it
+        return res.json({ success: true, message: 'If that email is registered, a reset link has been sent.' });
+    }
+    
+    // Generate reset token
+    const crypto = require('crypto');
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiresAt = Date.now() + 30 * 60 * 1000; // 30 minutes
+    
+    passwordResetTokens.set(token, { email, expiresAt });
+    
+    // Clean up expired tokens
+    for (const [t, data] of passwordResetTokens.entries()) {
+        if (data.expiresAt < Date.now()) passwordResetTokens.delete(t);
+    }
+    
+    // Build reset URL using the request's actual origin
+    const baseUrl = process.env.SITE_URL || (req.protocol + '://' + req.get('host'));
+    const resetUrl = baseUrl + '/reset-password.html?token=' + token;
+    
+    // Send reset email
+    try {
+        await transporter.sendMail({
+            from: '"ANKES LODGE" <' + adminEmail + '>',
+            to: email,
+            subject: 'ANKES LODGE - Password Reset Request',
+            html: `
+                <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto;">
+                    <h2 style="color: #FFA500;">ANKES LODGE - Password Reset</h2>
+                    <p>You requested a password reset for your admin panel.</p>
+                    <p>Click the button below to reset your password:</p>
+                    <a href="${resetUrl}" style="display: inline-block; background-color: #FFA500; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">Reset Password</a>
+                    <p style="margin-top: 20px; color: #666;">This link expires in 30 minutes.</p>
+                    <p style="color: #666;">If you didn't request this, ignore this email.</p>
+                </div>
+            `
+        });
+        
+        res.json({ success: true, message: 'If that email is registered, a reset link has been sent.' });
+    } catch (error) {
+        console.error('Error sending reset email:', error);
+        // Still return success to not reveal email existence
+        res.json({ success: true, message: 'If that email is registered, a reset link has been sent.' });
+    }
+});
+
+// Admin reset password - validates token and updates password
+app.post('/admin/reset-password', async (req, res) => {
+    const { token, newPassword } = req.body;
+    
+    if (!token || !newPassword) {
+        return res.status(400).json({ success: false, message: 'Token and new password are required' });
+    }
+    
+    if (newPassword.length < 6) {
+        return res.status(400).json({ success: false, message: 'Password must be at least 6 characters' });
+    }
+    
+    // Validate token
+    const tokenData = passwordResetTokens.get(token);
+    if (!tokenData) {
+        return res.status(400).json({ success: false, message: 'Invalid or expired reset token' });
+    }
+    
+    if (tokenData.expiresAt < Date.now()) {
+        passwordResetTokens.delete(token);
+        return res.status(400).json({ success: false, message: 'Reset token has expired' });
+    }
+    
+    try {
+        // Hash the new password
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        
+        // Update credentials file
+        const credentialsPath = path.join(__dirname, 'admin-credentials.json');
+        const credentials = JSON.parse(fs.readFileSync(credentialsPath, 'utf8'));
+        credentials.password = hashedPassword;
+        fs.writeFileSync(credentialsPath, JSON.stringify(credentials, null, 2));
+        
+        // Remove used token
+        passwordResetTokens.delete(token);
+        
+        res.json({ success: true, message: 'Password has been reset successfully' });
+    } catch (error) {
+        console.error('Error resetting password:', error);
+        res.status(500).json({ success: false, message: 'Failed to reset password' });
+    }
 });
 
 // Legacy endpoints for compatibility with old admin page

@@ -95,6 +95,34 @@
         .back-link a:hover {
             text-decoration: underline;
         }
+        
+        .forgot-link {
+            text-align: center;
+            margin-top: 10px;
+        }
+        
+        .forgot-link a {
+            color: #FFA500;
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+        
+        .forgot-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .success-message {
+            color: #28a745;
+            background-color: #d4edda;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .forgot-section {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -108,6 +136,11 @@
             Invalid username or password.
         </div>
         
+        <div class="success-message" id="successMessage">
+            Password reset link sent! Check your email.
+        </div>
+        
+        <!-- Login Form -->
         <form id="loginForm">
             <div class="form-group">
                 <label for="username">Username</label>
@@ -122,21 +155,66 @@
             <button type="submit" class="login-btn">Login</button>
         </form>
         
+        <div class="forgot-link">
+            <a href="#" id="forgotPasswordLink">Forgot password?</a>
+        </div>
+        
+        <!-- Forgot Password Form -->
+        <div class="forgot-section" id="forgotSection">
+            <form id="forgotForm">
+                <div class="form-group">
+                    <label for="resetEmail">Enter your admin email</label>
+                    <input type="email" id="resetEmail" name="resetEmail" placeholder="admin@example.com" required>
+                </div>
+                
+                <button type="submit" class="login-btn">Send Reset Link</button>
+            </form>
+            
+            <div class="forgot-link" style="margin-top: 15px;">
+                <a href="#" id="backToLoginLink">Back to Login</a>
+            </div>
+        </div>
+        
         <div class="back-link">
             <a href="/">Back to Website</a>
         </div>
     </div>
 
     <script>
+        // Toggle between login and forgot password forms
+        const loginForm = document.getElementById('loginForm');
+        const forgotSection = document.getElementById('forgotSection');
+        const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+        const backToLoginLink = document.getElementById('backToLoginLink');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        
+        forgotPasswordLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            loginForm.style.display = 'none';
+            forgotSection.style.display = 'block';
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+        });
+        
+        backToLoginLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            loginForm.style.display = 'block';
+            forgotSection.style.display = 'none';
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+        });
+        
+        // Login form submission
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
-            const errorMessage = document.getElementById('errorMessage');
             
-            // Hide error message
+            // Hide messages
             errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
             
             // Send login request
             fetch('/admin/login', {
@@ -161,6 +239,44 @@
             })
             .catch(error => {
                 console.error('Login error:', error);
+                errorMessage.style.display = 'block';
+            });
+        });
+        
+        // Forgot password form submission
+        document.getElementById('forgotForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('resetEmail').value;
+            
+            // Hide messages
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+            
+            // Send forgot password request
+            fetch('/admin/forgot-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: email
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    successMessage.textContent = 'If that email is registered, a password reset link has been sent.';
+                    successMessage.style.display = 'block';
+                    document.getElementById('forgotForm').reset();
+                } else {
+                    errorMessage.textContent = data.message || 'Failed to send reset link.';
+                    errorMessage.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Forgot password error:', error);
+                errorMessage.textContent = 'An error occurred. Please try again.';
                 errorMessage.style.display = 'block';
             });
         });

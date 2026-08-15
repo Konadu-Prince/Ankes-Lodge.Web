@@ -63,7 +63,7 @@
                 <!-- Progress Steps -->
                 <div class="progress-steps">
                     <div class="step completed">
-                        <span class="step-number">1</span>
+                        <span class="step-number">✓</span>
                         <span class="step-label">Booking</span>
                     </div>
                     <div class="step active">
@@ -76,23 +76,43 @@
                     </div>
                 </div>
 
-                <div class="payment-content">
+                <!-- Missing Data Alert (hidden by default) -->
+                <div id="missing-data-alert" class="missing-data-alert" style="display: none;">
+                    <div class="missing-data-content">
+                        <span class="alert-icon">⚠️</span>
+                        <h3>No Booking Found</h3>
+                        <p>It looks like you haven't completed the booking form yet. Please fill in your details first.</p>
+                        <a href="/booking.html" class="btn-primary">Go to Booking Form</a>
+                    </div>
+                </div>
+
+                <div id="payment-main-content" class="payment-content">
                     <div class="payment-header">
                         <h2>Complete Your Payment</h2>
-                        <p>Securely finish your reservation with our trusted payment gateway</p>
+                        <p>Choose your preferred payment method to finalize your reservation</p>
                     </div>
 
                     <div class="payment-grid">
                         <!-- Booking Summary -->
                         <div class="payment-summary">
-                            <h3>Booking Summary</h3>
+                            <h3>Your Booking Details</h3>
+                            <p class="summary-note">Use these details to complete your payment</p>
                             <div class="summary-item">
                                 <span class="label">Booking ID:</span>
-                                <span id="payment-booking-id">-</span>
+                                <span class="summary-value">
+                                    <span id="payment-booking-id">-</span>
+                                    <button class="copy-btn" onclick="copyToClipboard(document.getElementById('payment-booking-id').textContent)" title="Copy Booking ID">
+                                        <span class="copy-icon">📋</span>
+                                    </button>
+                                </span>
                             </div>
                             <div class="summary-item">
                                 <span class="label">Guest Name:</span>
                                 <span id="payment-customer-name">-</span>
+                            </div>
+                            <div class="summary-item">
+                                <span class="label">Phone:</span>
+                                <span id="payment-customer-phone">-</span>
                             </div>
                             <div class="summary-item">
                                 <span class="label">Email:</span>
@@ -115,7 +135,7 @@
                                 <span id="payment-nights">-</span>
                             </div>
                             <div class="summary-total">
-                                <span class="label">Total Amount:</span>
+                                <span class="label">Amount to Pay:</span>
                                 <span class="amount" id="payment-amount">₵0.00</span>
                             </div>
                         </div>
@@ -124,61 +144,53 @@
                         <div class="payment-options">
                             <h3>Payment Methods</h3>
                             
-                            <!-- Paystack Payment Option -->
-                            <div class="payment-option active" data-method="paystack">
+                            <!-- Mobile Money (MoMo) Option -->
+                            <div class="payment-option active" data-method="momo">
                                 <div class="option-header">
-                                    <input type="radio" id="paystack" name="payment-method" value="paystack" checked>
-                                    <label for="paystack">
+                                    <input type="radio" id="momo" name="payment-method" value="momo" checked>
+                                    <label for="momo">
                                         <div class="option-icon">
                                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z" fill="#00A651"/>
-                                                <path d="M8.5 16L10.5 8L15.5 16H8.5Z" fill="white"/>
-                                                <path d="M15.5 8H17.5L19.5 12L17.5 16H15.5L13.5 12L15.5 8Z" fill="white"/>
+                                                <rect x="5" y="2" width="14" height="20" rx="2" fill="#FFA500"/>
+                                                <rect x="7" y="5" width="10" height="12" rx="1" fill="white"/>
+                                                <circle cx="12" cy="19" r="1" fill="white"/>
                                             </svg>
                                         </div>
                                         <div class="option-info">
-                                            <h4>Paystack</h4>
-                                            <p>Secure online payment with Visa, Mastercard, or mobile money</p>
+                                            <h4>Mobile Money (MoMo)</h4>
+                                            <p>Send payment to our MoMo number, then confirm via WhatsApp</p>
                                         </div>
                                     </label>
                                 </div>
                                 <div class="option-details">
-                                    <div class="security-badge">
-                                        <span class="secure-icon">🔒</span>
-                                        <span class="secure-text">256-bit SSL encryption</span>
-                                    </div>
-                                    <div class="accepted-cards">
-                                        <span>Visa</span>
-                                        <span>Mastercard</span>
-                                        <span>Mobile Money</span>
-                                        <span>Verve</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Bank Transfer Option -->
-                            <div class="payment-option" data-method="bank-transfer">
-                                <div class="option-header">
-                                    <input type="radio" id="bank-transfer" name="payment-method" value="bank-transfer">
-                                    <label for="bank-transfer">
-                                        <div class="option-icon">
-                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M4 10H20V14H4V10ZM4 16H20V20H4V16ZM4 4H20V8H4V4Z" fill="#1976D2"/>
-                                                <path d="M2 2H22V6H2V2Z" fill="#1565C0"/>
-                                            </svg>
+                                    <div class="momo-details">
+                                        <div class="momo-info-row">
+                                            <span class="momo-label">Number:</span>
+                                            <span class="momo-value" id="momo-number">0544904547</span>
+                                            <button class="copy-btn" onclick="copyToClipboard('0544904547')" title="Copy number">
+                                                <span class="copy-icon">📋</span> Copy
+                                            </button>
                                         </div>
-                                        <div class="option-info">
-                                            <h4>Bank Transfer</h4>
-                                            <p>Transfer funds directly to our bank account</p>
+                                        <div class="momo-info-row">
+                                            <span class="momo-label">Name:</span>
+                                            <span class="momo-value">ANKAMAH URBAN</span>
                                         </div>
-                                    </label>
-                                </div>
-                                <div class="option-details">
-                                    <div class="bank-details">
-                                        <p><strong>Bank:</strong> Access Bank Ghana</p>
-                                        <p><strong>Account Name:</strong> ANKES LODGE Services</p>
-                                        <p><strong>Account Number:</strong> 1234567890</p>
-                                        <p><strong>Reference:</strong> <span id="payment-reference">-</span></p>
+                                        <div class="momo-info-row">
+                                            <span class="momo-label">Network:</span>
+                                            <span class="momo-value">MTN MoMo / Vodafone Cash / AirtelTigo Money</span>
+                                        </div>
+                                        <div class="momo-steps">
+                                            <p><strong>How to pay:</strong></p>
+                                            <ol>
+                                                <li>Send the <strong>exact amount</strong> shown above to <strong>0544904547</strong></li>
+                                                <li>Use your <strong>Booking ID</strong> as the MoMo reference</li>
+                                                <li>After sending, paste the MoMo reference below and click <strong>"Confirm via WhatsApp"</strong></li>
+                                            </ol>
+                                        </div>
+                                        <div class="momo-input-group">
+                                            <label for="momo-reference">MoMo Reference / Transaction ID (after sending):</label>
+                                            <input type="text" id="momo-reference" placeholder="e.g. MP24081012345">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -190,20 +202,51 @@
                                     <label for="cash-on-arrival">
                                         <div class="option-icon">
                                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z" fill="#FF9800"/>
-                                                <path d="M12 17C14.7614 17 17 14.7614 17 12C17 9.23858 14.7614 7 12 7C9.23858 7 7 9.23858 7 12C7 14.7614 9.23858 17 12 17Z" fill="white"/>
-                                                <path d="M12 14C13.1046 14 14 13.1046 14 12C14 10.8954 13.1046 10 12 10C10.8954 10 10 10.8954 10 12C10 13.1046 10.8954 14 12 14Z" fill="#FF9800"/>
+                                                <rect x="2" y="6" width="20" height="12" rx="2" fill="#4CAF50"/>
+                                                <circle cx="12" cy="12" r="3" fill="white"/>
+                                                <path d="M6 12H8M16 12H18" stroke="white" stroke-width="1.5"/>
                                             </svg>
                                         </div>
                                         <div class="option-info">
                                             <h4>Cash on Arrival</h4>
-                                            <p>Pay directly when you arrive at the lodge</p>
+                                            <p>Pay in person when you check in at the lodge</p>
                                         </div>
                                     </label>
                                 </div>
                                 <div class="option-details">
                                     <div class="warning-message">
-                                        <p><strong>Note:</strong> Reservation will be held for 24 hours after scheduled arrival time. Payment must be made in Ghana Cedis (GHS).</p>
+                                        <p><strong>Important:</strong></p>
+                                        <ul>
+                                            <li>Payment must be made in <strong>Ghana Cedis (GHS)</strong></li>
+                                            <li>Your reservation will be held for <strong>24 hours</strong> after scheduled arrival</li>
+                                            <li>Please have the <strong>exact amount</strong> ready for check-in</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- WhatsApp Direct Option -->
+                            <div class="payment-option" data-method="whatsapp-direct">
+                                <div class="option-header">
+                                    <input type="radio" id="whatsapp-direct" name="payment-method" value="whatsapp-direct">
+                                    <label for="whatsapp-direct">
+                                        <div class="option-icon">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="#25D366" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M12 2C6.48 2 2 6.48 2 12c0 1.77.46 3.44 1.27 4.89L2 22l5.34-1.4c1.34.73 2.86 1.14 4.46 1.14h.2c5.52 0 10-4.48 10-10S17.52 2 12 2z"/>
+                                            </svg>
+                                        </div>
+                                        <div class="option-info">
+                                            <h4>WhatsApp Direct</h4>
+                                            <p>Chat with us on WhatsApp to arrange payment or ask questions</p>
+                                        </div>
+                                    </label>
+                                </div>
+                                <div class="option-details">
+                                    <div class="whatsapp-direct-info">
+                                        <p>Click the button below to open a WhatsApp chat with your booking details. Our team will guide you through the payment process.</p>
+                                        <button class="btn-whatsapp-direct" onclick="openWhatsAppDirect()">
+                                            💬 Open WhatsApp Chat
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -211,26 +254,26 @@
 
                         <!-- Payment Actions -->
                         <div class="payment-actions">
-                            <div class="payment-security">
-                                <div class="security-feature">
-                                    <span class="feature-icon">🛡️</span>
-                                    <div class="feature-info">
-                                        <h4>Secure Payment</h4>
-                                        <p>All transactions are encrypted and secure</p>
+                            <div class="payment-trust-badges">
+                                <div class="trust-badge">
+                                    <span class="badge-icon">📱</span>
+                                    <div class="badge-info">
+                                        <h4>Instant Confirmation</h4>
+                                        <p>Receive confirmation on WhatsApp within minutes</p>
                                     </div>
                                 </div>
-                                <div class="security-feature">
-                                    <span class="feature-icon">🔒</span>
-                                    <div class="feature-info">
-                                        <h4>PCI DSS Compliant</h4>
-                                        <p>We meet industry security standards</p>
+                                <div class="trust-badge">
+                                    <span class="badge-icon">🏠</span>
+                                    <div class="badge-info">
+                                        <h4>Verified Lodge</h4>
+                                        <p>ANKES LODGE is a verified guest house in Abesim, Sunyani</p>
                                     </div>
                                 </div>
-                                <div class="security-feature">
-                                    <span class="feature-icon">🛡️</span>
-                                    <div class="feature-info">
-                                        <h4>Money Back Guarantee</h4>
-                                        <p>Cancellation policy applies</p>
+                                <div class="trust-badge">
+                                    <span class="badge-icon">💬</span>
+                                    <div class="badge-info">
+                                        <h4>24/7 Support</h4>
+                                        <p>Reach us anytime on WhatsApp or phone</p>
                                     </div>
                                 </div>
                             </div>
@@ -240,15 +283,19 @@
                                     <span class="btn-icon">←</span>
                                     Back to Booking
                                 </button>
-                                <button class="btn-primary" onclick="processPayment()">
-                                    <span class="btn-icon">💳</span>
-                                    <span id="payment-button-text">Process Payment</span>
+                                <button class="btn-primary" id="confirm-payment-btn" onclick="processPayment()">
+                                    <span class="btn-icon">📱</span>
+                                    <span id="payment-button-text">Confirm via WhatsApp</span>
                                 </button>
                             </div>
 
                             <div class="payment-help">
-                                <p>Need help? Contact our support team:</p>
-                                <p class="contact-info">📧 ankeslodge@gmail.com | 📞 0544904547</p>
+                                <p>Need help? Contact us:</p>
+                                <p class="contact-info">
+                                    <a href="mailto:ankeslodge@gmail.com">📧 ankeslodge@gmail.com</a> |
+                                    <a href="tel:0544904547">📞 0544904547</a> |
+                                    <a href="https://wa.me/233544904547" target="_blank">💬 WhatsApp</a>
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -257,8 +304,8 @@
                     <div id="payment-loading" class="loading-overlay" style="display: none;">
                         <div class="loading-content">
                             <div class="spinner"></div>
-                            <h3>Processing Payment</h3>
-                            <p>Please wait while we process your payment...</p>
+                            <h3>Processing</h3>
+                            <p>Please wait...</p>
                         </div>
                     </div>
                 </div>
@@ -355,50 +402,53 @@
     </div>
 
     <script>
+        // Store booking data globally
+        let bookingData = {};
+
         // Load booking details from URL parameters
         document.addEventListener('DOMContentLoaded', function() {
             const urlParams = new URLSearchParams(window.location.search);
             const bookingId = urlParams.get('id');
             const name = urlParams.get('name');
             const email = urlParams.get('email');
+            const phone = urlParams.get('phone');
             const checkin = urlParams.get('checkin');
             const checkout = urlParams.get('checkout');
             const roomType = urlParams.get('room');
             
+            // Check if we have minimum required data
+            if (!bookingId || !name || !checkin || !checkout || !roomType) {
+                document.getElementById('missing-data-alert').style.display = 'block';
+                document.getElementById('payment-main-content').style.display = 'none';
+                return;
+            }
+            
+            // Store booking data
+            bookingData = { bookingId, name, email, phone, checkin, checkout, roomType };
+            
             // Display booking details
-            if (bookingId) {
-                document.getElementById('payment-booking-id').textContent = bookingId;
-                document.getElementById('payment-reference').textContent = bookingId;
-            }
-            
-            if (name) {
-                document.getElementById('payment-customer-name').textContent = name;
-            }
-            
-            if (email) {
-                document.getElementById('payment-customer-email').textContent = email;
-            }
+            document.getElementById('payment-booking-id').textContent = bookingId;
+            document.getElementById('payment-customer-name').textContent = name;
+            document.getElementById('payment-customer-phone').textContent = phone || '-';
+            document.getElementById('payment-customer-email').textContent = email || '-';
             
             if (checkin) {
                 document.getElementById('payment-checkin').textContent = formatDate(checkin);
             }
-            
             if (checkout) {
                 document.getElementById('payment-checkout').textContent = formatDate(checkout);
             }
             
-            if (roomType) {
-                const roomTypes = {
-                    'executive': 'Executive Room — GH₵400/night',
-                    'deluxe': 'Deluxe Room — GH₵300/night',
-                    'standard': 'Standard Room — GH₵250/night',
-                    'full-house': 'Full House — Inquire for Pricing'
-                };
-                document.getElementById('payment-room-type').textContent = roomTypes[roomType] || roomType;
-            }
+            const roomTypes = {
+                'executive': 'Executive Room — GH₵400/night',
+                'deluxe': 'Deluxe Room — GH₵300/night',
+                'standard': 'Standard Room — GH₵250/night',
+                'full-house': 'Full House — Inquire for Pricing'
+            };
+            document.getElementById('payment-room-type').textContent = roomTypes[roomType] || roomType;
             
-            // Display pricing based on room type
-            if (checkin && checkout && roomType) {
+            // Calculate nights and amount
+            if (checkin && checkout) {
                 const checkinDate = new Date(checkin);
                 const checkoutDate = new Date(checkout);
                 const timeDiff = checkoutDate.getTime() - checkinDate.getTime();
@@ -412,8 +462,11 @@
                 if (pricePerNight && nights > 0) {
                     const total = pricePerNight * nights;
                     document.getElementById('payment-amount').textContent = `₵${total.toLocaleString()}.00`;
+                    bookingData.amount = total;
+                    bookingData.nights = nights;
                 } else {
                     document.getElementById('payment-amount').textContent = 'Inquire for Pricing';
+                    bookingData.amount = 0;
                 }
             }
             
@@ -421,16 +474,36 @@
             const paymentOptions = document.querySelectorAll('.payment-option');
             paymentOptions.forEach(option => {
                 option.addEventListener('click', function() {
-                    // Remove active class from all options
                     paymentOptions.forEach(opt => opt.classList.remove('active'));
-                    // Add active class to clicked option
                     this.classList.add('active');
-                    // Check the radio button
                     const radio = this.querySelector('input[type="radio"]');
                     radio.checked = true;
+                    updateButtonText();
                 });
             });
         });
+
+        // Update button text based on selected payment method
+        function updateButtonText() {
+            const selectedMethod = document.querySelector('input[name="payment-method"]:checked').value;
+            const btnText = document.getElementById('payment-button-text');
+            const btnIcon = document.querySelector('#confirm-payment-btn .btn-icon');
+            
+            switch(selectedMethod) {
+                case 'momo':
+                    btnText.textContent = 'Confirm via WhatsApp';
+                    btnIcon.textContent = '📱';
+                    break;
+                case 'cash-on-arrival':
+                    btnText.textContent = 'Confirm Cash on Arrival';
+                    btnIcon.textContent = '🏠';
+                    break;
+                case 'whatsapp-direct':
+                    btnText.textContent = 'Open WhatsApp Chat';
+                    btnIcon.textContent = '💬';
+                    break;
+            }
+        }
 
         // Format date function
         function formatDate(dateString) {
@@ -442,104 +515,157 @@
             });
         }
 
-        // Process payment function
+        // Copy to clipboard
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                // Show brief feedback
+                const btn = event.target.closest('.copy-btn');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<span class="copy-icon">✅</span> Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.classList.remove('copied');
+                }, 2000);
+            }).catch(() => {
+                // Fallback for older browsers
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert('Copied: ' + text);
+            });
+        }
+
+        // Build WhatsApp message with booking details
+        function buildWhatsAppMessage() {
+            const momoRef = document.getElementById('momo-reference')?.value.trim() || '';
+            const lines = [
+                '*PAYMENT CONFIRMATION - ANKES LODGE*',
+                '',
+                '*Booking Details*',
+                `Booking ID: ${bookingData.bookingId}`,
+                `Name: ${bookingData.name}`,
+                `Phone: ${bookingData.phone || 'N/A'}`,
+                `Room: ${bookingData.roomType}`,
+                `Check-in: ${formatDate(bookingData.checkin)}`,
+                `Check-out: ${formatDate(bookingData.checkout)}`,
+                `Amount: GH₵${bookingData.amount || '0'}`,
+                ''
+            ];
+            
+            if (momoRef) {
+                lines.push(`*MoMo Reference:* ${momoRef}`);
+                lines.push('I have sent the payment via Mobile Money. Please confirm.');
+            } else {
+                lines.push('I would like to arrange payment for my booking.');
+            }
+            
+            lines.push('', 'Thank you!');
+            return lines.join('\n');
+        }
+
+        // Process payment based on selected method
         async function processPayment() {
             const selectedMethod = document.querySelector('input[name="payment-method"]:checked').value;
-            const bookingId = new URLSearchParams(window.location.search).get('id');
-            const name = new URLSearchParams(window.location.search).get('name');
-            const email = new URLSearchParams(window.location.search).get('email');
-            const roomType = new URLSearchParams(window.location.search).get('room');
-            const amountText = document.getElementById('payment-amount').textContent.replace('₵', '').replace(',', '');
-            const amount = parseFloat(amountText);
-
-            if (!bookingId || !name || !email || !roomType) {
-                alert('Booking information is incomplete. Please contact support.');
+            
+            if (!bookingData.bookingId) {
+                alert('Booking information is incomplete. Please go back and complete the booking form.');
                 return;
             }
 
             const paymentLoading = document.getElementById('payment-loading');
             const buttonText = document.getElementById('payment-button-text');
 
-            // Show loading state
-            paymentLoading.style.display = 'flex';
-            buttonText.textContent = 'Processing...';
+            if (selectedMethod === 'momo') {
+                // MoMo: Open WhatsApp with payment confirmation
+                const message = buildWhatsAppMessage();
+                const whatsappUrl = `https://wa.me/233544904547?text=${encodeURIComponent(message)}`;
+                
+                // Show loading briefly
+                paymentLoading.style.display = 'flex';
+                buttonText.textContent = 'Opening WhatsApp...';
+                
+                setTimeout(() => {
+                    paymentLoading.style.display = 'none';
+                    buttonText.textContent = 'Confirm via WhatsApp';
+                    window.open(whatsappUrl, '_blank');
+                    // Also redirect to confirmation
+                    setTimeout(() => {
+                        window.location.href = `booking-confirmation.html?id=${bookingData.bookingId}&name=${encodeURIComponent(bookingData.name)}&email=${encodeURIComponent(bookingData.email || '')}&phone=${encodeURIComponent(bookingData.phone || '')}&checkin=${bookingData.checkin}&checkout=${bookingData.checkout}&room=${bookingData.roomType}`;
+                    }, 1000);
+                }, 800);
+                
+            } else if (selectedMethod === 'cash-on-arrival') {
+                const confirmed = confirm('Confirm: You will pay in cash when you arrive at ANKES LODGE.\n\nYour reservation will be held for 24 hours after your scheduled arrival time.\n\nPayment must be in Ghana Cedis (GHS).\n\nClick OK to confirm.');
+                if (!confirmed) return;
 
-            try {
-                if (selectedMethod === 'paystack') {
-                    // Initiate Paystack payment
-                    const response = await fetch('/initiate-payment', {
+                paymentLoading.style.display = 'flex';
+                buttonText.textContent = 'Confirming...';
+
+                try {
+                    const response = await fetch('/update-booking', {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
-                            booking_id: bookingId,
-                            email: email,
-                            customer_name: name,
-                            room_type: roomType,
-                            amount: amount
+                            booking_id: bookingData.bookingId,
+                            payment_method: 'cash_on_arrival'
                         })
                     });
                     
                     const result = await response.json();
                     
                     if (result.success) {
-                        // Redirect to Paystack payment page
-                        window.location.href = result.authorization_url;
-                    } else {
-                        throw new Error(result.message || 'Payment initiation failed');
-                    }
-                } else if (selectedMethod === 'bank-transfer') {
-                    // Show bank transfer instructions
-                    alert('Bank transfer instructions have been sent to your email. Please complete the transfer within 24 hours.');
-                    window.location.href = `booking-confirmation.html?id=${bookingId}&name=${encodeURIComponent(name)}&checkin=${new URLSearchParams(window.location.search).get('checkin')}&checkout=${new URLSearchParams(window.location.search).get('checkout')}&room=${roomType}`;
-                } else if (selectedMethod === 'cash-on-arrival') {
-                    // Confirm cash on arrival
-                    const confirmed = confirm('Are you sure you want to pay cash on arrival? Your reservation will be held for 24 hours after scheduled arrival time.');
-                    if (confirmed) {
-                        // Update booking to cash on arrival
-                        const response = await fetch('/update-booking', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                booking_id: bookingId,
-                                payment_method: 'cash_on_arrival'
-                            })
-                        });
-                        
-                        const result = await response.json();
-                        
-                        if (result.success) {
-                            window.location.href = `booking-confirmation.html?id=${bookingId}&name=${encodeURIComponent(name)}&checkin=${new URLSearchParams(window.location.search).get('checkin')}&checkout=${new URLSearchParams(window.location.search).get('checkout')}&room=${roomType}`;
-                        } else {
-                            throw new Error(result.message || 'Failed to update booking');
-                        }
-                    } else {
-                        // Hide loading state and restore button text
                         paymentLoading.style.display = 'none';
-                        buttonText.textContent = 'Process Payment';
-                        return;
+                        window.location.href = `booking-confirmation.html?id=${bookingData.bookingId}&name=${encodeURIComponent(bookingData.name)}&email=${encodeURIComponent(bookingData.email || '')}&phone=${encodeURIComponent(bookingData.phone || '')}&checkin=${bookingData.checkin}&checkout=${bookingData.checkout}&room=${bookingData.roomType}&payment=cash_on_arrival`;
+                    } else {
+                        throw new Error(result.message || 'Failed to confirm booking');
                     }
+                } catch (error) {
+                    console.error('Error:', error);
+                    paymentLoading.style.display = 'none';
+                    buttonText.textContent = 'Confirm Cash on Arrival';
+                    // Still redirect to confirmation even if server update fails
+                    window.location.href = `booking-confirmation.html?id=${bookingData.bookingId}&name=${encodeURIComponent(bookingData.name)}&email=${encodeURIComponent(bookingData.email || '')}&phone=${encodeURIComponent(bookingData.phone || '')}&checkin=${bookingData.checkin}&checkout=${bookingData.checkout}&room=${bookingData.roomType}&payment=cash_on_arrival`;
                 }
-            } catch (error) {
-                console.error('Error processing payment:', error);
-                alert('Error processing payment: ' + error.message + '\n\nPlease try again or contact support.');
-                // Hide loading state and restore button text
-                paymentLoading.style.display = 'none';
-                buttonText.textContent = 'Process Payment';
+                
+            } else if (selectedMethod === 'whatsapp-direct') {
+                openWhatsAppDirect();
             }
+        }
+
+        // Open WhatsApp directly with booking details
+        function openWhatsAppDirect() {
+            if (!bookingData.bookingId) {
+                window.open('https://wa.me/233544904547?text=Hello!%20I%20would%20like%20to%20book%20a%20room%20at%20ANKES%20LODGE.', '_blank');
+                return;
+            }
+            
+            const message = [
+                '*Hello ANKES LODGE!*',
+                '',
+                'I have a booking and would like to arrange payment.',
+                '',
+                `*Booking ID:* ${bookingData.bookingId}`,
+                `*Name:* ${bookingData.name}`,
+                `*Phone:* ${bookingData.phone || 'N/A'}`,
+                `*Room:* ${bookingData.roomType}`,
+                `*Check-in:* ${formatDate(bookingData.checkin)}`,
+                `*Check-out:* ${formatDate(bookingData.checkout)}`,
+                `*Amount:* GH₵${bookingData.amount || '0'}`,
+                '',
+                'Please guide me on the payment options.',
+                'Thank you!'
+            ].join('\n');
+            
+            window.open(`https://wa.me/233544904547?text=${encodeURIComponent(message)}`, '_blank');
         }
 
         // Go back to booking function
         function goBackToBooking() {
-            const bookingId = new URLSearchParams(window.location.search).get('id');
-            if (bookingId) {
-                window.location.href = `booking-confirmation.html?id=${bookingId}`;
-            } else {
-                window.history.back();
-            }
+            window.location.href = '/booking.html';
         }
 
         // Affiliate Company Modal Functions
@@ -547,7 +673,7 @@
             const modal = document.getElementById('affiliateModal');
             if (modal) {
                 modal.style.display = 'block';
-                document.body.style.overflow = 'hidden'; // Prevent background scrolling
+                document.body.style.overflow = 'hidden';
             }
         }
 
@@ -555,11 +681,11 @@
             const modal = document.getElementById('affiliateModal');
             if (modal) {
                 modal.style.display = 'none';
-                document.body.style.overflow = ''; // Restore scrolling
+                document.body.style.overflow = '';
             }
         }
 
-        // Close modal when clicking outside of it
+        // Close modal when clicking outside
         document.addEventListener('DOMContentLoaded', function() {
             const modal = document.getElementById('affiliateModal');
             if (modal) {

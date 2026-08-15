@@ -93,6 +93,14 @@
             margin-top: 10px;
         }
 
+        #bookings-tab .table-wrapper {
+            overflow-x: auto;
+        }
+
+        #bookings-tab table {
+            min-width: 1100px;
+        }
+
         th, td {
             padding: 12px;
             text-align: left;
@@ -228,6 +236,115 @@
             background-color: #6c757d;
             color: white;
         }
+
+        /* Stats Dashboard */
+        .stats-dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 18px 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+            border-left: 4px solid #FFA500;
+        }
+
+        .stat-card.today {
+            border-left-color: #28a745;
+        }
+
+        .stat-card.yesterday {
+            border-left-color: #007bff;
+        }
+
+        .stat-card.week {
+            border-left-color: #6f42c1;
+        }
+
+        .stat-card.total {
+            border-left-color: #FFA500;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #333;
+            margin: 0;
+        }
+
+        .stat-card.today .stat-number { color: #28a745; }
+        .stat-card.yesterday .stat-number { color: #007bff; }
+        .stat-card.week .stat-number { color: #6f42c1; }
+        .stat-card.total .stat-number { color: #FFA500; }
+
+        .stat-label {
+            font-size: 0.85em;
+            color: #6c757d;
+            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .daily-breakdown {
+            background: white;
+            border-radius: 5px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .daily-breakdown h3 {
+            margin: 0 0 12px 0;
+            font-size: 1em;
+            color: #333;
+        }
+
+        .day-row {
+            display: flex;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .day-row:last-child {
+            border-bottom: none;
+        }
+
+        .day-label {
+            width: 120px;
+            font-size: 0.85em;
+            color: #555;
+        }
+
+        .day-bar-container {
+            flex: 1;
+            background: #f0f0f0;
+            border-radius: 10px;
+            height: 18px;
+            margin: 0 10px;
+            overflow: hidden;
+        }
+
+        .day-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #FFA500, #e69500);
+            border-radius: 10px;
+            min-width: 2px;
+            transition: width 0.4s ease;
+        }
+
+        .day-count {
+            width: 35px;
+            text-align: right;
+            font-weight: bold;
+            font-size: 0.85em;
+            color: #333;
+        }
     </style>
 </head>
 <body>
@@ -245,7 +362,34 @@
 
         <!-- Bookings Tab -->
         <div id="bookings-tab" class="tab-content active">
+            <!-- Stats Dashboard -->
+            <div class="stats-dashboard" id="statsDashboard">
+                <div class="stat-card today">
+                    <p class="stat-number" id="statToday">-</p>
+                    <p class="stat-label">Today</p>
+                </div>
+                <div class="stat-card yesterday">
+                    <p class="stat-number" id="statYesterday">-</p>
+                    <p class="stat-label">Yesterday</p>
+                </div>
+                <div class="stat-card week">
+                    <p class="stat-number" id="statWeek">-</p>
+                    <p class="stat-label">This Week</p>
+                </div>
+                <div class="stat-card total">
+                    <p class="stat-number" id="statTotal">-</p>
+                    <p class="stat-label">Total Bookings</p>
+                </div>
+            </div>
+
+            <!-- Daily Breakdown (last 7 days) -->
+            <div class="daily-breakdown" id="dailyBreakdown">
+                <h3>Last 7 Days</h3>
+                <div id="dailyBars">Loading...</div>
+            </div>
+
             <button id="refreshBtn" class="refresh-btn">Refresh Bookings</button>
+            <div class="table-wrapper">
             <table>
                 <thead>
                     <tr>
@@ -258,14 +402,17 @@
                         <th>Check-out</th>
                         <th>Guests</th>
                         <th>Room Type</th>
+                        <th>Payment</th>
                         <th>Status</th>
+                        <th>Message</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="bookingsBody">
-                    <tr><td colspan="11" class="no-bookings">Loading bookings...</td></tr>
+                    <tr><td colspan="13" class="no-bookings">Loading bookings...</td></tr>
                 </tbody>
             </table>
+            </div>
         </div>
 
         <!-- Contacts Tab -->
@@ -432,6 +579,85 @@
             console.log('Offline data sync completed');
         }
         
+        // Function to compute and display booking stats
+        function updateBookingStats(bookings) {
+            const now = new Date();
+            const todayStr = now.toISOString().split('T')[0]; // YYYY-MM-DD
+            
+            const yesterday = new Date(now);
+            yesterday.setDate(yesterday.getDate() - 1);
+            const yesterdayStr = yesterday.toISOString().split('T')[0];
+            
+            // Start of this week (Monday)
+            const weekStart = new Date(now);
+            const dayOfWeek = now.getDay(); // 0=Sun, 1=Mon...
+            const diffToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+            weekStart.setDate(now.getDate() - diffToMonday);
+            weekStart.setHours(0, 0, 0, 0);
+            
+            let todayCount = 0;
+            let yesterdayCount = 0;
+            let weekCount = 0;
+            const dailyCounts = {}; // date string -> count
+            
+            bookings.forEach(booking => {
+                // Parse timestamp (format: "2025-12-02 11:28:46" or ISO)
+                const ts = booking.timestamp;
+                if (!ts) return;
+                const bookingDate = new Date(ts).toISOString().split('T')[0];
+                
+                // Count for today
+                if (bookingDate === todayStr) todayCount++;
+                
+                // Count for yesterday
+                if (bookingDate === yesterdayStr) yesterdayCount++;
+                
+                // Count for this week
+                const bookingDateObj = new Date(ts);
+                if (bookingDateObj >= weekStart) weekCount++;
+                
+                // Track daily counts
+                dailyCounts[bookingDate] = (dailyCounts[bookingDate] || 0) + 1;
+            });
+            
+            // Update stat cards
+            document.getElementById('statToday').textContent = todayCount;
+            document.getElementById('statYesterday').textContent = yesterdayCount;
+            document.getElementById('statWeek').textContent = weekCount;
+            document.getElementById('statTotal').textContent = bookings.length;
+            
+            // Build daily breakdown for last 7 days
+            const dailyBarsEl = document.getElementById('dailyBars');
+            const days = [];
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date(now);
+                d.setDate(now.getDate() - i);
+                const dateStr = d.toISOString().split('T')[0];
+                const dayLabel = d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+                const count = dailyCounts[dateStr] || 0;
+                days.push({ label: dayLabel, count: count, date: dateStr });
+            }
+            
+            const maxCount = Math.max(...days.map(d => d.count), 1);
+            
+            let barsHTML = '';
+            days.forEach(day => {
+                const barWidth = (day.count / maxCount) * 100;
+                const isToday = day.date === todayStr;
+                const labelStyle = isToday ? 'font-weight: bold; color: #FFA500;' : '';
+                barsHTML += `
+                    <div class="day-row">
+                        <span class="day-label" style="${labelStyle}">${day.label}${isToday ? ' *' : ''}</span>
+                        <div class="day-bar-container">
+                            <div class="day-bar" style="width: ${barWidth}%"></div>
+                        </div>
+                        <span class="day-count">${day.count}</span>
+                    </div>
+                `;
+            });
+            dailyBarsEl.innerHTML = barsHTML;
+        }
+        
         // Function to fetch and display bookings
         function loadBookings() {
             fetch('/admin/bookings')
@@ -448,8 +674,11 @@
                     
                     const tbody = document.getElementById('bookingsBody');
                     
+                    // Update stats dashboard (even if 0 bookings)
+                    updateBookingStats(bookings);
+                    
                     if (bookings.length === 0) {
-                        tbody.innerHTML = '<tr><td colspan="11" class="no-bookings">No bookings found</td></tr>';
+                        tbody.innerHTML = '<tr><td colspan="13" class="no-bookings">No bookings found</td></tr>';
                         return;
                     }
                     
@@ -459,6 +688,10 @@
                     // Add bookings to table (reverse order to show newest first)
                     bookings.slice().reverse().forEach(booking => {
                         const row = document.createElement('tr');
+                        const paymentMethod = booking.paymentMethod || 'Not set';
+                        const paymentStatus = booking.paymentStatus || '';
+                        const paymentDisplay = paymentMethod + (paymentStatus ? ` (${paymentStatus})` : '');
+                        const guestMessage = booking.message || '-';
                         row.innerHTML = `
                             <td>${booking.id?.substring(0, 8) || 'N/A'}</td>
                             <td>${formatDate(booking.timestamp)}</td>
@@ -469,7 +702,9 @@
                             <td>${booking.checkout || 'N/A'}</td>
                             <td>${booking.adults || 0} adults, ${booking.children || 0} children</td>
                             <td>${booking['room-type'] || booking.roomType || 'N/A'}</td>
-                            <td>${booking.status || 'N/A'}</td>
+                            <td>${paymentDisplay}</td>
+                            <td>${booking.status || 'pending'}</td>
+                            <td style="max-width: 200px; word-wrap: break-word; font-size: 0.9em;">${guestMessage}</td>
                             <td>
                                 <button class="action-btn edit-btn" onclick="editBooking('${booking.id}')" title="Edit Booking">✏️</button>
                                 <button class="action-btn refund-btn" onclick="processRefund('${booking.id}')" title="Process Refund">💰</button>
@@ -487,9 +722,12 @@
                         const bookings = JSON.parse(localStorage.getItem('bookings') || '[]');
                         saveOfflineData('bookings', bookings);
                         
+                        // Update stats even in offline mode
+                        updateBookingStats(bookings);
+                        
                         const tbody = document.getElementById('bookingsBody');
                         if (bookings.length === 0) {
-                            tbody.innerHTML = '<tr><td colspan="11" class="no-bookings">No bookings found (offline mode)</td></tr>';
+                            tbody.innerHTML = '<tr><td colspan="13" class="no-bookings">No bookings found (offline mode)</td></tr>';
                             return;
                         }
                         
@@ -499,6 +737,10 @@
                         // Add bookings to table (reverse order to show newest first)
                         bookings.slice().reverse().forEach(booking => {
                             const row = document.createElement('tr');
+                            const paymentMethod = booking.paymentMethod || 'Not set';
+                            const paymentStatus = booking.paymentStatus || '';
+                            const paymentDisplay = paymentMethod + (paymentStatus ? ` (${paymentStatus})` : '');
+                            const guestMessage = booking.message || '-';
                             row.innerHTML = `
                                 <td>${booking.id?.substring(0, 8) || 'N/A'}</td>
                                 <td>${formatDate(booking.timestamp)}</td>
@@ -509,7 +751,9 @@
                                 <td>${booking.checkout || 'N/A'}</td>
                                 <td>${booking.adults || 0} adults, ${booking.children || 0} children</td>
                                 <td>${booking['room-type'] || booking.roomType || 'N/A'}</td>
-                                <td>${booking.status || 'N/A'}</td>
+                                <td>${paymentDisplay}</td>
+                                <td>${booking.status || 'pending'}</td>
+                                <td style="max-width: 200px; word-wrap: break-word; font-size: 0.9em;">${guestMessage}</td>
                                 <td>
                                     <button class="action-btn edit-btn" onclick="editBooking('${booking.id}')" title="Edit Booking">✏️</button>
                                     <button class="action-btn refund-btn" onclick="processRefund('${booking.id}')" title="Process Refund">💰</button>
@@ -518,7 +762,7 @@
                             tbody.appendChild(row);
                         });
                     } catch (storageError) {
-                        document.getElementById('bookingsBody').innerHTML = '<tr><td colspan="11" class="no-bookings">Error loading bookings (offline mode unavailable)</td></tr>';
+                        document.getElementById('bookingsBody').innerHTML = '<tr><td colspan="13" class="no-bookings">Error loading bookings (offline mode unavailable)</td></tr>';
                     }
                 });
         }

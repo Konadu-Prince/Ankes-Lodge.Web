@@ -1,6 +1,9 @@
 # Environment variables
 .env
 
+# Admin credentials (contains hashed password)
+admin-credentials.json
+
 # Node modules
 node_modules/
 

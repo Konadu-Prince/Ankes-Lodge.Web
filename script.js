@@ -862,14 +862,58 @@ function handleFormSubmit(formId, successMessage) {
             // Show success or error message
             if (data.status === 'success') {
                 if (formId === 'booking-form') {
-                    // Redirect to confirmation page with booking details
+                    // Get all form values
                     const name = form.querySelector('#name').value;
                     const checkin = form.querySelector('#checkin').value;
                     const checkout = form.querySelector('#checkout').value;
                     const roomType = form.querySelector('#room-type').value;
-                    
                     const email = form.querySelector('#email').value;
-                    window.location.href = `payment.html?id=${data.bookingId}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&checkin=${checkin}&checkout=${checkout}&room=${roomType}`;
+                    const phone = form.querySelector('#phone').value;
+                    const adults = form.querySelector('#adults').value;
+                    const children = form.querySelector('#children').value;
+                    
+                    const roomNames = {
+                        'executive': 'Executive Room',
+                        'deluxe': 'Deluxe Room',
+                        'standard': 'Standard Room',
+                        'full-house': 'Full House'
+                    };
+                    const roomPrices = { 'executive': 400, 'deluxe': 300, 'standard': 250 };
+                    
+                    // Calculate nights and total
+                    const checkinDate = new Date(checkin);
+                    const checkoutDate = new Date(checkout);
+                    const nights = Math.ceil((checkoutDate - checkinDate) / (1000 * 3600 * 24));
+                    const pricePerNight = roomPrices[roomType];
+                    const total = pricePerNight ? pricePerNight * nights : 0;
+                    
+                    // Build WhatsApp message with booking details for the lodge
+                    const whatsappMsg = [
+                        '*NEW BOOKING REQUEST*',
+                        '',
+                        `*Booking ID:* ${data.bookingId}`,
+                        `*Name:* ${name}`,
+                        `*Email:* ${email}`,
+                        `*Phone:* ${phone}`,
+                        '',
+                        '*Stay Details*',
+                        `*Room:* ${roomNames[roomType] || roomType}`,
+                        `*Check-in:* ${checkin}`,
+                        `*Check-out:* ${checkout}`,
+                        `*Nights:* ${nights}`,
+                        `*Adults:* ${adults}`,
+                        `*Children:* ${children}`,
+                        total > 0 ? `*Total:* GH₵${total.toLocaleString()}` : '*Total:* Inquire for pricing',
+                        '',
+                        'Guest will complete payment via MoMo or Cash on Arrival.'
+                    ].join('\n');
+                    
+                    // Open WhatsApp in new tab (sends booking details to lodge)
+                    const whatsappUrl = `https://wa.me/233544904547?text=${encodeURIComponent(whatsappMsg)}`;
+                    window.open(whatsappUrl, '_blank');
+                    
+                    // Redirect browser to payment page (details remain visible for user to pay)
+                    window.location.href = `payment.html?id=${data.bookingId}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}&checkin=${checkin}&checkout=${checkout}&room=${roomType}`;
                 } else {
                     alert(data.message);
                     form.reset();
@@ -2271,8 +2315,9 @@ function generateWhatsAppMessage() {
             `*Total Accommodation Cost: GH₵${typeof totalCost === 'number' ? totalCost.toLocaleString() : totalCost}*`,
             '',
             '*Payment*',
-            'Payment Method: Mobile Money / Paystack',
-            `ANKES LODGE Payment Number: ${ANKES_LODGE_PAYMENT_NUMBER}`
+            'Payment Method: Mobile Money',
+            `MoMo Name: ANKAMAH URBAN`,
+            `MoMo Number: ${ANKES_LODGE_PAYMENT_NUMBER}`
         );
 
         if (paymentRef && paymentStatus === 'success') {
@@ -2390,9 +2435,10 @@ function toggleEditWhatsAppMessage() {
 
 /**
  * Send the booking message to WhatsApp.
- * Opens wa.me with the (possibly user-edited) message pre-filled.
+ * Opens wa.me with the (possibly user-edited) message pre-filled,
+ * saves the booking to the server, then redirects to payment.html.
  */
-function sendBookingToWhatsApp() {
+async function sendBookingToWhatsApp() {
     const editArea    = document.getElementById('whatsapp-message-edit');
     const displayEl   = document.getElementById('whatsapp-message-display');
 
@@ -2410,21 +2456,73 @@ function sendBookingToWhatsApp() {
         return;
     }
 
-    // Encode the message for the URL
-    const encodedMessage = encodeURIComponent(finalMessage);
-    const whatsappUrl    = `https://wa.me/${WHATSAPP_LODGE_NUMBER}?text=${encodedMessage}`;
+    // Collect form values for server save and payment page
+    const name      = document.getElementById('name')?.value.trim() || '';
+    const email     = document.getElementById('email')?.value.trim() || '';
+    const phone     = document.getElementById('phone')?.value.trim() || '';
+    const checkin   = document.getElementById('checkin')?.value || '';
+    const checkout  = document.getElementById('checkout')?.value || '';
+    const roomType  = document.getElementById('room-type')?.value || '';
+    const adults    = document.getElementById('adults')?.value || '';
+    const children  = document.getElementById('children')?.value || '0';
+    const message   = document.getElementById('message')?.value.trim() || '';
 
-    // Open WhatsApp in a new tab
-    window.open(whatsappUrl, '_blank');
-
-    // Show a confirmation notice
+    // Show loading state
     const feedback = document.getElementById('booking-form-feedback');
     if (feedback) {
-        feedback.innerHTML = 'Your booking message has been opened in WhatsApp. Please press <strong>Send</strong> in the WhatsApp chat to complete your booking request.';
-        feedback.className = 'form-feedback success';
+        feedback.innerHTML = 'Saving your booking and opening WhatsApp...';
+        feedback.className = 'form-feedback loading';
         feedback.style.display = 'block';
-        feedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
+
+    // Save booking to server first (so admin panel can track it)
+    let bookingId = 'BK' + Date.now(); // fallback ID if server fails
+    try {
+        const formData = new URLSearchParams();
+        formData.append('name', name);
+        formData.append('email', email);
+        formData.append('phone', phone);
+        formData.append('checkin', checkin);
+        formData.append('checkout', checkout);
+        formData.append('room-type', roomType);
+        formData.append('adults', adults);
+        formData.append('children', children);
+        formData.append('message', message);
+
+        const baseUrl = window.location.hostname.includes('github.io')
+            ? 'https://ankes-lodge.onrender.com'
+            : window.location.origin;
+
+        const response = await fetch(`${baseUrl}/submit-booking`, {
+            method: 'POST',
+            body: formData,
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+        });
+
+        const data = await response.json();
+        if (data.bookingId) {
+            bookingId = data.bookingId;
+        }
+    } catch (err) {
+        console.error('Failed to save booking to server:', err);
+        // Continue anyway — WhatsApp + payment page will still work
+    }
+
+    // Open WhatsApp in a new tab (sends booking details to lodge)
+    const encodedMessage = encodeURIComponent(finalMessage);
+    const whatsappUrl    = `https://wa.me/${WHATSAPP_LODGE_NUMBER}?text=${encodedMessage}`;
+    window.open(whatsappUrl, '_blank');
+
+    // Show confirmation then redirect to payment page
+    if (feedback) {
+        feedback.innerHTML = 'Booking saved! Opening WhatsApp... Redirecting to payment page.';
+        feedback.className = 'form-feedback success';
+    }
+
+    // Redirect to payment.html with all booking details
+    setTimeout(() => {
+        window.location.href = `payment.html?id=${encodeURIComponent(bookingId)}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}&checkin=${checkin}&checkout=${checkout}&room=${roomType}`;
+    }, 1200);
 }
 
 // Attach the edit toggle handler after DOM is ready
