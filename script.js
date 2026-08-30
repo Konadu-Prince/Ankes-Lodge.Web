@@ -1588,9 +1588,9 @@ function initMultiStepBooking() {
             'full-house': 'Full House'
         };
         const roomPrices = {
-            'executive': 400,
-            'deluxe': 300,
-            'standard': 250
+            'executive': 500,
+            'deluxe': 400,
+            'standard': 300
         };
         
         document.getElementById('review-room').textContent = roomNames[roomType] || '-';
