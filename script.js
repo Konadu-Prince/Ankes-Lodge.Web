@@ -2567,7 +2567,8 @@ async function getPaystackConfig() {
 
 async function initiatePaystackPayment() {
     const roomType = document.getElementById('room-type')?.value;
-    const roomPrices = { 'executive': 500, 'deluxe': 400, 'standard': 300 };
+    const roomPrices = { 'executive': 500, 'deluxe': 5
+400, 'standard': 300 };
     const pricePerNight = roomPrices[roomType];
 
     if (!pricePerNight) {
