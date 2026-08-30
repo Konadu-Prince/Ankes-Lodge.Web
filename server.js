@@ -156,13 +156,13 @@ const generalLimiter = rateLimit({
 
 const contactLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 5, // Limit each IP to 5 contact form submissions per windowMs
+    max: 20, // Limit each IP to 5 contact form submissions per windowMs
     message: 'Too many contact form submissions, please try again later.'
 });
 
 const bookingLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 5, // Limit each IP to 5 booking form submissions per windowMs
+    max: 20, // Limit each IP to 5 booking form submissions per windowMs
     message: 'Too many booking form submissions, please try again later.'
 });
 
@@ -284,7 +284,7 @@ app.post('/initiate-booking-payment', bookingLimiter, async (req, res) => {
         }
 
         // Server-side pricing validation — NEVER trust frontend amount
-        const roomPrices = { 'executive': 400, 'deluxe': 300, 'standard': 250 };
+        const roomPrices = { 'executive': 500, 'deluxe': 400, 'standard': 300 };
         const pricePerNight = roomPrices[roomType];
 
         if (!pricePerNight) {
