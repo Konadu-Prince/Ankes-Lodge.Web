@@ -878,7 +878,7 @@ function handleFormSubmit(formId, successMessage) {
                         'standard': 'Standard Room',
                         'full-house': 'Full House'
                     };
-                    const roomPrices = { 'executive': 400, 'deluxe': 300, 'standard': 250 };
+                    const roomPrices = { 'executive': 500, 'deluxe': 400, 'standard': 300 };
                     
                     // Calculate nights and total
                     const checkinDate = new Date(checkin);
