@@ -240,9 +240,9 @@
             
             if (roomType) {
                 const roomTypes = {
-                    'executive': 'Executive Room — GH₵400/night',
-                    'deluxe': 'Deluxe Room — GH₵300/night',
-                    'standard': 'Standard Room — GH₵250/night',
+                    'executive': 'Executive Room — GH₵500/night',
+                    'deluxe': 'Deluxe Room — GH₵400/night',
+                    'standard': 'Standard Room — GH₵300/night',
                     'full-house': 'Full House — Inquire for Pricing'
                 };
                 document.getElementById('room-type').textContent = roomTypes[roomType] || roomType;
@@ -269,7 +269,7 @@
                 const timeDiff = checkoutDate.getTime() - checkinDate.getTime();
                 const nights = Math.ceil(timeDiff / (1000 * 3600 * 24));
                 
-                const roomPrices = { 'executive': 400, 'deluxe': 300, 'standard': 250 };
+                const roomPrices = { 'executive': 500, 'deluxe': 400, 'standard': 300 };
                 const pricePerNight = roomPrices[roomType];
                 
                 if (pricePerNight && nights > 0) {
