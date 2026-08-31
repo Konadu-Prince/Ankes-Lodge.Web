@@ -826,7 +826,7 @@ function handleFormSubmit(formId, successMessage) {
         // Check if we're on GitHub Pages and use Render.com server instead
         if (window.location.hostname.includes('github.io')) {
             // Use your Render.com server URL for form submissions when hosted on GitHub Pages
-            baseUrl = 'https://ankes-lodge.onrender.com';
+            baseUrl = 'https://www.ankeslodge.com';
         }
         
         const endpoint = formId === 'booking-form' ? `${baseUrl}/submit-booking` : `${baseUrl}/process-contact`;
@@ -1003,7 +1003,7 @@ function initViewsCounter() {
     // Check if we're on GitHub Pages and use Render.com server instead
     if (window.location.hostname.includes('github.io')) {
         // Use your Render.com server URL for form submissions when hosted on GitHub Pages
-        baseUrl = 'https://ankes-lodge.onrender.com'; // Replace with your actual Render.com URL
+        baseUrl = 'https://www.ankeslodge.com'; // Use canonical production domain
     }
     
     fetch(`${baseUrl}/views`)
@@ -1027,7 +1027,7 @@ function incrementViewsCount() {
     // Check if we're on GitHub Pages and use Render.com server instead
     if (window.location.hostname.includes('github.io')) {
         // Use your Render.com server URL for form submissions when hosted on GitHub Pages
-        baseUrl = 'https://ankes-lodge.onrender.com'; // Replace with your actual Render.com URL
+        baseUrl = 'https://www.ankeslodge.com'; // Use canonical production domain
     }
     
     fetch(`${baseUrl}/increment-views`, {
@@ -1080,7 +1080,7 @@ function initTestimonialMarquee() {
     // Check if we're on GitHub Pages and use Render.com server instead
     if (window.location.hostname.includes('github.io')) {
         // Use your Render.com server URL for form submissions when hosted on GitHub Pages
-        baseUrl = 'https://ankes-lodge.onrender.com'; // Replace with your actual Render.com URL
+        baseUrl = 'https://www.ankeslodge.com'; // Use canonical production domain
     }
     
     // Fetch testimonials with fallback mechanism
@@ -1279,7 +1279,7 @@ function initTestimonialForm() {
         // Check if we're on GitHub Pages and use Render.com server instead
         if (window.location.hostname.includes('github.io')) {
             // Use your Render.com server URL for form submissions when hosted on GitHub Pages
-            baseUrl = 'https://ankes-lodge.onrender.com'; // Replace with your actual Render.com URL
+            baseUrl = 'https://www.ankeslodge.com'; // Use canonical production domain
         }
         
         fetch(`${baseUrl}/add-testimonial`, {
@@ -1307,7 +1307,7 @@ function initTestimonialForm() {
                 // Check if we're on GitHub Pages and use Render.com server instead
                 if (window.location.hostname.includes('github.io')) {
                     // Use your Render.com server URL for form submissions when hosted on GitHub Pages
-                    baseUrl = 'https://ankes-lodge.onrender.com';
+                    baseUrl = 'https://www.ankeslodge.com';
                 }
                 
                 fetch(`${baseUrl}/testimonials.json`)
@@ -2098,6 +2098,7 @@ function showError(field, message) {
 
 // Slideshow functionality for hero section
 let slideIndex = 0;
+let slideTimer = null;
 
 function initHeroSlideshow() {
     const slideshowContainer = document.querySelector('.hero-slideshow');
@@ -2122,21 +2123,41 @@ function initHeroSlideshow() {
     srcs.forEach((src, idx) => {
         const slide = document.createElement('div');
         slide.className = 'slide';
-        if (idx === 0) slide.classList.add('active');
         // Use encodeURI for safe URL in CSS
         slide.style.backgroundImage = `url('${encodeURI(src)}')`;
         slideshowContainer.appendChild(slide);
 
         if (indicatorsContainer) {
             const indicator = document.createElement('span');
-            indicator.className = 'indicator' + (idx === 0 ? ' active' : '');
-            indicator.setAttribute('onclick', `currentSlide(${idx + 1})`);
+            indicator.className = 'indicator';
+            // attach event listener instead of inline onclick
+            indicator.addEventListener('click', () => currentSlide(idx + 1));
             indicatorsContainer.appendChild(indicator);
         }
     });
 
-    // Reset slideIndex
-    slideIndex = 0;
+    // Initialize slideIndex to first slide
+    slideIndex = 1;
+
+    // Add pause/resume on hover
+    slideshowContainer.addEventListener('mouseenter', pauseSlideshow);
+    slideshowContainer.addEventListener('mouseleave', resumeSlideshow);
+
+    // Touch swipe support
+    let touchStartX = 0;
+    slideshowContainer.addEventListener('touchstart', (e) => {
+        pauseSlideshow();
+        touchStartX = e.touches[0].clientX;
+    }, {passive: true});
+    slideshowContainer.addEventListener('touchend', (e) => {
+        const touchEndX = e.changedTouches[0].clientX;
+        const delta = touchEndX - touchStartX;
+        if (Math.abs(delta) > 40) {
+            if (delta < 0) changeSlide(1);
+            else changeSlide(-1);
+        }
+        resumeSlideshow();
+    });
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -2160,21 +2181,25 @@ function showSlides() {
         indicator.classList.remove('active');
     });
     
-    // Increment slide index
+    // If slideIndex not set, start at 1
+    if (!slideIndex || slideIndex < 1) slideIndex = 1;
+
+    // Increment slide index for auto-rotation
     slideIndex++;
     if (slideIndex > slides.length) {
         slideIndex = 1;
     }
-    
+
     // Show current slide
     slides[slideIndex - 1].classList.add('active');
     // Activate current indicator
     if (indicators[slideIndex - 1]) {
         indicators[slideIndex - 1].classList.add('active');
     }
-    
-    // Change slide every 5 seconds
-    setTimeout(showSlides, 5000);
+
+    // Change slide every 5 seconds (managed timer so we can pause)
+    if (slideTimer) clearTimeout(slideTimer);
+    slideTimer = setTimeout(showSlides, 5000);
 }
 
 function changeSlide(n) {
@@ -2182,29 +2207,21 @@ function changeSlide(n) {
     const indicators = document.querySelectorAll('.indicator');
     
     if (slides.length === 0) return; // Exit if no slides found
-    
     slideIndex += n;
-    if (slideIndex > slides.length) {
-        slideIndex = 1;
-    }
-    if (slideIndex < 1) {
-        slideIndex = slides.length;
-    }
-    
-    // Hide all slides
-    slides.forEach(slide => {
-        slide.classList.remove('active');
-    });
-    
-    // Remove active class from all indicators
-    indicators.forEach(indicator => {
-        indicator.classList.remove('active');
-    });
-    
-    // Show current slide
+    if (slideIndex > slides.length) slideIndex = 1;
+    if (slideIndex < 1) slideIndex = slides.length;
+
+    // Hide all slides and deactivate indicators
+    slides.forEach(slide => slide.classList.remove('active'));
+    indicators.forEach(ind => ind.classList.remove('active'));
+
+    // Show selected slide and indicator
     slides[slideIndex - 1].classList.add('active');
-    // Activate current indicator
-    indicators[slideIndex - 1].classList.add('active');
+    if (indicators[slideIndex - 1]) indicators[slideIndex - 1].classList.add('active');
+
+    // Restart auto-rotation timer
+    if (slideTimer) clearTimeout(slideTimer);
+    slideTimer = setTimeout(showSlides, 5000);
 }
 
 function currentSlide(n) {
@@ -2212,26 +2229,35 @@ function currentSlide(n) {
     const indicators = document.querySelectorAll('.indicator');
     
     if (slides.length === 0) return; // Exit if no slides found
-    
     if (n < 1) n = 1;
     if (n > slides.length) n = slides.length;
-    
+
     slideIndex = n;
-    
-    // Hide all slides
-    slides.forEach(slide => {
-        slide.classList.remove('active');
-    });
-    
-    // Remove active class from all indicators
-    indicators.forEach(indicator => {
-        indicator.classList.remove('active');
-    });
-    
-    // Show current slide
+
+    // Hide all slides and deactivate indicators
+    slides.forEach(slide => slide.classList.remove('active'));
+    indicators.forEach(ind => ind.classList.remove('active'));
+
+    // Show chosen slide and indicator
     slides[n - 1].classList.add('active');
-    // Activate current indicator
-    indicators[n - 1].classList.add('active');
+    if (indicators[n - 1]) indicators[n - 1].classList.add('active');
+
+    // Restart auto-rotation timer
+    if (slideTimer) clearTimeout(slideTimer);
+    slideTimer = setTimeout(showSlides, 5000);
+}
+
+function pauseSlideshow() {
+    if (slideTimer) {
+        clearTimeout(slideTimer);
+        slideTimer = null;
+    }
+}
+
+function resumeSlideshow() {
+    if (!slideTimer) {
+        slideTimer = setTimeout(showSlides, 5000);
+    }
 }
 
 // Active navigation highlighting
@@ -2534,7 +2560,7 @@ async function sendBookingToWhatsApp() {
         formData.append('message', message);
 
         const baseUrl = window.location.hostname.includes('github.io')
-            ? 'https://ankes-lodge.onrender.com'
+            ? 'https://www.ankeslodge.com'
             : window.location.origin;
 
         const response = await fetch(`${baseUrl}/submit-booking`, {

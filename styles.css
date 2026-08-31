@@ -235,6 +235,8 @@ nav ul li .btn-primary {
     overflow: hidden;
 }
 
+.hero { min-height: 70vh; }
+
 /* Hero Slideshow */
 .hero-slideshow {
     position: absolute;
@@ -352,6 +354,18 @@ nav ul li .btn-primary {
     padding-top: 60px;
     z-index: 2;
     position: relative;
+}
+
+/* Ensure hero content sits above slideshow and scales on small screens */
+.hero-content {
+    z-index: 6;
+    padding: 20px;
+}
+
+@media (max-width: 900px) {
+    .hero { min-height: auto; padding: 24px 0; }
+    .hero h1 { font-size: 2.2rem; }
+    .hero p { font-size: 1.1rem; }
 }
 
 .hero h1 {

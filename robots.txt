@@ -1,6 +1,6 @@
 User-agent: *
 Allow: /
-Sitemap: https://ankes-lodge.onrender.com/sitemap.xml
+Sitemap: https://www.ankeslodge.com/sitemap.xml
 
 User-agent: Googlebot
 Allow: /
