@@ -108,10 +108,10 @@
     <!-- Hero Section with Slideshow Background -->
     <section id="home" class="hero">
         <div class="hero-media">
-            <!-- Slideshow Container -->
-            <div class="hero-slideshow">
-                <div class="slide active" style="background-image: url('main-flyer.jpeg');"></div>
-                <div class="slide" style="background-image: url('DownloadableFlyer.jpeg');"></div>
+            <!-- Image Slideshow Container -->
+            <div class="hero-slideshow-images">
+                <div class="slide image-slide active" style="background-image: url('main-flyer.jpeg');"></div>
+                <div class="slide image-slide" style="background-image: url('DownloadableFlyer.jpeg');"></div>
             </div>
 
             <!-- Social embeds placed next to the slideshow -->
@@ -127,9 +127,13 @@
                         <script src="https://apis.google.com/js/platform.js"></script>
                         <div class="g-ytsubscribe" data-channel="@ankeslodge" data-layout="default" data-theme="default" data-count="default"></div>
                     </div>
-                    <div class="youtube-player">
-                        <iframe src="https://www.youtube.com/embed?listType=user_uploads&list=@ankeslodge" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                    <div class="youtube-player" style="display:none;">
+                        <iframe id="hero-youtube-iframe" src="https://www.youtube.com/embed?listType=user_uploads&list=@ankeslodge" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
                     </div>
+                </div>
+                <!-- Video Slideshow Container -->
+                <div class="hero-slideshow-videos">
+                    <!-- video slides will be initialized by script.js using the iframe above -->
                 </div>
             </div>
         </div>
@@ -140,16 +144,16 @@
             <a href="/booking.html" class="btn-secondary">Book Your Stay</a>
         </div>
         
-        <!-- Slideshow Controls -->
-        <div class="slideshow-controls">
-            <button class="slide-nav prev" onclick="changeSlide(-1)">‹</button>
-            <button class="slide-nav next" onclick="changeSlide(1)">›</button>
+        <!-- Slideshow Controls (images) -->
+        <div class="slideshow-controls image-controls">
+            <button class="slide-nav prev image-prev" onclick="changeImageSlide(-1)">‹</button>
+            <button class="slide-nav next image-next" onclick="changeImageSlide(1)">›</button>
         </div>
         
-        <!-- Slide Indicators -->
-        <div class="slide-indicators">
-            <span class="indicator active" onclick="currentSlide(1)"></span>
-            <span class="indicator" onclick="currentSlide(2)"></span>
+        <!-- Slide Indicators (images) -->
+        <div class="slide-indicators image-indicators">
+            <span class="indicator image-indicator active" onclick="currentImageSlide(1)"></span>
+            <span class="indicator image-indicator" onclick="currentImageSlide(2)"></span>
         </div>
     </section>
 

@@ -2100,9 +2100,9 @@ function showError(field, message) {
 let slideIndex = 0;
 let slideTimer = null;
 
-function initHeroSlideshow() {
-    const slideshowContainer = document.querySelector('.hero-slideshow');
-    const indicatorsContainer = document.querySelector('.slide-indicators');
+function initImageSlideshow() {
+    const slideshowContainer = document.querySelector('.hero-slideshow-images');
+    const indicatorsContainer = document.querySelector('.image-indicators');
     if (!slideshowContainer) return;
 
     // Collect all image srcs from the page (unique, relative or same-origin)
@@ -2122,16 +2122,18 @@ function initHeroSlideshow() {
     // Create slide divs and matching indicators
     srcs.forEach((src, idx) => {
         const slide = document.createElement('div');
-        slide.className = 'slide';
+        slide.className = 'slide image-slide';
+        if (idx === 0) slide.classList.add('active');
         // Use encodeURI for safe URL in CSS
         slide.style.backgroundImage = `url('${encodeURI(src)}')`;
         slideshowContainer.appendChild(slide);
 
         if (indicatorsContainer) {
             const indicator = document.createElement('span');
-            indicator.className = 'indicator';
+            indicator.className = 'indicator image-indicator';
             // attach event listener instead of inline onclick
-            indicator.addEventListener('click', () => currentSlide(idx + 1));
+            indicator.addEventListener('click', () => currentImageSlide(idx + 1));
+            if (idx === 0) indicator.classList.add('active');
             indicatorsContainer.appendChild(indicator);
         }
     });
@@ -2153,21 +2155,30 @@ function initHeroSlideshow() {
         const touchEndX = e.changedTouches[0].clientX;
         const delta = touchEndX - touchStartX;
         if (Math.abs(delta) > 40) {
-            if (delta < 0) changeSlide(1);
-            else changeSlide(-1);
+            if (delta < 0) changeImageSlide(1);
+            else changeImageSlide(-1);
         }
         resumeSlideshow();
     });
+    }
+    // Start auto-rotation from the first slide after a delay
+    if (slideTimer) clearTimeout(slideTimer);
+    slideTimer = setTimeout(showImageSlides, 5000);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    initHeroSlideshow();
-    showSlides();
+    initImageSlideshow();
+    initVideoSlideshow();
+    // Attach listeners to image prev/next controls
+    const prev = document.querySelector('.image-prev');
+    const next = document.querySelector('.image-next');
+    if (prev) prev.addEventListener('click', () => changeImageSlide(-1));
+    if (next) next.addEventListener('click', () => changeImageSlide(1));
 });
 
-function showSlides() {
-    const slides = document.querySelectorAll('.slide');
-    const indicators = document.querySelectorAll('.indicator');
+function showImageSlides() {
+    const slides = document.querySelectorAll('.image-slide');
+    const indicators = document.querySelectorAll('.image-indicator');
     
     if (slides.length === 0) return; // Exit if no slides found
     
@@ -2181,70 +2192,70 @@ function showSlides() {
         indicator.classList.remove('active');
     });
     
-    // If slideIndex not set, start at 1
-    if (!slideIndex || slideIndex < 1) slideIndex = 1;
-
-    // Increment slide index for auto-rotation
-    slideIndex++;
-    if (slideIndex > slides.length) {
-        slideIndex = 1;
+    // Helper: show slide at 1-based index
+    function showSlideAt(n) {
+        if (slides.length === 0) return;
+        if (n < 1) n = slides.length;
+        if (n > slides.length) n = 1;
+        // Hide all and deactivate
+        slides.forEach(s => s.classList.remove('active'));
+        indicators.forEach(i => i.classList.remove('active'));
+        // Show desired
+        slides[n - 1].classList.add('active');
+        if (indicators[n - 1]) indicators[n - 1].classList.add('active');
+        slideIndex = n;
     }
 
-    // Show current slide
-    slides[slideIndex - 1].classList.add('active');
-    // Activate current indicator
-    if (indicators[slideIndex - 1]) {
-        indicators[slideIndex - 1].classList.add('active');
-    }
+    // If slideIndex not set, start at 0 so first call advances to 1
+    if (!slideIndex || slideIndex < 1) slideIndex = 0;
+
+    // Advance to next slide for auto-rotation
+    let next = slideIndex + 1;
+    if (next > slides.length) next = 1;
+    showSlideAt(next);
 
     // Change slide every 5 seconds (managed timer so we can pause)
     if (slideTimer) clearTimeout(slideTimer);
-    slideTimer = setTimeout(showSlides, 5000);
+    slideTimer = setTimeout(showImageSlides, 5000);
 }
+function changeImageSlide(n) {
+    const slides = document.querySelectorAll('.image-slide');
+    const indicators = document.querySelectorAll('.image-indicator');
 
-function changeSlide(n) {
-    const slides = document.querySelectorAll('.slide');
-    const indicators = document.querySelectorAll('.indicator');
-    
     if (slides.length === 0) return; // Exit if no slides found
-    slideIndex += n;
-    if (slideIndex > slides.length) slideIndex = 1;
-    if (slideIndex < 1) slideIndex = slides.length;
+    // Compute target index and show using showSlideAt defined in showImageSlides
+    const slidesCount = slides.length;
+    let target = (slideIndex || 0) + n;
+    if (target > slidesCount) target = 1;
+    if (target < 1) target = slidesCount;
 
-    // Hide all slides and deactivate indicators
-    slides.forEach(slide => slide.classList.remove('active'));
-    indicators.forEach(ind => ind.classList.remove('active'));
-
-    // Show selected slide and indicator
-    slides[slideIndex - 1].classList.add('active');
-    if (indicators[slideIndex - 1]) indicators[slideIndex - 1].classList.add('active');
+    // Reuse the show logic: hide all and show target
+    slides.forEach(s => s.classList.remove('active'));
+    indicators.forEach(i => i.classList.remove('active'));
+    slides[target - 1].classList.add('active');
+    if (indicators[target - 1]) indicators[target - 1].classList.add('active');
+    slideIndex = target;
 
     // Restart auto-rotation timer
     if (slideTimer) clearTimeout(slideTimer);
-    slideTimer = setTimeout(showSlides, 5000);
+    slideTimer = setTimeout(showImageSlides, 5000);
 }
-
-function currentSlide(n) {
-    const slides = document.querySelectorAll('.slide');
-    const indicators = document.querySelectorAll('.indicator');
+function currentImageSlide(n) {
+    const slides = document.querySelectorAll('.image-slide');
+    const indicators = document.querySelectorAll('.image-indicator');
     
     if (slides.length === 0) return; // Exit if no slides found
     if (n < 1) n = 1;
     if (n > slides.length) n = slides.length;
 
     slideIndex = n;
-
-    // Hide all slides and deactivate indicators
-    slides.forEach(slide => slide.classList.remove('active'));
-    indicators.forEach(ind => ind.classList.remove('active'));
-
-    // Show chosen slide and indicator
+    slides.forEach(s => s.classList.remove('active'));
+    indicators.forEach(i => i.classList.remove('active'));
     slides[n - 1].classList.add('active');
     if (indicators[n - 1]) indicators[n - 1].classList.add('active');
 
-    // Restart auto-rotation timer
     if (slideTimer) clearTimeout(slideTimer);
-    slideTimer = setTimeout(showSlides, 5000);
+    slideTimer = setTimeout(showImageSlides, 5000);
 }
 
 function pauseSlideshow() {
@@ -2256,8 +2267,64 @@ function pauseSlideshow() {
 
 function resumeSlideshow() {
     if (!slideTimer) {
-        slideTimer = setTimeout(showSlides, 5000);
+        slideTimer = setTimeout(showImageSlides, 5000);
     }
+}
+
+// Video slideshow (separate from images)
+let videoIndex = 0;
+function initVideoSlideshow() {
+    const videoContainer = document.querySelector('.hero-slideshow-videos');
+    if (!videoContainer) return;
+
+    // Find hero iframe (hidden) and move it into a video slide
+    const iframe = document.getElementById('hero-youtube-iframe');
+    if (iframe) {
+        const slide = document.createElement('div');
+        slide.className = 'slide video-slide active';
+        // Clone iframe to avoid removing original reference
+        const clone = iframe.cloneNode(true);
+        clone.style.width = '100%';
+        clone.style.height = '100%';
+        slide.appendChild(clone);
+        videoContainer.appendChild(slide);
+        videoIndex = 1;
+    }
+
+    // Create video controls
+    const controls = document.createElement('div');
+    controls.className = 'slideshow-controls video-controls';
+    controls.innerHTML = '<button class="slide-nav prev video-prev">‹</button><button class="slide-nav next video-next">›</button>';
+    videoContainer.appendChild(controls);
+
+    // Attach handlers
+    const prev = videoContainer.querySelector('.video-prev');
+    const next = videoContainer.querySelector('.video-next');
+    if (prev) prev.addEventListener('click', () => changeVideoSlide(-1));
+    if (next) next.addEventListener('click', () => changeVideoSlide(1));
+}
+
+function showVideoSlides() {
+    const slides = document.querySelectorAll('.video-slide');
+    if (slides.length === 0) return;
+    slides.forEach(s => s.classList.remove('active'));
+    if (videoIndex < 1) videoIndex = 1;
+    if (videoIndex > slides.length) videoIndex = slides.length;
+    slides[videoIndex - 1].classList.add('active');
+}
+
+function changeVideoSlide(n) {
+    const slides = document.querySelectorAll('.video-slide');
+    if (slides.length === 0) return;
+    videoIndex += n;
+    if (videoIndex > slides.length) videoIndex = 1;
+    if (videoIndex < 1) videoIndex = slides.length;
+    showVideoSlides();
+}
+
+function currentVideoSlide(n) {
+    videoIndex = n;
+    showVideoSlides();
 }
 
 // Active navigation highlighting
