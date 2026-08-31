@@ -104,10 +104,31 @@
 
     <!-- Hero Section with Slideshow Background -->
     <section id="home" class="hero">
-        <!-- Slideshow Container -->
-        <div class="hero-slideshow">
-            <div class="slide active" style="background-image: url('main-flyer.jpeg');"></div>
-            <div class="slide" style="background-image: url('DownloadableFlyer.jpeg');"></div>
+        <div class="hero-media">
+            <!-- Slideshow Container -->
+            <div class="hero-slideshow">
+                <div class="slide active" style="background-image: url('main-flyer.jpeg');"></div>
+                <div class="slide" style="background-image: url('DownloadableFlyer.jpeg');"></div>
+            </div>
+
+            <!-- Social embeds placed next to the slideshow -->
+            <div class="embeds-wrapper">
+                <div class="tiktok-embed-wrapper">
+                    <blockquote class="tiktok-embed" cite="https://www.tiktok.com/@ankes.lodge" data-unique-id="ankes.lodge" data-embed-type="creator" style="max-width: 780px; min-width: 288px;" > <section> <a target="_blank" href="https://www.tiktok.com/@ankes.lodge?refer=creator_embed">@ankes.lodge</a> </section> </blockquote>
+                    <script async src="https://www.tiktok.com/embed.js"></script>
+                </div>
+
+                <div class="youtube-embed-wrapper">
+                    <!-- YouTube subscribe button and uploads player (uses channel handle) -->
+                    <div class="youtube-subscribe">
+                        <script src="https://apis.google.com/js/platform.js"></script>
+                        <div class="g-ytsubscribe" data-channel="@ankeslodge" data-layout="default" data-theme="default" data-count="default"></div>
+                    </div>
+                    <div class="youtube-player">
+                        <iframe src="https://www.youtube.com/embed?listType=user_uploads&list=@ankeslodge" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <div class="hero-content">

@@ -409,6 +409,65 @@ section h2::after {
     border-radius: 2px;
 }
 
+/* Layout for hero media: slideshow + TikTok embed side-by-side */
+.hero .hero-media {
+    position: relative;
+    width: 100%;
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero .hero-media .hero-slideshow {
+    position: relative;
+    width: 65%;
+    height: 70vh;
+}
+
+.hero .embeds-wrapper {
+    width: 32%;
+    max-width: 420px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.hero .tiktok-embed-wrapper,
+.hero .youtube-embed-wrapper {
+    width: 100%;
+}
+
+.youtube-embed-wrapper .youtube-subscribe {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.youtube-embed-wrapper .youtube-player iframe {
+    width: 100%;
+    height: 260px;
+    border-radius: 8px;
+    border: none;
+}
+
+@media (max-width: 900px) {
+    .hero {
+        height: auto;
+        padding: 40px 0;
+    }
+    .hero .hero-media {
+        flex-direction: column;
+    }
+    .hero .hero-media .hero-slideshow {
+        width: 100%;
+        height: 50vh;
+    }
+    .hero .embeds-wrapper {
+        width: 100%;
+    }
+}
+
 .about {
     background-color: var(--accent-color);
     padding: var(--spacing-xl) 0;

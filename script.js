@@ -2098,7 +2098,51 @@ function showError(field, message) {
 
 // Slideshow functionality for hero section
 let slideIndex = 0;
-showSlides();
+
+function initHeroSlideshow() {
+    const slideshowContainer = document.querySelector('.hero-slideshow');
+    const indicatorsContainer = document.querySelector('.slide-indicators');
+    if (!slideshowContainer) return;
+
+    // Collect all image srcs from the page (unique, relative or same-origin)
+    const imgEls = Array.from(document.querySelectorAll('img'));
+    const srcs = imgEls
+        .map(img => img.getAttribute('src'))
+        .filter(s => s && typeof s === 'string')
+        .map(s => s.trim())
+        .filter((v, i, a) => a.indexOf(v) === i); // unique
+
+    if (srcs.length === 0) return;
+
+    // Clear existing slides and indicators
+    slideshowContainer.innerHTML = '';
+    if (indicatorsContainer) indicatorsContainer.innerHTML = '';
+
+    // Create slide divs and matching indicators
+    srcs.forEach((src, idx) => {
+        const slide = document.createElement('div');
+        slide.className = 'slide';
+        if (idx === 0) slide.classList.add('active');
+        // Use encodeURI for safe URL in CSS
+        slide.style.backgroundImage = `url('${encodeURI(src)}')`;
+        slideshowContainer.appendChild(slide);
+
+        if (indicatorsContainer) {
+            const indicator = document.createElement('span');
+            indicator.className = 'indicator' + (idx === 0 ? ' active' : '');
+            indicator.setAttribute('onclick', `currentSlide(${idx + 1})`);
+            indicatorsContainer.appendChild(indicator);
+        }
+    });
+
+    // Reset slideIndex
+    slideIndex = 0;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    initHeroSlideshow();
+    showSlides();
+});
 
 function showSlides() {
     const slides = document.querySelectorAll('.slide');
