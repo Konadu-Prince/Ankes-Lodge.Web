@@ -1555,7 +1555,7 @@ function initMultiStepBooking() {
         
         const errorElement = document.createElement('div');
         errorElement.className = 'field-error';
-        errorElement.style.color = '#dc3545';
+        errorElement.style.color = 'var(--danger-color)';
         errorElement.style.fontSize = '0.85rem';
         errorElement.style.marginTop = '5px';
         errorElement.textContent = message;
@@ -1796,7 +1796,7 @@ document.addEventListener('DOMContentLoaded', function() {
         inputs.forEach(input => {
             if (!input.value.trim()) {
                 isValid = false;
-                input.style.borderColor = '#dc3545';
+                input.style.borderColor = 'var(--danger-color)';
             } else {
                 input.style.borderColor = '';
             }
@@ -2857,10 +2857,10 @@ function updatePaymentStatusDisplay(status, transactionId) {
 
     statusEl.style.display = 'block';
     const statusMessages = {
-        'verifying': { text: '⏳ Verifying payment...', color: '#ffc107', bg: '#fff3cd' },
-        'success':   { text: '✅ Payment Successful ✓' + (transactionId ? ' (Ref: ' + transactionId + ')' : ''), color: '#28a745', bg: '#d4edda' },
-        'failed':    { text: '❌ Payment Failed. Please try again.', color: '#dc3545', bg: '#f8d7da' },
-        'cancelled': { text: '⚠️ Payment Cancelled.', color: '#ffc107', bg: '#fff3cd' }
+        'verifying': { text: '⏳ Verifying payment...', color: 'var(--warning-color)', bg: 'var(--bg-warning)' },
+        'success':   { text: '✅ Payment Successful ✓' + (transactionId ? ' (Ref: ' + transactionId + ')' : ''), color: 'var(--success-color)', bg: 'var(--bg-success)' },
+        'failed':    { text: '❌ Payment Failed. Please try again.', color: 'var(--danger-color)', bg: 'var(--bg-danger)' },
+        'cancelled': { text: '⚠️ Payment Cancelled.', color: 'var(--warning-color)', bg: 'var(--bg-warning)' }
     };
 
     const s = statusMessages[status] || statusMessages['verifying'];

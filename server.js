@@ -150,19 +150,19 @@ async function sendContactNotification(contact) {
 // Rate limiting middleware
 const generalLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // Limit each IP to 100 requests per windowMs
+    max: 500, // Limit each IP to 100 requests per windowMs
     message: 'Too many requests from this IP, please try again later.'
 });
 
 const contactLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 20, // Limit each IP to 5 contact form submissions per windowMs
+    max: 500, // Limit each IP to 5 contact form submissions per windowMs
     message: 'Too many contact form submissions, please try again later.'
 });
 
 const bookingLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 20, // Limit each IP to 5 booking form submissions per windowMs
+    max: 500, // Limit each IP to 5 booking form submissions per windowMs
     message: 'Too many booking form submissions, please try again later.'
 });
 
@@ -1317,10 +1317,10 @@ app.post('/admin/forgot-password', async (req, res) => {
             subject: 'ANKES LODGE - Password Reset Request',
             html: `
                 <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto;">
-                    <h2 style="color: #FFA500;">ANKES LODGE - Password Reset</h2>
+                    <h2 style="color: #C8871A;">ANKES LODGE - Password Reset</h2>
                     <p>You requested a password reset for your admin panel.</p>
                     <p>Click the button below to reset your password:</p>
-                    <a href="${resetUrl}" style="display: inline-block; background-color: #FFA500; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">Reset Password</a>
+                    <a href="${resetUrl}" style="display: inline-block; background-color: #C8871A; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">Reset Password</a>
                     <p style="margin-top: 20px; color: #666;">This link expires in 30 minutes.</p>
                     <p style="color: #666;">If you didn't request this, ignore this email.</p>
                 </div>

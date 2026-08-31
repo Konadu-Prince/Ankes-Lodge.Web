@@ -21,7 +21,7 @@
         }
 
         .admin-header {
-            background-color: #FFA500;
+            background-color: var(--primary-color);
             color: white;
             padding: 15px 20px;
             margin-bottom: 20px;
@@ -37,7 +37,7 @@
         }
 
         .logout-btn {
-            background-color: #dc3545;
+            background-color: var(--danger-color);
             color: white;
             border: none;
             padding: 8px 15px;
@@ -71,7 +71,7 @@
         }
 
         .tab.active {
-            background-color: #FFA500;
+            background-color: var(--primary-color);
             color: white;
         }
 
@@ -132,17 +132,17 @@
         }
 
         .edit-btn {
-            background-color: #007bff;
+            background-color: var(--primary-color);
             color: white;
         }
 
         .refund-btn {
-            background-color: #28a745;
+            background-color: var(--success-color);
             color: white;
         }
 
         .delete-btn {
-            background-color: #dc3545;
+            background-color: var(--danger-color);
             color: white;
         }
 
@@ -228,7 +228,7 @@
         }
 
         .btn-save {
-            background-color: #28a745;
+            background-color: var(--success-color);
             color: white;
         }
 
@@ -251,23 +251,23 @@
             padding: 18px 15px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             text-align: center;
-            border-left: 4px solid #FFA500;
+            border-left: 4px solid var(--primary-color);
         }
 
         .stat-card.today {
-            border-left-color: #28a745;
+            border-left-color: var(--success-color);
         }
 
         .stat-card.yesterday {
-            border-left-color: #007bff;
+            border-left-color: var(--primary-color);
         }
 
         .stat-card.week {
-            border-left-color: #6f42c1;
+            border-left-color: var(--primary-dark);
         }
 
         .stat-card.total {
-            border-left-color: #FFA500;
+            border-left-color: var(--primary-color);
         }
 
         .stat-number {
@@ -277,10 +277,10 @@
             margin: 0;
         }
 
-        .stat-card.today .stat-number { color: #28a745; }
-        .stat-card.yesterday .stat-number { color: #007bff; }
-        .stat-card.week .stat-number { color: #6f42c1; }
-        .stat-card.total .stat-number { color: #FFA500; }
+        .stat-card.today .stat-number { color: var(--success-color); }
+        .stat-card.yesterday .stat-number { color: var(--primary-color); }
+        .stat-card.week .stat-number { color: var(--primary-dark); }
+        .stat-card.total .stat-number { color: var(--primary-color); }
 
         .stat-label {
             font-size: 0.85em;
@@ -332,7 +332,7 @@
 
         .day-bar {
             height: 100%;
-            background: linear-gradient(90deg, #FFA500, #e69500);
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
             border-radius: 10px;
             min-width: 2px;
             transition: width 0.4s ease;
@@ -644,7 +644,7 @@
             days.forEach(day => {
                 const barWidth = (day.count / maxCount) * 100;
                 const isToday = day.date === todayStr;
-                const labelStyle = isToday ? 'font-weight: bold; color: #FFA500;' : '';
+                const labelStyle = isToday ? 'font-weight: bold; color: var(--primary-color);' : '';
                 barsHTML += `
                     <div class="day-row">
                         <span class="day-label" style="${labelStyle}">${day.label}${isToday ? ' *' : ''}</span>
@@ -876,9 +876,9 @@
                             <td>${testimonial.location || 'N/A'}</td>
                             <td>${'★'.repeat(testimonial.rating) + '☆'.repeat(5 - testimonial.rating)} (${testimonial.rating})</td>
                             <td style="max-width: 300px; word-wrap: break-word;">${testimonial.comment || 'N/A'}</td>
-                            <td>
-                                <button class="delete-btn" data-id="${testimonial.id}" style="background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Delete</button>
-                            </td>
+                                        <td>
+                                            <button class="delete-btn" data-id="${testimonial.id}" style="background-color: var(--danger-color); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Delete</button>
+                                        </td>
                         `;
                         tbody.appendChild(row);
                     });
@@ -920,7 +920,7 @@
                                 <td>${'★'.repeat(testimonial.rating) + '☆'.repeat(5 - testimonial.rating)} (${testimonial.rating})</td>
                                 <td style="max-width: 300px; word-wrap: break-word;">${testimonial.comment || 'N/A'}</td>
                                 <td>
-                                    <button class="delete-btn" data-id="${testimonial.id}" style="background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Delete</button>
+                                    <button class="delete-btn" data-id="${testimonial.id}" style="background-color: var(--danger-color); color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Delete</button>
                                 </td>
                             `;
                             tbody.appendChild(row);
