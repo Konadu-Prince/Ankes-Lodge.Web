@@ -190,16 +190,20 @@ document.addEventListener('DOMContentLoaded', function() {
 // Set minimum check-in date to today
 document.addEventListener('DOMContentLoaded', function() {
     const today = new Date().toISOString().split('T')[0];
-    document.getElementById('checkin').setAttribute('min', today);
-});
+    const checkinEl = document.getElementById('checkin');
+    const checkoutEl = document.getElementById('checkout');
+    if (checkinEl) checkinEl.setAttribute('min', today);
 
-// Set minimum check-out date based on check-in date
-document.getElementById('checkin').addEventListener('change', function() {
-    const checkinDate = new Date(this.value);
-    const minCheckout = new Date(checkinDate);
-    minCheckout.setDate(minCheckout.getDate() + 1);
-    const minCheckoutStr = minCheckout.toISOString().split('T')[0];
-    document.getElementById('checkout').setAttribute('min', minCheckoutStr);
+    // Set minimum check-out date when check-in changes
+    if (checkinEl) {
+        checkinEl.addEventListener('change', function() {
+            const checkinDate = new Date(this.value);
+            const minCheckout = new Date(checkinDate);
+            minCheckout.setDate(minCheckout.getDate() + 1);
+            const minCheckoutStr = minCheckout.toISOString().split('T')[0];
+            if (checkoutEl) checkoutEl.setAttribute('min', minCheckoutStr);
+        });
+    }
 });
 
 // Handle room booking buttons
@@ -2160,7 +2164,6 @@ function initImageSlideshow() {
         }
         resumeSlideshow();
     });
-    }
     // Start auto-rotation from the first slide after a delay
     if (slideTimer) clearTimeout(slideTimer);
     slideTimer = setTimeout(showImageSlides, 5000);
@@ -2276,9 +2279,9 @@ let videoIndex = 0;
 function initVideoSlideshow() {
     const videoContainer = document.querySelector('.hero-slideshow-videos');
     if (!videoContainer) return;
-
     // Find hero iframe (hidden) and move it into a video slide
     const iframe = document.getElementById('hero-youtube-iframe');
+    let createdSlides = 0;
     if (iframe) {
         const slide = document.createElement('div');
         slide.className = 'slide video-slide active';
@@ -2289,7 +2292,11 @@ function initVideoSlideshow() {
         slide.appendChild(clone);
         videoContainer.appendChild(slide);
         videoIndex = 1;
+        createdSlides++;
     }
+
+    // Only create controls if we actually have slides
+    if (createdSlides === 0) return;
 
     // Create video controls
     const controls = document.createElement('div');
