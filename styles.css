@@ -262,7 +262,7 @@ nav ul li .btn-primary {
 .hero {
     height: 100vh;
     background: linear-gradient(135deg, rgba(23,19,15,0.45) 0%, rgba(23,19,15,0.25) 100%);
-    display: flex;
+    display: start;
     align-items: center;
     text-align: center;
     color: var(--light-color);

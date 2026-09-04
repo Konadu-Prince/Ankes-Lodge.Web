@@ -891,31 +891,12 @@ function handleFormSubmit(formId, successMessage) {
                     const pricePerNight = roomPrices[roomType];
                     const total = pricePerNight ? pricePerNight * nights : 0;
                     
-                    // Build WhatsApp message with booking details for the lodge
-                    const whatsappMsg = [
-                        '*NEW BOOKING REQUEST*',
-                        '',
-                        `*Booking ID:* ${data.bookingId}`,
-                        `*Name:* ${name}`,
-                        `*Email:* ${email}`,
-                        `*Phone:* ${phone}`,
-                        '',
-                        '*Stay Details*',
-                        `*Room:* ${roomNames[roomType] || roomType}`,
-                        `*Check-in:* ${checkin}`,
-                        `*Check-out:* ${checkout}`,
-                        `*Nights:* ${nights}`,
-                        `*Adults:* ${adults}`,
-                        `*Children:* ${children}`,
-                        total > 0 ? `*Total:* GH₵${total.toLocaleString()}` : '*Total:* Inquire for pricing',
-                        '',
-                        'Guest will complete payment via MoMo or Cash on Arrival.'
-                    ].join('\n');
-                    
-                    // Open WhatsApp in new tab (sends booking details to lodge)
+                    // Use the unified WhatsApp template generator so the same message
+                    // is shown in preview and when opening the chat (avoids duplicates)
+                    const whatsappMsg = generateWhatsAppMessage();
                     const whatsappUrl = `https://wa.me/233544904547?text=${encodeURIComponent(whatsappMsg)}`;
                     window.open(whatsappUrl, '_blank');
-                    
+
                     // Redirect browser to payment page (details remain visible for user to pay)
                     window.location.href = `payment.html?id=${data.bookingId}&name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}&checkin=${checkin}&checkout=${checkout}&room=${roomType}`;
                 } else {
@@ -2711,8 +2692,7 @@ async function getPaystackConfig() {
 
 async function initiatePaystackPayment() {
     const roomType = document.getElementById('room-type')?.value;
-    const roomPrices = { 'executive': 500, 'deluxe': 5
-400, 'standard': 300 };
+    const roomPrices = { 'executive': 500, 'deluxe': 400, 'standard': 300 };
     const pricePerNight = roomPrices[roomType];
 
     if (!pricePerNight) {
