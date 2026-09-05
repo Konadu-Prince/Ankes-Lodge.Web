@@ -3130,6 +3130,59 @@ footer {
         font-size: 1.8rem;
     }
     
+
+/* Phone-specific: make hero slideshow fill viewport height and show images fully */
+@media (max-width: 480px) {
+    header { position: fixed; height: 56px; }
+    .hero {
+        padding: 0;
+        margin-top: 56px; /* reserve space for fixed header */
+        height: calc(100vh - 56px);
+    }
+
+    .hero .hero-media {
+        display: block;
+        height: 100%;
+    }
+
+    .hero .hero-media .hero-slideshow-images,
+    .hero .hero-media .hero-slideshow-videos {
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+    .hero .hero-media .hero-slideshow-images .slide,
+    .hero .hero-media .hero-slideshow-videos .slide {
+        height: 100% !important;
+        width: 100% !important;
+        background-size: cover !important;
+        background-position: center center !important;
+    }
+
+    .hero .hero-content {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        transform: translateY(-50%);
+        text-align: center;
+        padding: 12px 16px;
+        z-index: 10;
+    }
+
+    .slideshow-controls, .slide-indicators {
+        position: absolute;
+        z-index: 12;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .slideshow-controls { top: auto; bottom: 18px; }
+    .slide-indicators { bottom: 8px; }
+}
     section h2 {
         font-size: 3rem;
     }

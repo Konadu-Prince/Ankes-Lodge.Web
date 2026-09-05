@@ -206,18 +206,26 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Handle room booking buttons
-document.querySelectorAll('.room-card .btn-primary').forEach(button => {
-    button.addEventListener('click', function(e) {
-        // Prevent default behavior since we're recommending Airbnb
-        e.preventDefault();
-        
-        // Get the Airbnb link from the parent's first anchor element
-        const airbnbLink = this.parentElement.querySelector('a[href*="airbnb"]').href;
-        
-        // Open Airbnb link in new tab
-        window.open(airbnbLink, '_blank');
-    });
+// Handle room booking buttons (deferred to DOMContentLoaded for safety)
+document.addEventListener('DOMContentLoaded', function() {
+    const roomButtons = document.querySelectorAll('.room-card .btn-primary');
+    if (roomButtons && roomButtons.length) {
+        roomButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                // Find an Airbnb link in the card; guard against missing anchors
+                const parent = this.closest('.room-card') || this.parentElement;
+                if (!parent) return;
+                const anchor = parent.querySelector('a[href*="airbnb"]');
+                if (anchor && anchor.href) {
+                    window.open(anchor.href, '_blank');
+                } else {
+                    console.warn('Airbnb link not found for room button');
+                }
+            });
+        });
+    }
 });
 
 // Handle room booking buttons for direct booking (now enabled)
