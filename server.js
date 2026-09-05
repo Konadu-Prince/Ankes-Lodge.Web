@@ -1,6 +1,8 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+const cluster = require('cluster');
+const os = require('os');
 const { MongoClient } = require('mongodb');
 const bcrypt = require('bcryptjs');
 const rateLimit = require('express-rate-limit');
@@ -148,25 +150,52 @@ async function sendContactNotification(contact) {
 }
 
 // Rate limiting middleware
+// By default we protect against excessive requests. For local development
+// or trusted internal IPs you can disable or bypass the limiter by
+// setting DISABLE_RATE_LIMIT=true or by coming from a local IP.
+
+function isTrustedRequest(req) {
+    // If explicitly disabled via env var, treat as trusted
+    if (process.env.DISABLE_RATE_LIMIT === 'true') return true;
+
+    // Check forwarded IPs first (comma separated)
+    const forwarded = req.headers['x-forwarded-for'];
+    const candidates = forwarded ? forwarded.split(',').map(s => s.trim()) : [];
+    if (req.ip) candidates.unshift(req.ip);
+
+    for (const ip of candidates) {
+        if (!ip) continue;
+        // common local addresses
+        if (ip === '127.0.0.1' || ip === '::1' || ip === 'localhost') return true;
+        // private network ranges (basic checks)
+        if (ip.startsWith('10.') || ip.startsWith('192.168.') || ip.startsWith('172.')) return true;
+    }
+
+    return false;
+}
+
 const generalLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 500, // Limit each IP to 100 requests per windowMs
-    message: 'Too many requests from this IP, please try again later.'
+    max: parseInt(process.env.RATE_LIMIT_MAX || '500', 10),
+    message: 'Too many requests from this IP, please try again later.',
+    skip: (req) => isTrustedRequest(req)
 });
 
 const contactLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 500, // Limit each IP to 5 contact form submissions per windowMs
-    message: 'Too many contact form submissions, please try again later.'
+    windowMs: 15 * 60 * 1000,
+    max: parseInt(process.env.CONTACT_RATE_LIMIT_MAX || '50', 10),
+    message: 'Too many contact form submissions, please try again later.',
+    skip: (req) => isTrustedRequest(req)
 });
 
 const bookingLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 500, // Limit each IP to 5 booking form submissions per windowMs
-    message: 'Too many booking form submissions, please try again later.'
+    windowMs: 15 * 60 * 1000,
+    max: parseInt(process.env.BOOKING_RATE_LIMIT_MAX || '50', 10),
+    message: 'Too many booking form submissions, please try again later.',
+    skip: (req) => isTrustedRequest(req)
 });
 
-// Apply general rate limiting to all requests
+// Apply general rate limiting to all requests (skips trusted requests)
 app.use(generalLimiter);
 
 // CORS middleware
@@ -493,40 +522,27 @@ app.post('/verify-payment', async (req, res) => {
 });
 */
 
-// Fallback route for any other routes
+// Fallback route: serve static file if it exists, otherwise serve index.html
+// This ensures the server responds to any request (useful for SPAs and arbitrary paths)
 app.get('*', (req, res) => {
-    // Don't serve HTML pages for API endpoints
-    if (req.path.startsWith('/api/') || 
-        req.path.startsWith('/admin/') || 
-        req.path.endsWith('.json') ||
-        req.path.includes('testimonials') ||
-        req.path.includes('booking') ||
-        req.path.includes('contact')) {
-        return res.status(404).json({ error: 'API endpoint not found' });
-    }
-    
-    // Handle routes with fragments by serving the appropriate page
-    const cleanPath = req.path.split('/')[1]; // Get the first part of the path
-    
-    if (cleanPath === 'about.html' || cleanPath.includes('about')) {
-        res.sendFile(path.join(__dirname, 'about.html'));
-    } else if (cleanPath === 'rooms.html' || cleanPath.includes('rooms')) {
-        res.sendFile(path.join(__dirname, 'rooms.html'));
-    } else if (cleanPath === 'gallery.html' || cleanPath.includes('gallery')) {
-        res.sendFile(path.join(__dirname, 'gallery.html'));
-    } else if (cleanPath === 'booking.html' || cleanPath.includes('booking')) {
-        res.sendFile(path.join(__dirname, 'booking.html'));
-    } else if (cleanPath === 'contact.html' || cleanPath.includes('contact')) {
-        res.sendFile(path.join(__dirname, 'contact.html'));
-    } else {
-        // Check if file exists
+    try {
         const filePath = path.join(__dirname, req.path);
+
         if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
-            res.sendFile(filePath);
-        } else {
-            // If file doesn't exist, redirect to homepage
-            res.sendFile(path.join(__dirname, 'index.html'));
+            return res.sendFile(filePath);
         }
+
+        // If the request looks like a directory (ends with /), try to serve index.html from that folder
+        const indexInFolder = path.join(__dirname, req.path, 'index.html');
+        if (fs.existsSync(indexInFolder) && fs.statSync(indexInFolder).isFile()) {
+            return res.sendFile(indexInFolder);
+        }
+
+        // Default to serving the main index.html so the server responds to any path
+        return res.sendFile(path.join(__dirname, 'index.html'));
+    } catch (err) {
+        logger.error('Fallback route error:', err && err.stack ? err.stack : err);
+        return res.status(500).send('Server error');
     }
 });
 
@@ -1465,6 +1481,15 @@ function startServer(port = 3000) {
         logger.info('ANKES LODGE website is now accessible at the above address.');
     });
 
+    // Increase timeouts to help handle slow clients and many concurrent connections
+    // Prevents premature socket closure when behind proxies or slow networks
+    try {
+        server.keepAliveTimeout = 65 * 1000; // 65s
+        server.headersTimeout = 66 * 1000; // slightly higher than keepAlive
+    } catch (e) {
+        logger.warn('Unable to set server timeouts:', e && e.message);
+    }
+
     server.on('error', (err) => {
         if (err.code === 'EADDRINUSE') {
             console.log(`Port ${port} is busy, trying ${port + 1}...`);
@@ -1486,5 +1511,21 @@ app.use((err, req, res, next) => {
 
 // Convert environment PORT to number, default to 3000 if not available or invalid
 const initialPort = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
-startServer(initialPort)
-;
+
+// If running as master, fork workers to use multiple CPU cores
+if (cluster.isMaster) {
+    const numCPUs = Math.max(1, parseInt(process.env.WEB_CONCURRENCY || os.cpus().length, 10));
+    logger.info(`Master process is running. Forking ${numCPUs} workers...`);
+
+    for (let i = 0; i < numCPUs; i++) {
+        cluster.fork();
+    }
+
+    cluster.on('exit', (worker, code, signal) => {
+        logger.warn(`Worker ${worker.process.pid} exited (code=${code}, signal=${signal}). Restarting...`);
+        cluster.fork();
+    });
+} else {
+    // Worker processes run the server
+    startServer(initialPort);
+}

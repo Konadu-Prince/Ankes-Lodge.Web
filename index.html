@@ -116,12 +116,8 @@
 
             <!-- Social embeds placed next to the slideshow -->
             <div class="embeds-wrapper">
-                <div class="tiktok-embed-wrapper">
-                    <blockquote class="tiktok-embed" cite="https://www.tiktok.com/@ankes.lodge" data-unique-id="ankes.lodge" data-embed-type="creator" style="max-width: 780px; min-width: 288px;" > <section> <a target="_blank" href="https://www.tiktok.com/@ankes.lodge?refer=creator_embed">@ankes.lodge</a> </section> </blockquote>
-                    <script async src="https://www.tiktok.com/embed.js"></script>
-                </div>
+                <!-- Social embeds placed here, TikTok moved below the hero for responsive layout -->
 
-                <!-- YouTube embed removed per request -->
                 <!-- Video Slideshow Container -->
                 <div class="hero-slideshow-videos">
                     <!-- video slides will be initialized by script.js using the iframe above -->
@@ -146,6 +142,19 @@
             <span class="indicator image-indicator active" onclick="currentImageSlide(1)"></span>
             <span class="indicator image-indicator" onclick="currentImageSlide(2)"></span>
         </div>
+    </section>
+
+    <!-- Social Embeds: responsive TikTok block moved out of hero for better layout -->
+    <section class="social-embeds">
+        <div class="container">
+            <div class="social-embeds-inner">
+                <h2 style="font-size:1.4rem; text-align:center; margin-bottom:12px;">Follow us on TikTok</h2>
+                <div class="tiktok-embed-wrapper responsive-tiktok">
+                    <blockquote class="tiktok-embed" cite="https://www.tiktok.com/@ankes.lodge" data-unique-id="ankes.lodge" data-embed-type="creator" style="max-width: 780px; min-width: 280px; width:100%;"> <section> <a target="_blank" href="https://www.tiktok.com/@ankes.lodge?refer=creator_embed">@ankes.lodge</a> </section> </blockquote>
+                </div>
+            </div>
+        </div>
+        <script async src="https://www.tiktok.com/embed.js"></script>
     </section>
 
     <!-- About Section -->

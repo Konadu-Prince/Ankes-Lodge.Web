@@ -90,6 +90,89 @@ body {
     padding: 0 15px;
 }
 
+/* Global layout utilities */
+:root {
+    --max-content-width: 1200px;
+}
+
+/* Site header & navigation */
+.site-header {
+    background: linear-gradient(90deg, rgba(255,255,255,0.98), rgba(255,255,255,0.96));
+    position: sticky;
+    top: 0;
+    z-index: 900;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.site-header .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 15px;
+}
+.site-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.site-brand img { height: 48px; width: auto; }
+.site-nav {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+}
+.site-nav a { padding: 8px 12px; border-radius: 6px; }
+.site-nav a:hover { background: rgba(200,135,26,0.06); }
+
+/* Main page layout */
+.site-main {
+    max-width: var(--max-content-width);
+    margin: 0 auto;
+    padding: 40px 15px;
+}
+
+.content-grid {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 30px;
+    align-items: start;
+}
+.content-grid .main-area { min-width: 0; }
+.content-grid .sidebar { background: var(--accent-color); padding: 20px; border-radius: 8px; }
+
+/* Footer */
+.site-footer {
+    background: var(--secondary-color);
+    color: var(--light-color);
+    padding: 40px 15px;
+}
+.site-footer .container { display: flex; gap: 30px; flex-wrap: wrap; justify-content: space-between; }
+.site-footer a { color: var(--light-color); }
+
+/* Spacing helpers */
+.page-section { padding: 60px 0; }
+.narrow { max-width: 900px; margin: 0 auto; }
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .content-grid { grid-template-columns: 1fr 300px; }
+}
+
+@media (max-width: 768px) {
+    .site-header .container { padding: 10px; }
+    .site-nav { display: none; }
+    .content-grid { grid-template-columns: 1fr; }
+    .site-footer .container { flex-direction: column; align-items: center; }
+    .site-main { padding: 28px 12px; }
+}
+
+/* Ensure hero/gallery images fill their containers */
+.hero-media img, .hero-media video, .gallery-item img, .gallery-item video, .room-image img, .about-image img, .member-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
 a {
     text-decoration: none;
     color: var(--primary-color);
@@ -139,6 +222,75 @@ a:hover {
     transition: var(--transition);
     font-size: 0.95rem;
     text-decoration: none;
+}
+
+/* Unified button base + accessible focus states */
+.btn, .btn-primary, .btn-secondary, .btn-whatsapp, .btn-whatsapp-direct {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+button:focus, a:focus, .btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(200,135,26,0.18);
+    transform: translateY(-1px);
+}
+
+/* Slightly larger, more tappable controls for slideshow */
+.slide-nav {
+    background: rgba(0,0,0,0.45);
+    color: #fff;
+    border: none;
+    width: 54px;
+    height: 54px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+}
+
+.slide-nav:hover { transform: scale(1.05); }
+
+/* Ensure slides cover the container */
+.hero .hero-media .hero-slideshow-images .slide,
+.hero .hero-media .hero-slideshow-videos .slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+/* Make slide indicators larger and more visible */
+.slide-indicators .indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.45);
+    display: inline-block;
+    margin: 0 6px;
+}
+
+.slide-indicators .indicator.active { background: var(--primary-color); }
+
+/* Floating WhatsApp: reduce pulse frequency and improve contrast on small screens */
+.floating-whatsapp-booking .float-btn, .floating-whatsapp-booking .float-label {
+    animation-duration: 4s;
+}
+
+@media (max-width: 480px) {
+    .floating-whatsapp-booking .float-btn { padding: 10px 14px; font-size: 0.9rem; }
+    .floating-whatsapp-booking { right: 12px; bottom: 12px; }
 }
 
 .btn-secondary:hover {
@@ -578,6 +730,53 @@ section h2::after {
 .hero .tiktok-embed-wrapper,
 .hero .youtube-embed-wrapper {
     width: 100%;
+}
+
+/* Social embeds section (responsive TikTok) */
+.social-embeds {
+    padding: 30px 0 40px;
+    background: transparent;
+}
+.social-embeds .social-embeds-inner { max-width: 920px; margin: 0 auto; }
+.social-embeds .tiktok-embed-wrapper { width: 100%; max-width: 780px; margin: 0 auto; }
+.responsive-tiktok .tiktok-embed,
+.responsive-tiktok blockquote.tiktok-embed {
+    width: 100% !important;
+    min-width: 0 !important;
+}
+.responsive-tiktok iframe {
+    width: 100% !important;
+    height: auto !important;
+}
+
+@media (max-width: 900px) {
+    .social-embeds .social-embeds-inner h2 { font-size: 1.1rem; }
+    .responsive-tiktok .tiktok-embed { min-width: 260px !important; }
+}
+
+/* Ensure the TikTok embed shows fully without internal scrolling by enforcing
+   an appropriate aspect ratio and providing fallbacks for older browsers. */
+.responsive-tiktok {
+    overflow: visible;
+}
+.responsive-tiktok .tiktok-embed,
+.responsive-tiktok blockquote.tiktok-embed,
+.responsive-tiktok iframe {
+    aspect-ratio: 9 / 16; /* vertical video */
+}
+
+/* Fallback min-heights to avoid unexpected internal scrollbars */
+.responsive-tiktok iframe {
+    min-height: 640px !important;
+    border: none;
+}
+
+@media (max-width: 900px) {
+    .responsive-tiktok iframe { min-height: 520px !important; }
+}
+
+@media (max-width: 480px) {
+    .responsive-tiktok iframe { min-height: 720px !important; }
 }
 
 .youtube-embed-wrapper .youtube-subscribe {
@@ -1406,16 +1605,52 @@ section h2::after {
     align-items: center;
 }
 
-.image-modal-content img {
-    max-width: 100%;
-    max-height: 80vh;
-    border-radius: 8px;
+.hero {
+    position: relative;
+    overflow: hidden;
 }
 
-.image-modal-content .btn-secondary {
-    margin: 15px 0;
-    align-self: center;
-    padding: 12px 25px;
+.hero .hero-media .hero-slideshow-images {
+    position: relative;
+    width: 55%;
+    /* Use viewport-aware sizing but keep room for header/navigation */
+    height: min(75vh, calc(100vh - 100px));
+}
+.hero .hero-media .hero-slideshow-videos {
+    position: relative;
+    width: 20%;
+    height: min(75vh, calc(100vh - 100px));
+}
+
+/* Force slides to fully fill their container */
+.hero .hero-media {
+    /* Ensure hero-media inherits the hero height so slides can be 100% */
+    height: inherit;
+}
+
+.hero .hero-media .hero-slideshow-images,
+.hero .hero-media .hero-slideshow-videos {
+    height: 100% !important;
+}
+
+.hero .hero-media .hero-slideshow-images .slide,
+.hero .hero-media .hero-slideshow-videos .slide {
+    width: 100% !important;
+    height: 100% !important;
+    top: 0;
+    left: 0;
+    background-size: cover !important;
+    background-position: center center !important;
+}
+
+/* If slides contain <img>, make sure it fills and crops */
+.hero .hero-slideshow-images .slide img,
+.hero .hero-slideshow-videos .slide img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: block;
+}
     font-weight: bold;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -2268,7 +2503,8 @@ footer {
 
 .install-logo {
     width: 80px;
-    height: 80px;
+        width: 100%;
+        height: min(55vh, calc(100vh - 140px));
     border-radius: 50%;
     object-fit: contain;
     border: 3px solid var(--primary-color);
@@ -4441,6 +4677,15 @@ footer {
     .page-hero {
         height: 250px;
     }
+
+    /* Ensure any <img> inside a slide fills and crops correctly */
+    .hero .hero-slideshow-images .slide img,
+    .hero .hero-slideshow-videos .slide img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
     
     .page-hero .hero-content h1 {
         font-size: 1.8rem;
@@ -5428,7 +5673,7 @@ footer {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-size: 0.92rem;
     line-height: 1.65;
-    color: #111;
+    color: var(--text-dark);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
     position: relative;
     white-space: pre-wrap;
@@ -5465,10 +5710,17 @@ footer {
     resize: vertical;
     min-height: 200px;
     background: #fff;
-    color: #111;
+    color: var(--text-dark);
     outline: none;
     transition: border-color 0.2s ease;
     box-sizing: border-box;
+}
+
+/* Ensure preview display elements use visible dark text (overrides any accidental overrides) */
+.whatsapp-message-preview .whatsapp-message-bubble,
+#whatsapp-message-display,
+#contact-message-display {
+    color: var(--text-dark) !important;
 }
 
 .whatsapp-message-edit:focus {
